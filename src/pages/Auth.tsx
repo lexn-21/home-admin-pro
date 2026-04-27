@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,9 +15,16 @@ const emailSchema = z.string().trim().email("Ungültige E-Mail").max(255);
 const passSchema = z.string().min(8, "Mindestens 8 Zeichen").max(72);
 const nameSchema = z.string().trim().min(1, "Name fehlt").max(80);
 
+const GoogleIcon = () => (
+  <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden>
+    <path fill="#EA4335" d="M12 11v3.6h5.1c-.2 1.4-1.6 4-5.1 4-3.1 0-5.6-2.5-5.6-5.6S8.9 7.4 12 7.4c1.7 0 2.9.7 3.6 1.4l2.5-2.4C16.5 4.9 14.4 4 12 4 7.6 4 4 7.6 4 12s3.6 8 8 8c4.6 0 7.7-3.2 7.7-7.8 0-.5-.1-.9-.1-1.2H12z"/>
+  </svg>
+);
+
 const Auth = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -27,6 +35,20 @@ const Auth = () => {
       if (session) navigate("/app", { replace: true });
     });
   }, [navigate]);
+
+  const handleGoogle = async () => {
+    setOauthLoading(true);
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: `${window.location.origin}/app`,
+    });
+    if (result.error) {
+      setOauthLoading(false);
+      toast.error("Google-Anmeldung fehlgeschlagen.");
+      return;
+    }
+    if (result.redirected) return;
+    navigate("/app", { replace: true });
+  };
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,7 +89,7 @@ const Auth = () => {
       return toast.error(error.message);
     }
     toast.success("Konto erstellt. Willkommen bei ImmoNIQ.");
-    navigate("/app", { replace: true });
+    navigate("/app/onboarding", { replace: true });
   };
 
   return (
@@ -82,6 +104,16 @@ const Auth = () => {
             <h1 className="text-2xl font-bold tracking-tight">Willkommen</h1>
             <p className="text-sm text-muted-foreground mt-1">Dein Vermieter-Cockpit wartet.</p>
           </div>
+
+          <Button onClick={handleGoogle} disabled={oauthLoading} variant="outline" className="w-full mb-4 gap-2">
+            <GoogleIcon /> {oauthLoading ? "Verbinde…" : "Mit Google fortfahren"}
+          </Button>
+
+          <div className="relative my-4">
+            <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
+            <div className="relative flex justify-center text-[11px] uppercase tracking-wider"><span className="bg-card px-2 text-muted-foreground">oder mit E-Mail</span></div>
+          </div>
+
           <Tabs defaultValue="signin">
             <TabsList className="grid grid-cols-2 w-full mb-6">
               <TabsTrigger value="signin">Anmelden</TabsTrigger>

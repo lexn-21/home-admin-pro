@@ -2,7 +2,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Building2, Users, Wallet, Receipt, Calculator, LogOut } from "lucide-react";
+import { LayoutDashboard, Building2, Users, Wallet, Receipt, Calculator, LogOut, Settings as SettingsIcon } from "lucide-react";
 
 const nav = [
   { to: "/app", label: "Übersicht", icon: LayoutDashboard, end: true },
@@ -11,6 +11,7 @@ const nav = [
   { to: "/app/payments", label: "Zahlungen", icon: Wallet },
   { to: "/app/expenses", label: "Belege", icon: Receipt },
   { to: "/app/tax", label: "Steuer-Brücke", icon: Calculator },
+  { to: "/app/settings", label: "Einstellungen", icon: SettingsIcon },
 ];
 
 const AppLayout = () => {
