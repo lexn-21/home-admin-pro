@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      advisor_links: {
+        Row: {
+          access_count: number
+          advisor_email: string | null
+          advisor_name: string
+          created_at: string
+          expires_at: string
+          id: string
+          last_accessed_at: string | null
+          revoked: boolean
+          token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_count?: number
+          advisor_email?: string | null
+          advisor_name: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          last_accessed_at?: string | null
+          revoked?: boolean
+          token?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_count?: number
+          advisor_email?: string | null
+          advisor_name?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          last_accessed_at?: string | null
+          revoked?: boolean
+          token?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       expenses: {
         Row: {
           amount: number
@@ -296,7 +338,9 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      advisor_get_data: { Args: { _token: string }; Returns: Json }
+      advisor_owner_for_token: { Args: { _token: string }; Returns: string }
+      advisor_touch_token: { Args: { _token: string }; Returns: string }
     }
     Enums: {
       expense_category:
