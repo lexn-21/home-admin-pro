@@ -40,11 +40,11 @@ const TaxBridge = () => {
   const yearExpenses = useMemo(() => expenses.filter(e => e.spent_on >= yStart && e.spent_on <= yEnd), [expenses, year]);
 
   const income = yearPayments.reduce((s, p) => s + Number(p.amount), 0);
-  const byCat = yearExpenses.reduce((acc: Record<string, number>, e) => {
+  const byCat: Record<string, number> = yearExpenses.reduce((acc: Record<string, number>, e) => {
     acc[e.category] = (acc[e.category] ?? 0) + Number(e.amount);
     return acc;
-  }, {});
-  const totalExpenses = Object.values(byCat).reduce((s, v) => s + v, 0);
+  }, {} as Record<string, number>);
+  const totalExpenses = Object.values(byCat).reduce<number>((s, v) => s + v, 0);
 
   // AfA: 2% (oder Objekt-Satz) auf 80% des Kaufpreises (Gebäudeanteil-Annahme)
   const afaTotal = properties.reduce((s, p) => {
@@ -128,7 +128,7 @@ const TaxBridge = () => {
             {Object.entries(byCat).map(([cat, amount]) => (
               <div key={cat} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                 <span className="text-sm">{CAT_LABEL[cat]}</span>
-                <span className="font-semibold">{eur(amount)}</span>
+                <span className="font-semibold">{eur(amount as number)}</span>
               </div>
             ))}
             <div className="flex items-center justify-between pt-3 mt-2 border-t-2 border-primary/30">
