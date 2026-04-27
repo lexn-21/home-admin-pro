@@ -1,0 +1,137 @@
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Plus, Users, Mail, Phone } from "lucide-react";
+import { toast } from "sonner";
+import { eur, date } from "@/lib/format";
+import { z } from "zod";
+
+const schema = z.object({
+  unit_id: z.string().uuid("Einheit wählen"),
+  full_name: z.string().trim().min(1).max(120),
+  email: z.string().trim().email().max(255).optional().or(z.literal("")),
+  phone: z.string().trim().max(40).optional().or(z.literal("")),
+  lease_start: z.string().optional().or(z.literal("")),
+  lease_end: z.string().optional().or(z.literal("")),
+  deposit: z.number().min(0).max(99999).optional(),
+});
+
+const Tenants = () => {
+  const [tenants, setTenants] = useState<any[]>([]);
+  const [units, setUnits] = useState<any[]>([]);
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({ unit_id: "", full_name: "", email: "", phone: "", lease_start: "", lease_end: "", deposit: "" });
+
+  useEffect(() => { document.title = "Mieter · ImmoNIQ"; load(); }, []);
+
+  const load = async () => {
+    const [t, u] = await Promise.all([
+      supabase.from("tenants").select("*, units(label, properties(name))").order("created_at", { ascending: false }),
+      supabase.from("units").select("id, label, properties(name)"),
+    ]);
+    setTenants(t.data ?? []);
+    setUnits(u.data ?? []);
+  };
+
+  const submit = async () => {
+    const parsed = schema.safeParse({
+      unit_id: form.unit_id,
+      full_name: form.full_name,
+      email: form.email,
+      phone: form.phone,
+      lease_start: form.lease_start,
+      lease_end: form.lease_end,
+      deposit: form.deposit ? Number(form.deposit) : undefined,
+    });
+    if (!parsed.success) return toast.error(parsed.error.issues[0].message);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const payload: any = { ...parsed.data, user_id: user.id };
+    if (!payload.email) delete payload.email;
+    if (!payload.phone) delete payload.phone;
+    if (!payload.lease_start) delete payload.lease_start;
+    if (!payload.lease_end) delete payload.lease_end;
+    const { error } = await supabase.from("tenants").insert(payload);
+    if (error) return toast.error(error.message);
+    toast.success("Mieter angelegt.");
+    setOpen(false);
+    setForm({ unit_id: "", full_name: "", email: "", phone: "", lease_start: "", lease_end: "", deposit: "" });
+    load();
+  };
+
+  return (
+    <div className="space-y-6">
+      <header className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Mieter</h1>
+          <p className="text-muted-foreground text-sm mt-1">Mietverhältnisse und Kontaktdaten.</p>
+        </div>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-gradient-gold text-primary-foreground shadow-gold" disabled={units.length === 0}>
+              <Plus className="h-4 w-4 mr-2" /> Mieter
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader><DialogTitle>Neuer Mieter</DialogTitle></DialogHeader>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="col-span-2">
+                <Label>Wohneinheit *</Label>
+                <Select value={form.unit_id} onValueChange={(v) => setForm({ ...form, unit_id: v })}>
+                  <SelectTrigger><SelectValue placeholder="Wählen…" /></SelectTrigger>
+                  <SelectContent>{units.map((u: any) => <SelectItem key={u.id} value={u.id}>{u.properties?.name} — {u.label}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div className="col-span-2"><Label>Name *</Label><Input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} /></div>
+              <div><Label>E-Mail</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
+              <div><Label>Telefon</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
+              <div><Label>Mietbeginn</Label><Input type="date" value={form.lease_start} onChange={(e) => setForm({ ...form, lease_start: e.target.value })} /></div>
+              <div><Label>Mietende</Label><Input type="date" value={form.lease_end} onChange={(e) => setForm({ ...form, lease_end: e.target.value })} /></div>
+              <div className="col-span-2"><Label>Kaution (€)</Label><Input type="number" step="0.01" value={form.deposit} onChange={(e) => setForm({ ...form, deposit: e.target.value })} /></div>
+            </div>
+            <DialogFooter><Button onClick={submit} className="bg-gradient-gold text-primary-foreground shadow-gold">Anlegen</Button></DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </header>
+
+      {units.length === 0 && (
+        <Card className="p-6 glass border-primary/30">
+          <p className="text-sm">Lege zuerst ein Objekt mit mindestens einer Einheit an, bevor du Mieter erfasst.</p>
+        </Card>
+      )}
+
+      {tenants.length === 0 ? (
+        <Card className="p-10 text-center glass">
+          <Users className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+          <p className="text-sm text-muted-foreground">Noch keine Mieter angelegt.</p>
+        </Card>
+      ) : (
+        <div className="grid md:grid-cols-2 gap-3">
+          {tenants.map(t => (
+            <Card key={t.id} className="p-5 glass">
+              <div className="flex items-start justify-between mb-2">
+                <div>
+                  <h3 className="font-bold">{t.full_name}</h3>
+                  <p className="text-xs text-muted-foreground">{t.units?.properties?.name} — {t.units?.label}</p>
+                </div>
+                {t.deposit && <span className="text-xs px-2 py-0.5 rounded-full bg-muted">Kaution {eur(t.deposit)}</span>}
+              </div>
+              <div className="space-y-1 text-xs text-muted-foreground mt-3">
+                {t.email && <p className="flex items-center gap-1.5"><Mail className="h-3 w-3" /> {t.email}</p>}
+                {t.phone && <p className="flex items-center gap-1.5"><Phone className="h-3 w-3" /> {t.phone}</p>}
+                <p>Vertrag: {date(t.lease_start)} – {t.lease_end ? date(t.lease_end) : "unbefristet"}</p>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Tenants;
