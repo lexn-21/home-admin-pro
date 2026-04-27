@@ -2,13 +2,14 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Building2, Users, Wallet, Receipt, Calculator, LogOut, Settings as SettingsIcon } from "lucide-react";
+import { LayoutDashboard, Building2, Users, Wallet, Receipt, Calculator, LogOut, Settings as SettingsIcon, AlertTriangle } from "lucide-react";
 
 const nav = [
   { to: "/app", label: "Übersicht", icon: LayoutDashboard, end: true },
   { to: "/app/properties", label: "Objekte", icon: Building2 },
   { to: "/app/tenants", label: "Mieter", icon: Users },
   { to: "/app/payments", label: "Zahlungen", icon: Wallet },
+  { to: "/app/dunning", label: "Mahnwesen", icon: AlertTriangle },
   { to: "/app/expenses", label: "Belege", icon: Receipt },
   { to: "/app/tax", label: "Steuer-Brücke", icon: Calculator },
   { to: "/app/settings", label: "Einstellungen", icon: SettingsIcon },
