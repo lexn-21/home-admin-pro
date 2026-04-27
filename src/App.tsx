@@ -13,6 +13,7 @@ import Tenants from "./pages/app/Tenants";
 import Payments from "./pages/app/Payments";
 import Expenses from "./pages/app/Expenses";
 import TaxBridge from "./pages/app/TaxBridge";
+import Dunning from "./pages/app/Dunning";
 import Settings from "./pages/app/Settings";
 import Onboarding from "./pages/app/Onboarding";
 import AppLayout from "./pages/app/AppLayout";
@@ -51,6 +52,7 @@ const App = () => (
             <Route path="tenants" element={<Tenants />} />
             <Route path="payments" element={<Payments />} />
             <Route path="expenses" element={<Expenses />} />
+            <Route path="dunning" element={<Dunning />} />
             <Route path="tax" element={<TaxBridge />} />
             <Route path="settings" element={<Settings />} />
           </Route>
