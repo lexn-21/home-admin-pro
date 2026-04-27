@@ -1,0 +1,178 @@
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Plus, Receipt, Paperclip, Info } from "lucide-react";
+import { toast } from "sonner";
+import { eur, date } from "@/lib/format";
+import { z } from "zod";
+
+const schema = z.object({
+  property_id: z.string().uuid().optional().or(z.literal("")),
+  spent_on: z.string().min(1),
+  amount: z.number().min(0.01).max(9999999),
+  vendor: z.string().trim().max(120).optional().or(z.literal("")),
+  description: z.string().trim().max(500).optional().or(z.literal("")),
+  category: z.enum(["immediate","depreciable","utilities_passthrough","financing","other"]),
+});
+
+const CAT_INFO: Record<string, { label: string; hint: string }> = {
+  immediate: { label: "Sofort abzugsfähig", hint: "Erhaltungsaufwand · § 9 EStG · voll im Jahr absetzbar" },
+  depreciable: { label: "AfA-fähig (Anschaffung/Herstellung)", hint: "Wird über AfA verteilt · § 7 EStG · Vorsicht 15%-Grenze §6(1)1a EStG" },
+  utilities_passthrough: { label: "NK-umlagefähig", hint: "Auf Mieter umlegbar · BetrKV" },
+  financing: { label: "Finanzierung (Zinsen)", hint: "Werbungskosten · sofort absetzbar" },
+  other: { label: "Sonstige", hint: "Manuell prüfen" },
+};
+
+const Expenses = () => {
+  const [items, setItems] = useState<any[]>([]);
+  const [props, setProps] = useState<any[]>([]);
+  const [open, setOpen] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [form, setForm] = useState({ property_id: "", spent_on: new Date().toISOString().slice(0, 10), amount: "", vendor: "", description: "", category: "immediate" });
+
+  useEffect(() => { document.title = "Belege · ImmoNIQ"; load(); }, []);
+
+  const load = async () => {
+    const [e, p] = await Promise.all([
+      supabase.from("expenses").select("*, properties(name)").order("spent_on", { ascending: false }),
+      supabase.from("properties").select("id, name"),
+    ]);
+    setItems(e.data ?? []);
+    setProps(p.data ?? []);
+  };
+
+  const submit = async () => {
+    const parsed = schema.safeParse({
+      property_id: form.property_id,
+      spent_on: form.spent_on,
+      amount: Number(form.amount),
+      vendor: form.vendor,
+      description: form.description,
+      category: form.category as any,
+    });
+    if (!parsed.success) return toast.error(parsed.error.issues[0].message);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    let receipt_path: string | undefined;
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) return toast.error("Datei zu groß (max 10 MB).");
+      const ext = file.name.split(".").pop();
+      const path = `${user.id}/${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("receipts").upload(path, file);
+      if (upErr) return toast.error("Upload fehlgeschlagen: " + upErr.message);
+      receipt_path = path;
+    }
+
+    const payload: any = { ...parsed.data, user_id: user.id, receipt_path };
+    if (!payload.property_id) delete payload.property_id;
+    if (!payload.vendor) delete payload.vendor;
+    if (!payload.description) delete payload.description;
+
+    const { error } = await supabase.from("expenses").insert(payload);
+    if (error) return toast.error(error.message);
+    toast.success("Beleg erfasst.");
+    setOpen(false);
+    setFile(null);
+    setForm({ property_id: "", spent_on: new Date().toISOString().slice(0, 10), amount: "", vendor: "", description: "", category: "immediate" });
+    load();
+  };
+
+  const total = items.reduce((s, e) => s + Number(e.amount), 0);
+
+  return (
+    <div className="space-y-6">
+      <header className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Belege</h1>
+          <p className="text-muted-foreground text-sm mt-1">Werbungskosten und Anschaffungen — verschlüsselt abgelegt.</p>
+        </div>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-gradient-gold text-primary-foreground shadow-gold"><Plus className="h-4 w-4 mr-2" /> Beleg</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-lg">
+            <DialogHeader><DialogTitle>Beleg erfassen</DialogTitle></DialogHeader>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="col-span-2"><Label>Objekt</Label>
+                <Select value={form.property_id} onValueChange={(v) => setForm({ ...form, property_id: v })}>
+                  <SelectTrigger><SelectValue placeholder="Optional zuordnen" /></SelectTrigger>
+                  <SelectContent>{props.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div><Label>Datum *</Label><Input type="date" value={form.spent_on} onChange={(e) => setForm({ ...form, spent_on: e.target.value })} /></div>
+              <div><Label>Betrag (€) *</Label><Input type="number" step="0.01" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} /></div>
+              <div className="col-span-2"><Label>Lieferant / Handwerker</Label><Input value={form.vendor} onChange={(e) => setForm({ ...form, vendor: e.target.value })} /></div>
+              <div className="col-span-2"><Label>Beschreibung</Label><Textarea rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
+              <div className="col-span-2"><Label>Kategorie *</Label>
+                <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>{Object.entries(CAT_INFO).map(([k, v]) => <SelectItem key={k} value={k}>{v.label}</SelectItem>)}</SelectContent>
+                </Select>
+                <p className="text-[11px] text-muted-foreground mt-1.5 flex items-start gap-1">
+                  <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />{CAT_INFO[form.category].hint}
+                </p>
+              </div>
+              <div className="col-span-2"><Label>Belegfoto / PDF</Label>
+                <Input type="file" accept="image/*,application/pdf" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+              </div>
+            </div>
+            <DialogFooter><Button onClick={submit} className="bg-gradient-gold text-primary-foreground shadow-gold">Erfassen</Button></DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </header>
+
+      <Card className="p-6 glass">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs text-muted-foreground">Summe aller erfassten Belege</p>
+            <p className="text-3xl font-bold mt-1 text-gradient-gold">{eur(total)}</p>
+          </div>
+          <Receipt className="h-8 w-8 text-primary" />
+        </div>
+      </Card>
+
+      {items.length === 0 ? (
+        <Card className="p-10 text-center glass"><p className="text-sm text-muted-foreground">Noch keine Belege.</p></Card>
+      ) : (
+        <Card className="glass overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/50 text-xs">
+              <tr>
+                <th className="text-left p-3">Datum</th>
+                <th className="text-left p-3">Lieferant / Beschreibung</th>
+                <th className="text-left p-3">Kategorie</th>
+                <th className="text-left p-3">Objekt</th>
+                <th className="text-right p-3">Betrag</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map(e => (
+                <tr key={e.id} className="border-t border-border">
+                  <td className="p-3">{date(e.spent_on)}</td>
+                  <td className="p-3">
+                    <div className="flex items-center gap-1.5">
+                      {e.receipt_path && <Paperclip className="h-3 w-3 text-primary" />}
+                      <span>{e.vendor || e.description || "—"}</span>
+                    </div>
+                  </td>
+                  <td className="p-3"><span className="text-xs px-2 py-0.5 rounded-full bg-muted">{CAT_INFO[e.category].label}</span></td>
+                  <td className="p-3 text-muted-foreground">{e.properties?.name ?? "—"}</td>
+                  <td className="p-3 text-right font-semibold">−{eur(e.amount)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Card>
+      )}
+    </div>
+  );
+};
+
+export default Expenses;
