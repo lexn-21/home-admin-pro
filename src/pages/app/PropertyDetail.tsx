@@ -49,7 +49,8 @@ const PropertyDetail = () => {
     if (!parsed.success) return toast.error(parsed.error.issues[0].message);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    const { error } = await supabase.from("units").insert({ ...parsed.data, property_id: id as string, user_id: user.id });
+    const insertPayload = { ...parsed.data, property_id: id as string, user_id: user.id };
+    const { error } = await supabase.from("units").insert(insertPayload as any);
     if (error) return toast.error(error.message);
     toast.success("Einheit angelegt.");
     setOpen(false);
