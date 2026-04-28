@@ -4,22 +4,69 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { eur, pct } from "@/lib/format";
-import { ArrowUpRight, Building2, Wallet, Receipt, TrendingUp, Plus } from "lucide-react";
+import { eur, pct, num } from "@/lib/format";
+import { Stagger, Item, Tappable } from "@/components/motion/Primitives";
+import { motion } from "framer-motion";
+import {
+  ArrowUpRight, Building2, Wallet, Receipt, TrendingUp, Plus,
+  Lock, Wrench, CalendarClock, Scale, ShieldCheck, Sparkles,
+} from "lucide-react";
 
-const KPI = ({ label, value, hint, icon: Icon }: { label: string; value: string; hint?: string; icon: React.ElementType }) => (
-  <Card className="p-6 glass">
-    <div className="flex items-start justify-between">
-      <div>
-        <p className="text-xs text-muted-foreground font-medium">{label}</p>
-        <p className="text-3xl font-bold mt-1 tracking-tight">{value}</p>
-        {hint && <p className="text-xs text-muted-foreground mt-1">{hint}</p>}
+const KPI = ({ label, value, hint, trend, icon: Icon, tone = "default" }: {
+  label: string; value: string; hint?: string; trend?: "up" | "down" | null;
+  icon: React.ElementType; tone?: "default" | "success" | "warning";
+}) => (
+  <Item variant="scale">
+    <Card className="p-5 glass hover:shadow-elevated transition-shadow h-full">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">{label}</p>
+          <p className="text-2xl lg:text-3xl font-bold mt-1.5 tracking-tight tabular truncate">{value}</p>
+          {hint && (
+            <p className={`text-xs mt-1 flex items-center gap-1 ${
+              tone === "success" ? "text-success" : tone === "warning" ? "text-warning" : "text-muted-foreground"
+            }`}>
+              {trend === "up" && <TrendingUp className="h-3 w-3" />}
+              {hint}
+            </p>
+          )}
+        </div>
+        <div className={`h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+          tone === "success" ? "bg-success/10" : tone === "warning" ? "bg-warning/10" : "bg-primary/10"
+        }`}>
+          <Icon className={`h-[18px] w-[18px] ${
+            tone === "success" ? "text-success" : tone === "warning" ? "text-warning" : "text-primary"
+          }`} />
+        </div>
       </div>
-      <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
-        <Icon className="h-4 w-4 text-primary" />
-      </div>
-    </div>
-  </Card>
+    </Card>
+  </Item>
+);
+
+const QuickAction = ({ to, icon: Icon, label, desc, badge }: {
+  to: string; icon: React.ElementType; label: string; desc: string; badge?: string;
+}) => (
+  <Item>
+    <Tappable>
+      <Link to={to}>
+        <Card className="p-5 glass h-full group cursor-pointer interactive-card">
+          <div className="flex items-start justify-between mb-3">
+            <div className="h-10 w-10 rounded-xl bg-gradient-gold-soft border border-primary/15 flex items-center justify-center">
+              <Icon className="h-[18px] w-[18px] text-primary" />
+            </div>
+            {badge && (
+              <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary tracking-wider uppercase">
+                {badge}
+              </span>
+            )}
+          </div>
+          <p className="font-semibold text-sm">{label}</p>
+          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{desc}</p>
+          <ArrowUpRight className="h-4 w-4 text-muted-foreground mt-3 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+        </Card>
+      </Link>
+    </Tappable>
+  </Item>
 );
 
 const Dashboard = () => {
@@ -62,99 +109,193 @@ const Dashboard = () => {
   const monthlyTarget = units.reduce((s, u) => s + Number(u.rent_cold ?? 0) + Number(u.utilities ?? 0), 0);
 
   const isEmpty = properties.length === 0;
+  const greeting = (() => {
+    const h = new Date().getHours();
+    if (h < 11) return "Guten Morgen";
+    if (h < 18) return "Hallo";
+    return "Guten Abend";
+  })();
 
   return (
-    <div className="space-y-8">
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-sm text-muted-foreground">Hallo {name || "👋"}</p>
-          <h1 className="text-3xl font-bold tracking-tight">Deine Übersicht</h1>
-        </div>
-        <Button asChild className="bg-gradient-gold text-primary-foreground hover:opacity-90 shadow-gold">
-          <Link to="/app/properties"><Plus className="h-4 w-4 mr-2" /> Objekt hinzufügen</Link>
-        </Button>
-      </header>
+    <Stagger className="space-y-8">
+      <Item>
+        <header className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-sm text-muted-foreground font-medium">
+              {greeting}{name ? `, ${name.split(" ")[0]}` : ""} 👋
+            </p>
+            <h1 className="text-3xl lg:text-4xl font-bold tracking-tight mt-1">
+              Deine <span className="text-gradient-gold">Übersicht</span>
+            </h1>
+          </div>
+          <Button asChild className="bg-gradient-gold text-primary-foreground hover:opacity-90 shadow-gold h-10">
+            <Link to="/app/properties"><Plus className="h-4 w-4 mr-2" /> Objekt hinzufügen</Link>
+          </Button>
+        </header>
+      </Item>
 
       {isEmpty ? (
-        <Card className="p-12 text-center glass">
-          <div className="h-16 w-16 rounded-2xl bg-gradient-gold mx-auto mb-4 flex items-center justify-center shadow-gold">
-            <Building2 className="h-8 w-8 text-primary-foreground" />
-          </div>
-          <h2 className="text-2xl font-bold mb-2">Willkommen bei ImmoNIQ</h2>
-          <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-            Lege dein erstes Objekt an. Danach legst du Wohneinheiten und Mieter an —
-            und siehst Cashflow & Vermietungsquote in Echtzeit.
-          </p>
-          <Button asChild size="lg" className="bg-gradient-gold text-primary-foreground hover:opacity-90 shadow-gold">
-            <Link to="/app/properties">Erstes Objekt anlegen</Link>
-          </Button>
-        </Card>
-      ) : (
-        <>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <KPI label="Mieteinnahmen YTD" value={eur(ytdIncome)} hint={`${payments.filter(p => p.paid_on >= yearStart).length} Buchungen`} icon={Wallet} />
-            <KPI label="Ausgaben YTD" value={eur(ytdExpense)} hint={`${expenses.filter(e => e.spent_on >= yearStart).length} Belege`} icon={Receipt} />
-            <KPI label="Cashflow YTD" value={eur(cashflow)} hint={cashflow >= 0 ? "Positiv" : "Negativ"} icon={TrendingUp} />
-            <KPI label="Vermietungsquote" value={pct(occRate, 0)} hint={`${occupied} / ${units.length} Einheiten`} icon={Building2} />
-          </div>
-
-          <Card className="p-6 glass">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="font-bold text-lg">Sollmiete pro Monat</h2>
-                <p className="text-xs text-muted-foreground">Summe Kaltmiete + Nebenkosten aller Einheiten</p>
+        <Item variant="scale">
+          <Card className="p-8 lg:p-12 text-center glass relative overflow-hidden">
+            <motion.div
+              className="absolute -top-24 -right-24 w-64 h-64 rounded-full bg-primary/20 blur-3xl"
+              animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
+              transition={{ duration: 4, repeat: Infinity }}
+            />
+            <div className="relative">
+              <div className="h-16 w-16 rounded-2xl bg-gradient-gold mx-auto mb-5 flex items-center justify-center shadow-gold">
+                <Building2 className="h-8 w-8 text-primary-foreground" />
               </div>
-              <p className="text-2xl font-bold text-gradient-gold">{eur(monthlyTarget)}</p>
+              <h2 className="text-2xl lg:text-3xl font-bold mb-3">Willkommen bei ImmoNIQ</h2>
+              <p className="text-muted-foreground mb-7 max-w-md mx-auto leading-relaxed">
+                Leg dein erstes Objekt an — danach Wohneinheiten und Mieter. Du siehst
+                Cashflow & Vermietungsquote in Echtzeit.
+              </p>
+              <Button asChild size="lg" className="bg-gradient-gold text-primary-foreground hover:opacity-90 shadow-gold h-12 px-8">
+                <Link to="/app/properties"><Sparkles className="h-4 w-4 mr-2" />Erstes Objekt anlegen</Link>
+              </Button>
             </div>
           </Card>
+        </Item>
+      ) : (
+        <>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+            <KPI
+              label="Mieteinnahmen YTD"
+              value={eur(ytdIncome)}
+              hint={`${num(payments.filter(p => p.paid_on >= yearStart).length)} Buchungen`}
+              trend="up" tone="success" icon={Wallet}
+            />
+            <KPI
+              label="Ausgaben YTD"
+              value={eur(ytdExpense)}
+              hint={`${num(expenses.filter(e => e.spent_on >= yearStart).length)} Belege`}
+              icon={Receipt}
+            />
+            <KPI
+              label="Cashflow YTD"
+              value={eur(cashflow)}
+              hint={cashflow >= 0 ? "Positiv" : "Negativ"}
+              tone={cashflow >= 0 ? "success" : "warning"}
+              icon={TrendingUp}
+            />
+            <KPI
+              label="Vermietungsquote"
+              value={pct(occRate, 0)}
+              hint={`${num(occupied)} / ${num(units.length)} Einheiten`}
+              icon={Building2}
+            />
+          </div>
 
-          <div className="grid lg:grid-cols-2 gap-4">
+          <Item>
+            <Card className="p-6 glass relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-gold-soft pointer-events-none" />
+              <div className="relative flex items-center justify-between gap-4 flex-wrap">
+                <div>
+                  <h2 className="font-bold text-lg">Sollmiete pro Monat</h2>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Kaltmiete + Nebenkosten über alle {num(units.length)} Einheiten
+                  </p>
+                </div>
+                <p className="text-3xl font-bold text-gradient-gold tabular">{eur(monthlyTarget)}</p>
+              </div>
+            </Card>
+          </Item>
+        </>
+      )}
+
+      {/* Schnellaktionen */}
+      <div>
+        <Item>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold">Werkzeuge</h2>
+            <p className="text-xs text-muted-foreground">Alles, was du brauchst</p>
+          </div>
+        </Item>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <QuickAction to="/app/vault" icon={Lock} badge="Neu"
+            label="Dokumenten-Tresor"
+            desc="Verschlüsselt. Nur du siehst Inhalte." />
+          <QuickAction to="/app/deadlines" icon={CalendarClock}
+            label="Fristen"
+            desc="NK-Abrechnung, Mieterhöhung, §147 AO." />
+          <QuickAction to="/app/marketplace" icon={Wrench}
+            label="Handwerker finden"
+            desc="Geprüfte Profis in deiner Region." />
+          <QuickAction to="/app/law" icon={Scale}
+            label="Rechts-Ecke"
+            desc="§ BGB, § EStG — original verlinkt." />
+        </div>
+      </div>
+
+      {!isEmpty && (
+        <div className="grid lg:grid-cols-2 gap-4">
+          <Item>
             <Card className="p-6 glass">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-bold">Letzte Zahlungen</h2>
-                <Link to="/app/payments" className="text-xs text-primary inline-flex items-center gap-1">Alle <ArrowUpRight className="h-3 w-3" /></Link>
+                <Link to="/app/payments" className="text-xs text-primary inline-flex items-center gap-1 hover:gap-2 transition-all">
+                  Alle <ArrowUpRight className="h-3 w-3" />
+                </Link>
               </div>
               {payments.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-6">Noch keine Zahlungen erfasst.</p>
               ) : (
-                <ul className="divide-y divide-border">
+                <ul className="divide-y divide-border/60">
                   {payments.slice(0, 5).map(p => (
-                    <li key={p.id} className="py-2.5 flex items-center justify-between text-sm">
+                    <li key={p.id} className="py-3 flex items-center justify-between text-sm">
                       <div>
                         <p className="font-medium">{new Date(p.paid_on).toLocaleDateString("de-DE")}</p>
                         <p className="text-xs text-muted-foreground capitalize">{p.kind.replace("_", " ")}</p>
                       </div>
-                      <p className="font-semibold text-success">+{eur(p.amount)}</p>
+                      <p className="font-semibold text-success tabular">+{eur(p.amount)}</p>
                     </li>
                   ))}
                 </ul>
               )}
             </Card>
+          </Item>
+          <Item>
             <Card className="p-6 glass">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-bold">Letzte Belege</h2>
-                <Link to="/app/expenses" className="text-xs text-primary inline-flex items-center gap-1">Alle <ArrowUpRight className="h-3 w-3" /></Link>
+                <Link to="/app/expenses" className="text-xs text-primary inline-flex items-center gap-1 hover:gap-2 transition-all">
+                  Alle <ArrowUpRight className="h-3 w-3" />
+                </Link>
               </div>
               {expenses.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-6">Noch keine Belege erfasst.</p>
               ) : (
-                <ul className="divide-y divide-border">
+                <ul className="divide-y divide-border/60">
                   {expenses.slice(0, 5).map(e => (
-                    <li key={e.id} className="py-2.5 flex items-center justify-between text-sm">
-                      <div>
+                    <li key={e.id} className="py-3 flex items-center justify-between text-sm">
+                      <div className="min-w-0 pr-2">
                         <p className="font-medium truncate">{e.vendor || e.description || "Beleg"}</p>
                         <p className="text-xs text-muted-foreground">{new Date(e.spent_on).toLocaleDateString("de-DE")}</p>
                       </div>
-                      <p className="font-semibold">−{eur(e.amount)}</p>
+                      <p className="font-semibold tabular">−{eur(e.amount)}</p>
                     </li>
                   ))}
                 </ul>
               )}
             </Card>
-          </div>
-        </>
+          </Item>
+        </div>
       )}
-    </div>
+
+      {/* Trust bar */}
+      <Item>
+        <Card className="p-5 glass">
+          <div className="flex items-center gap-3 flex-wrap">
+            <ShieldCheck className="h-5 w-5 text-primary flex-shrink-0" />
+            <div className="text-xs text-muted-foreground flex-1 min-w-[200px]">
+              Server in Frankfurt · DSGVO · AES-256-Verschlüsselung at-rest · Audit-Log aktiv
+            </div>
+            <Link to="/app/settings" className="text-xs text-primary font-medium">Sicherheits-Status →</Link>
+          </div>
+        </Card>
+      </Item>
+    </Stagger>
   );
 };
 
