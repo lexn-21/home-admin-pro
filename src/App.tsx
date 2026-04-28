@@ -17,6 +17,10 @@ import Dunning from "./pages/app/Dunning";
 import Settings from "./pages/app/Settings";
 import Onboarding from "./pages/app/Onboarding";
 import Advisor from "./pages/app/Advisor";
+import Vault from "./pages/app/Vault";
+import Marketplace from "./pages/app/Marketplace";
+import Deadlines from "./pages/app/Deadlines";
+import LawCorner from "./pages/app/LawCorner";
 import AdvisorView from "./pages/AdvisorView";
 import AppLayout from "./pages/app/AppLayout";
 import NotFound from "./pages/NotFound";
@@ -58,6 +62,10 @@ const App = () => (
             <Route path="dunning" element={<Dunning />} />
             <Route path="tax" element={<TaxBridge />} />
             <Route path="advisor" element={<Advisor />} />
+            <Route path="vault" element={<Vault />} />
+            <Route path="marketplace" element={<Marketplace />} />
+            <Route path="deadlines" element={<Deadlines />} />
+            <Route path="law" element={<LawCorner />} />
             <Route path="settings" element={<Settings />} />
           </Route>
           <Route path="*" element={<NotFound />} />
