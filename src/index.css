@@ -1,24 +1,23 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ImmoNIQ Design System — Apple-iOS Aesthetic, Black + Gold #d4af6a */
+/* ImmoNIQ Design System — "Obsidian & Gold" · Apple-iOS + Trade Republic Präzision */
 @layer base {
   :root {
-    /* Light surfaces */
     --background: 40 30% 98%;
     --foreground: 0 0% 8%;
 
     --card: 0 0% 100%;
     --card-foreground: 0 0% 8%;
+    --card-elevated: 40 30% 99%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 8%;
 
-    /* Gold = brand */
-    --primary: 38 51% 62%;
+    --primary: 38 51% 52%;
     --primary-foreground: 0 0% 8%;
     --primary-glow: 42 70% 72%;
 
@@ -37,11 +36,17 @@
     --success: 142 60% 40%;
     --success-foreground: 0 0% 100%;
 
+    --warning: 32 95% 50%;
+    --warning-foreground: 0 0% 8%;
+
+    --info: 210 80% 55%;
+    --info-foreground: 0 0% 100%;
+
     --border: 30 8% 88%;
     --input: 30 8% 90%;
     --ring: 38 51% 62%;
 
-    --radius: 1rem;
+    --radius: 1.25rem;
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 0 0% 12%;
@@ -52,48 +57,51 @@
     --sidebar-border: 30 8% 88%;
     --sidebar-ring: 38 51% 62%;
 
-    /* Brand gradients & effects */
-    --gradient-gold: linear-gradient(135deg, hsl(38 60% 70%), hsl(38 51% 52%));
-    --gradient-dark: linear-gradient(180deg, hsl(0 0% 6%) 0%, hsl(0 0% 10%) 100%);
+    --gradient-gold: linear-gradient(135deg, hsl(42 70% 72%), hsl(38 51% 48%));
+    --gradient-gold-soft: linear-gradient(135deg, hsl(42 70% 72% / 0.15), hsl(38 51% 48% / 0.05));
+    --gradient-dark: linear-gradient(180deg, hsl(0 0% 4%) 0%, hsl(0 0% 9%) 100%);
     --gradient-hero: radial-gradient(ellipse 80% 60% at 50% 0%, hsl(38 51% 62% / 0.18), transparent 70%);
-    --shadow-gold: 0 10px 40px -12px hsl(38 51% 62% / 0.4);
+    --gradient-vault: linear-gradient(135deg, hsl(220 40% 12%), hsl(220 30% 6%));
+    --gradient-success: linear-gradient(135deg, hsl(142 60% 50%), hsl(142 60% 35%));
+
+    --shadow-gold: 0 10px 40px -12px hsl(38 51% 62% / 0.45);
     --shadow-soft: 0 1px 3px hsl(0 0% 0% / 0.04), 0 8px 24px -8px hsl(0 0% 0% / 0.08);
     --shadow-glass: 0 8px 32px hsl(0 0% 0% / 0.12);
+    --shadow-elevated: 0 1px 2px hsl(0 0% 0% / 0.04), 0 4px 12px -2px hsl(0 0% 0% / 0.06), 0 24px 48px -12px hsl(0 0% 0% / 0.12);
+    --shadow-vault: 0 20px 80px -20px hsl(220 60% 20% / 0.5);
+
+    --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dark {
     --background: 0 0% 5%;
     --foreground: 40 20% 96%;
-
     --card: 0 0% 8%;
     --card-foreground: 40 20% 96%;
-
+    --card-elevated: 0 0% 10%;
     --popover: 0 0% 8%;
     --popover-foreground: 40 20% 96%;
-
     --primary: 38 55% 65%;
     --primary-foreground: 0 0% 6%;
     --primary-glow: 42 70% 75%;
-
     --secondary: 0 0% 12%;
     --secondary-foreground: 40 20% 96%;
-
     --muted: 0 0% 12%;
     --muted-foreground: 40 8% 65%;
-
     --accent: 38 55% 65%;
     --accent-foreground: 0 0% 6%;
-
     --destructive: 0 65% 55%;
     --destructive-foreground: 0 0% 100%;
-
     --success: 142 55% 50%;
     --success-foreground: 0 0% 6%;
-
+    --warning: 32 95% 55%;
+    --warning-foreground: 0 0% 6%;
+    --info: 210 80% 60%;
+    --info-foreground: 0 0% 6%;
     --border: 0 0% 16%;
     --input: 0 0% 14%;
     --ring: 38 55% 65%;
-
     --sidebar-background: 0 0% 6%;
     --sidebar-foreground: 40 15% 88%;
     --sidebar-primary: 38 55% 65%;
@@ -107,22 +115,28 @@
 
 @layer base {
   * { @apply border-border; }
-  html { font-feature-settings: "cv02","cv03","cv04","cv11"; }
+  html { font-feature-settings: "cv02","cv03","cv04","cv11","ss01","ss03"; }
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
     font-synthesis: none;
     text-rendering: optimizeLegibility;
+    font-feature-settings: "tnum" 1, "cv11" 1;
   }
   h1, h2, h3, h4 {
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
     font-weight: 700;
   }
+  /* Tabular numerals for financial data */
+  .tabular { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+  /* Hide scrollbar for mobile nav */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 }
 
 @layer components {
   .glass {
-    background: hsl(var(--card) / 0.6);
+    background: hsl(var(--card) / 0.7);
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
     border: 1px solid hsl(var(--border) / 0.6);
@@ -133,6 +147,11 @@
     -webkit-backdrop-filter: blur(24px) saturate(180%);
     border: 1px solid hsl(38 51% 62% / 0.15);
   }
+  .vault-surface {
+    background: var(--gradient-vault);
+    border: 1px solid hsl(220 40% 20% / 0.5);
+    box-shadow: var(--shadow-vault);
+  }
   .text-gradient-gold {
     background: var(--gradient-gold);
     -webkit-background-clip: text;
@@ -141,4 +160,35 @@
     color: transparent;
   }
   .bg-hero-glow { background: var(--gradient-hero); }
+
+  /* Trade-Republic-style "press" effect on interactive cards */
+  .interactive-card {
+    @apply transition-all duration-300 cursor-pointer;
+    transition-timing-function: var(--ease-spring);
+  }
+  .interactive-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-elevated);
+  }
+  .interactive-card:active {
+    transform: translateY(0px) scale(0.995);
+    transition-duration: 100ms;
+  }
+
+  /* Subtle shimmer loader */
+  .shimmer {
+    background: linear-gradient(90deg, hsl(var(--muted)) 0%, hsl(var(--muted) / 0.6) 50%, hsl(var(--muted)) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s ease-in-out infinite;
+  }
+
+  /* Vault lock breathing */
+  .vault-lock {
+    animation: vault-breath 4s ease-in-out infinite;
+  }
+}
+
+@keyframes vault-breath {
+  0%, 100% { filter: drop-shadow(0 0 8px hsl(38 51% 62% / 0.4)); }
+  50% { filter: drop-shadow(0 0 20px hsl(38 51% 62% / 0.7)); }
 }
