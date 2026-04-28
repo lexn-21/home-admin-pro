@@ -85,7 +85,7 @@ const AppLayout = () => {
                     to={n.to}
                     end={n.end}
                     className={({ isActive }) =>
-                      `group flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
+                      `group relative flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
                         isActive
                           ? "bg-primary/10 text-primary shadow-sm"
                           : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
