@@ -19,7 +19,16 @@ const groups: NavGroup[] = [
     title: "Übersicht",
     items: [
       { to: "/app", label: "Dashboard", icon: LayoutDashboard, end: true },
-      { to: "/app/deadlines", label: "Fristen", icon: CalendarClock, badge: "neu" },
+      { to: "/app/deadlines", label: "Fristen", icon: CalendarClock },
+      { to: "/app/tasks", label: "Aufgaben", icon: Clock },
+    ],
+  },
+  {
+    title: "Markt",
+    items: [
+      { to: "/app/listings", label: "Meine Inserate", icon: Megaphone, badge: "live" },
+      { to: "/app/applications", label: "Bewerbungen", icon: Inbox },
+      { to: "/app/profile-seeker", label: "Mieter-Profil", icon: UserCircle2 },
     ],
   },
   {
@@ -30,14 +39,8 @@ const groups: NavGroup[] = [
       { to: "/app/payments", label: "Zahlungen", icon: Wallet },
       { to: "/app/dunning", label: "Mahnwesen", icon: AlertTriangle },
       { to: "/app/expenses", label: "Belege", icon: Receipt },
-    ],
-  },
-  {
-    title: "Markt",
-    items: [
-      { to: "/app/listings", label: "Inserate", icon: Megaphone, badge: "USP" },
-      { to: "/app/profile-seeker", label: "Bewerber-Profil", icon: UserCircle2 },
-      { to: "/app/applications", label: "Bewerbungen", icon: Inbox },
+      { to: "/app/vault", label: "Tresor", icon: Lock, badge: "Zero-Knowledge" },
+      { to: "/app/templates", label: "Vorlagen", icon: FileText },
     ],
   },
   {
@@ -48,17 +51,9 @@ const groups: NavGroup[] = [
     ],
   },
   {
-    title: "Verwaltung",
-    items: [
-      { to: "/app/tasks", label: "Aufgaben", icon: Clock },
-      { to: "/app/vault", label: "Tresor", icon: Lock, badge: "Zero-Knowledge" },
-      { to: "/app/templates", label: "Vorlagen", icon: FileText },
-    ],
-  },
-  {
     title: "Finanzen & Steuer",
     items: [
-      { to: "/app/calculator", label: "Rechner", icon: Calculator, badge: "neu" },
+      { to: "/app/calculator", label: "Rechner", icon: Calculator },
       { to: "/app/tax", label: "Steuer-Brücke", icon: Calculator },
       { to: "/app/advisor", label: "Steuerberater", icon: ShieldCheck },
     ],
@@ -67,7 +62,7 @@ const groups: NavGroup[] = [
     title: "Werkzeuge",
     items: [
       { to: "/app/bookings", label: "Aufträge", icon: Briefcase },
-      { to: "/app/marketplace", label: "Marktplatz", icon: Wrench },
+      { to: "/app/marketplace", label: "Handwerker", icon: Wrench },
       { to: "/app/law", label: "Rechts-Ecke", icon: Scale },
     ],
   },

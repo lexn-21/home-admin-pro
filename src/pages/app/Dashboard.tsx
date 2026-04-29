@@ -78,19 +78,25 @@ const Dashboard = () => {
   const [tenants, setTenants] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
   const [expenses, setExpenses] = useState<any[]>([]);
+  const [listings, setListings] = useState<any[]>([]);
+  const [appsIn, setAppsIn] = useState<number>(0);
+  const [appsOut, setAppsOut] = useState<number>(0);
 
   useEffect(() => { document.title = "Übersicht · ImmoNIQ"; }, []);
 
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [p, u, t, pay, ex, prof] = await Promise.all([
+      const [p, u, t, pay, ex, prof, li, ai, ao] = await Promise.all([
         supabase.from("properties").select("*"),
         supabase.from("units").select("*"),
         supabase.from("tenants").select("*"),
         supabase.from("payments").select("*").order("paid_on", { ascending: false }).limit(50),
         supabase.from("expenses").select("*").order("spent_on", { ascending: false }).limit(50),
         supabase.from("profiles").select("display_name").eq("user_id", user.id).maybeSingle(),
+        supabase.from("listings").select("id,status,views_count,applications_count").eq("user_id", user.id),
+        supabase.from("applications").select("id", { count: "exact", head: true }).eq("owner_user_id", user.id),
+        supabase.from("applications").select("id", { count: "exact", head: true }).eq("seeker_user_id", user.id),
       ]);
       setProperties(p.data ?? []);
       setUnits(u.data ?? []);
@@ -98,6 +104,9 @@ const Dashboard = () => {
       setPayments(pay.data ?? []);
       setExpenses(ex.data ?? []);
       setName(prof.data?.display_name ?? "");
+      setListings(li.data ?? []);
+      setAppsIn(ai.count ?? 0);
+      setAppsOut(ao.count ?? 0);
     })();
   }, [user]);
 
@@ -203,6 +212,34 @@ const Dashboard = () => {
             </Card>
           </Item>
         </>
+      )}
+
+      {/* Markt-Stats Streifen */}
+      {(listings.length > 0 || appsIn > 0 || appsOut > 0) && (
+        <Item>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <Card className="p-4 glass">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Aktive Inserate</p>
+              <p className="text-2xl font-bold tabular mt-1">{listings.filter(l => l.status === "published").length}</p>
+              <Link to="/app/listings" className="text-xs text-primary mt-1 inline-flex items-center gap-1">Verwalten →</Link>
+            </Card>
+            <Card className="p-4 glass">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Profil-Aufrufe</p>
+              <p className="text-2xl font-bold tabular mt-1">{listings.reduce((s, l) => s + Number(l.views_count ?? 0), 0)}</p>
+              <p className="text-xs text-muted-foreground mt-1">Letzte 30 Tage</p>
+            </Card>
+            <Card className="p-4 glass border-primary/30">
+              <p className="text-[10px] uppercase tracking-wider text-primary font-bold">Bewerbungen offen</p>
+              <p className="text-2xl font-bold tabular mt-1">{appsIn}</p>
+              <Link to="/app/applications" className="text-xs text-primary mt-1 inline-flex items-center gap-1">Sichten →</Link>
+            </Card>
+            <Card className="p-4 glass">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Eigene Bewerbungen</p>
+              <p className="text-2xl font-bold tabular mt-1">{appsOut}</p>
+              <Link to="/app/applications" className="text-xs text-primary mt-1 inline-flex items-center gap-1">Status →</Link>
+            </Card>
+          </div>
+        </Item>
       )}
 
       {/* Markt-CTA */}
