@@ -155,7 +155,33 @@ const Expenses = () => {
         </div>
       </Card>
 
-      {items.length === 0 ? (
+      {warnings.length > 0 && (
+        <Card className="p-5 glass border-destructive/40 bg-destructive/5">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+            <div className="text-sm space-y-2 flex-1">
+              <p className="font-semibold text-destructive">Achtung: Anschaffungsnahe Herstellungskosten möglich</p>
+              <p className="text-muted-foreground">
+                Folgende Objekte überschreiten in den ersten 3 Jahren nach Kauf die 15 %-Grenze
+                der Gebäude-AK gem. <strong className="text-foreground">§ 6 Abs. 1 Nr. 1a EStG</strong>.
+                Diese Kosten müssen aktiviert (über AfA verteilt) statt sofort abgezogen werden.
+                Bitte mit Steuerberater klären.
+              </p>
+              <ul className="space-y-1 mt-2">
+                {warnings.map((w, i) => (
+                  <li key={i} className="flex justify-between bg-background/40 rounded-lg px-3 py-2">
+                    <span className="font-medium">{w.propertyName}</span>
+                    <span className="text-muted-foreground">
+                      <span className="text-destructive font-semibold">{eur(w.spent)}</span> / Grenze {eur(w.limit)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </Card>
+      )}
+
         <Card className="p-10 text-center glass"><p className="text-sm text-muted-foreground">Noch keine Belege.</p></Card>
       ) : (
         <Card className="glass overflow-hidden">
