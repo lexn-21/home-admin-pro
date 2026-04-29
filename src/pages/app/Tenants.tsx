@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Users, Mail, Phone } from "lucide-react";
+import { Plus, Users, Mail, Phone, Link2 } from "lucide-react";
 import { toast } from "sonner";
 import { eur, date } from "@/lib/format";
 import { z } from "zod";
@@ -126,6 +126,25 @@ const Tenants = () => {
                 {t.phone && <p className="flex items-center gap-1.5"><Phone className="h-3 w-3" /> {t.phone}</p>}
                 <p>Vertrag: {date(t.lease_start)} – {t.lease_end ? date(t.lease_end) : "unbefristet"}</p>
               </div>
+              <Button variant="outline" size="sm" className="w-full mt-3" onClick={async () => {
+                const { data: auth } = await supabase.auth.getUser();
+                if (!auth.user) return;
+                const existing = await supabase.from("tenant_portal_links")
+                  .select("token").eq("tenant_id", t.id).eq("revoked", false).maybeSingle();
+                let token = existing.data?.token;
+                if (!token) {
+                  const ins = await supabase.from("tenant_portal_links").insert({
+                    user_id: auth.user.id, tenant_id: t.id, unit_id: t.unit_id,
+                  }).select("token").single();
+                  if (ins.error) { toast.error(ins.error.message); return; }
+                  token = ins.data.token;
+                }
+                const url = `${window.location.origin}/mieter/${token}`;
+                await navigator.clipboard.writeText(url);
+                toast.success("Mieter-Link kopiert", { description: url });
+              }}>
+                <Link2 className="h-3.5 w-3.5 mr-1.5" /> Mieter-Portal-Link
+              </Button>
             </Card>
           ))}
         </div>
