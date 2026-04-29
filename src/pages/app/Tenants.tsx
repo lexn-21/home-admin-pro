@@ -12,7 +12,7 @@ import { eur, date } from "@/lib/format";
 import { z } from "zod";
 
 const schema = z.object({
-  unit_id: z.string().uuid("Einheit wählen"),
+  property_id: z.string().uuid("Objekt wählen"),
   full_name: z.string().trim().min(1).max(120),
   email: z.string().trim().email().max(255).optional().or(z.literal("")),
   phone: z.string().trim().max(40).optional().or(z.literal("")),
@@ -23,24 +23,24 @@ const schema = z.object({
 
 const Tenants = () => {
   const [tenants, setTenants] = useState<any[]>([]);
-  const [units, setUnits] = useState<any[]>([]);
+  const [properties, setProperties] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ unit_id: "", full_name: "", email: "", phone: "", lease_start: "", lease_end: "", deposit: "" });
+  const [form, setForm] = useState({ property_id: "", full_name: "", email: "", phone: "", lease_start: "", lease_end: "", deposit: "" });
 
   useEffect(() => { document.title = "Mieter · ImmoNIQ"; load(); }, []);
 
   const load = async () => {
-    const [t, u] = await Promise.all([
-      supabase.from("tenants").select("*, units(label, properties(name))").order("created_at", { ascending: false }),
-      supabase.from("units").select("id, label, properties(name)"),
+    const [t, p] = await Promise.all([
+      supabase.from("tenants").select("*, properties(name)").order("created_at", { ascending: false }),
+      supabase.from("properties").select("id, name").order("name"),
     ]);
     setTenants(t.data ?? []);
-    setUnits(u.data ?? []);
+    setProperties(p.data ?? []);
   };
 
   const submit = async () => {
     const parsed = schema.safeParse({
-      unit_id: form.unit_id,
+      property_id: form.property_id,
       full_name: form.full_name,
       email: form.email,
       phone: form.phone,
@@ -51,7 +51,12 @@ const Tenants = () => {
     if (!parsed.success) return toast.error(parsed.error.issues[0].message);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    const payload: any = { ...parsed.data, user_id: user.id };
+
+    // Default-Unit sicherstellen (für Konsistenz mit bestehenden Modulen)
+    const { data: unitId, error: uErr } = await supabase.rpc("ensure_default_unit", { _property_id: parsed.data.property_id });
+    if (uErr) return toast.error(uErr.message);
+
+    const payload: any = { ...parsed.data, user_id: user.id, unit_id: unitId };
     if (!payload.email) delete payload.email;
     if (!payload.phone) delete payload.phone;
     if (!payload.lease_start) delete payload.lease_start;
@@ -60,7 +65,7 @@ const Tenants = () => {
     if (error) return toast.error(error.message);
     toast.success("Mieter angelegt.");
     setOpen(false);
-    setForm({ unit_id: "", full_name: "", email: "", phone: "", lease_start: "", lease_end: "", deposit: "" });
+    setForm({ property_id: "", full_name: "", email: "", phone: "", lease_start: "", lease_end: "", deposit: "" });
     load();
   };
 
@@ -73,7 +78,7 @@ const Tenants = () => {
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-gradient-gold text-primary-foreground shadow-gold" disabled={units.length === 0}>
+            <Button className="bg-gradient-gold text-primary-foreground shadow-gold" disabled={properties.length === 0}>
               <Plus className="h-4 w-4 mr-2" /> Mieter
             </Button>
           </DialogTrigger>
@@ -81,10 +86,10 @@ const Tenants = () => {
             <DialogHeader><DialogTitle>Neuer Mieter</DialogTitle></DialogHeader>
             <div className="grid grid-cols-2 gap-3">
               <div className="col-span-2">
-                <Label>Wohneinheit *</Label>
-                <Select value={form.unit_id} onValueChange={(v) => setForm({ ...form, unit_id: v })}>
+                <Label>Objekt *</Label>
+                <Select value={form.property_id} onValueChange={(v) => setForm({ ...form, property_id: v })}>
                   <SelectTrigger><SelectValue placeholder="Wählen…" /></SelectTrigger>
-                  <SelectContent>{units.map((u: any) => <SelectItem key={u.id} value={u.id}>{u.properties?.name} — {u.label}</SelectItem>)}</SelectContent>
+                  <SelectContent>{properties.map((p: any) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <div className="col-span-2"><Label>Name *</Label><Input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} /></div>
@@ -99,9 +104,9 @@ const Tenants = () => {
         </Dialog>
       </header>
 
-      {units.length === 0 && (
+      {properties.length === 0 && (
         <Card className="p-6 glass border-primary/30">
-          <p className="text-sm">Lege zuerst ein Objekt mit mindestens einer Einheit an, bevor du Mieter erfasst.</p>
+          <p className="text-sm">Lege zuerst ein Objekt an, bevor du Mieter erfasst.</p>
         </Card>
       )}
 
@@ -117,7 +122,7 @@ const Tenants = () => {
               <div className="flex items-start justify-between mb-2">
                 <div>
                   <h3 className="font-bold">{t.full_name}</h3>
-                  <p className="text-xs text-muted-foreground">{t.units?.properties?.name} — {t.units?.label}</p>
+                  <p className="text-xs text-muted-foreground">{t.properties?.name}</p>
                 </div>
                 {t.deposit && <span className="text-xs px-2 py-0.5 rounded-full bg-muted">Kaution {eur(t.deposit)}</span>}
               </div>
@@ -128,7 +133,7 @@ const Tenants = () => {
               </div>
               <Button variant="outline" size="sm" className="w-full mt-3" onClick={async () => {
                 const { data: auth } = await supabase.auth.getUser();
-                if (!auth.user) return;
+                if (!auth.user || !t.unit_id) return;
                 const existing = await supabase.from("tenant_portal_links")
                   .select("token").eq("tenant_id", t.id).eq("revoked", false).maybeSingle();
                 let token = existing.data?.token;
