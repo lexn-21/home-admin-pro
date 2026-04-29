@@ -446,8 +446,8 @@ const Marketplace = () => {
                             </p>
                           </div>
                           {p.premium && (
-                            <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-primary text-primary-foreground tracking-wider uppercase flex-shrink-0">
-                              Premium
+                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border border-border text-muted-foreground tracking-wider uppercase flex-shrink-0">
+                              Anzeige
                             </span>
                           )}
                         </div>
