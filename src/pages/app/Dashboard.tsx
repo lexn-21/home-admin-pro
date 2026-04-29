@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 import {
   ArrowUpRight, Building2, Wallet, Receipt, TrendingUp, Plus,
   Lock, Wrench, CalendarClock, Scale, ShieldCheck, Sparkles,
-  BarChart3, Briefcase,
+  BarChart3, Briefcase, Megaphone,
 } from "lucide-react";
 
 const KPI = ({ label, value, hint, trend, icon: Icon, tone = "default" }: {
@@ -205,6 +205,34 @@ const Dashboard = () => {
         </>
       )}
 
+      {/* Markt-CTA */}
+      <Item variant="scale">
+        <Tappable>
+          <Link to="/app/listings/new">
+            <Card className="p-6 glass relative overflow-hidden cursor-pointer border-primary/30">
+              <motion.div
+                className="absolute -left-20 -bottom-20 w-72 h-72 rounded-full bg-primary/15 blur-3xl pointer-events-none"
+                animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
+                transition={{ duration: 6, repeat: Infinity }}
+              />
+              <div className="relative flex items-center gap-5">
+                <div className="h-14 w-14 rounded-2xl bg-gradient-gold flex items-center justify-center shadow-gold flex-shrink-0">
+                  <Megaphone className="h-7 w-7 text-primary-foreground" strokeWidth={2.5} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-primary">Neu · Markt</p>
+                  <h2 className="text-xl lg:text-2xl font-bold">Leerstand? In 60 Sekunden veröffentlicht.</h2>
+                  <p className="text-sm text-muted-foreground mt-1 hidden sm:block">
+                    Direkt aus deinen Daten. Bewerbungen kommen strukturiert in deine Inbox — wie Indeed für Mieter.
+                  </p>
+                </div>
+                <ArrowUpRight className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+              </div>
+            </Card>
+          </Link>
+        </Tappable>
+      </Item>
+
       {/* Tresor Hero — der Magnet */}
       <Item variant="scale">
         <Tappable>
@@ -248,6 +276,9 @@ const Dashboard = () => {
           </div>
         </Item>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <QuickAction to="/app/listings" icon={Megaphone} badge="USP"
+            label="Inserate"
+            desc="Vermieten/verkaufen — direkt." />
           <QuickAction to="/app/valuation" icon={TrendingUp} badge="AVM"
             label="Live-Bewertung"
             desc="Was ist mein Objekt heute wert?" />

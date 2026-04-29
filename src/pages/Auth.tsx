@@ -29,12 +29,14 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
 
+  const redirect = new URLSearchParams(window.location.search).get("redirect") || "/app";
+
   useEffect(() => {
     document.title = "Anmelden · ImmoNIQ";
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) navigate("/app", { replace: true });
+      if (session) navigate(redirect, { replace: true });
     });
-  }, [navigate]);
+  }, [navigate, redirect]);
 
   const handleGoogle = async () => {
     setOauthLoading(true);
@@ -47,7 +49,7 @@ const Auth = () => {
       return;
     }
     if (result.redirected) return;
-    navigate("/app", { replace: true });
+    navigate(redirect, { replace: true });
   };
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -61,7 +63,7 @@ const Auth = () => {
     setLoading(false);
     if (error) return toast.error(error.message === "Invalid login credentials" ? "E-Mail oder Passwort falsch." : error.message);
     toast.success("Willkommen zurück.");
-    navigate("/app", { replace: true });
+    navigate(redirect, { replace: true });
   };
 
   const handleSignUp = async (e: React.FormEvent) => {

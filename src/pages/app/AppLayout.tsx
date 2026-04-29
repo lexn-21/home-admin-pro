@@ -7,7 +7,7 @@ import {
   LayoutDashboard, Building2, Users, Wallet, Receipt, Calculator,
   LogOut, Settings as SettingsIcon, AlertTriangle, ShieldCheck,
   Lock, Wrench, Bell, Search, CalendarClock, Scale,
-  TrendingUp, BarChart3, Briefcase,
+  TrendingUp, BarChart3, Briefcase, Megaphone, UserCircle2, Inbox,
 } from "lucide-react";
 
 type NavItem = { to: string; label: string; icon: any; end?: boolean; badge?: string };
@@ -29,6 +29,14 @@ const groups: NavGroup[] = [
       { to: "/app/payments", label: "Zahlungen", icon: Wallet },
       { to: "/app/dunning", label: "Mahnwesen", icon: AlertTriangle },
       { to: "/app/expenses", label: "Belege", icon: Receipt },
+    ],
+  },
+  {
+    title: "Markt",
+    items: [
+      { to: "/app/listings", label: "Inserate", icon: Megaphone, badge: "USP" },
+      { to: "/app/profile-seeker", label: "Bewerber-Profil", icon: UserCircle2 },
+      { to: "/app/applications", label: "Bewerbungen", icon: Inbox },
     ],
   },
   {

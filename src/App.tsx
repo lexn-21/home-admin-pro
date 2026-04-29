@@ -23,9 +23,16 @@ import Deadlines from "./pages/app/Deadlines";
 import LawCorner from "./pages/app/LawCorner";
 import AdvisorView from "./pages/AdvisorView";
 import TenantPortal from "./pages/TenantPortal";
+import Markt from "./pages/Markt";
+import MarktDetail from "./pages/MarktDetail";
 import Valuation from "./pages/app/Valuation";
 import Benchmark from "./pages/app/Benchmark";
 import Bookings from "./pages/app/Bookings";
+import Listings from "./pages/app/Listings";
+import ListingEditor from "./pages/app/ListingEditor";
+import ListingApplications from "./pages/app/ListingApplications";
+import SeekerProfile from "./pages/app/SeekerProfile";
+import MyApplications from "./pages/app/MyApplications";
 import AppLayout from "./pages/app/AppLayout";
 import NotFound from "./pages/NotFound";
 
@@ -42,6 +49,8 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/advisor/:token" element={<AdvisorView />} />
           <Route path="/mieter/:token" element={<TenantPortal />} />
+          <Route path="/markt" element={<Markt />} />
+          <Route path="/markt/:id" element={<MarktDetail />} />
           <Route
             path="/app/onboarding"
             element={
@@ -71,6 +80,12 @@ const App = () => (
             <Route path="valuation" element={<Valuation />} />
             <Route path="benchmark" element={<Benchmark />} />
             <Route path="bookings" element={<Bookings />} />
+            <Route path="listings" element={<Listings />} />
+            <Route path="listings/new" element={<ListingEditor />} />
+            <Route path="listings/:id/edit" element={<ListingEditor />} />
+            <Route path="listings/:id/applications" element={<ListingApplications />} />
+            <Route path="profile-seeker" element={<SeekerProfile />} />
+            <Route path="applications" element={<MyApplications />} />
             <Route path="marketplace" element={<Marketplace />} />
             <Route path="deadlines" element={<Deadlines />} />
             <Route path="law" element={<LawCorner />} />

@@ -28,6 +28,7 @@ const Index = () => {
             <a href="#preise" className="hover:text-foreground transition">Preise</a>
           </nav>
           <div className="flex items-center gap-2">
+            <Button asChild variant="ghost" size="sm"><Link to="/markt">Markt</Link></Button>
             <Button asChild variant="ghost" size="sm"><Link to="/auth">Anmelden</Link></Button>
             <Button asChild size="sm" className="bg-gradient-gold text-primary-foreground hover:opacity-90 shadow-gold">
               <Link to="/auth">Kostenlos starten</Link>

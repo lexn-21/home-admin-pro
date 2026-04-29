@@ -56,6 +56,53 @@ export type Database = {
         }
         Relationships: []
       }
+      applications: {
+        Row: {
+          cover_message: string | null
+          created_at: string
+          id: string
+          listing_id: string
+          owner_seen_at: string | null
+          owner_user_id: string
+          seeker_user_id: string
+          snapshot_profile: Json
+          status: Database["public"]["Enums"]["application_status"]
+          updated_at: string
+        }
+        Insert: {
+          cover_message?: string | null
+          created_at?: string
+          id?: string
+          listing_id: string
+          owner_seen_at?: string | null
+          owner_user_id: string
+          seeker_user_id: string
+          snapshot_profile?: Json
+          status?: Database["public"]["Enums"]["application_status"]
+          updated_at?: string
+        }
+        Update: {
+          cover_message?: string | null
+          created_at?: string
+          id?: string
+          listing_id?: string
+          owner_seen_at?: string | null
+          owner_user_id?: string
+          seeker_user_id?: string
+          snapshot_profile?: Json
+          status?: Database["public"]["Enums"]["application_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bookings: {
         Row: {
           budget_estimate: number | null
@@ -192,6 +239,199 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      listing_alerts: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          kind: Database["public"]["Enums"]["listing_kind"]
+          last_notified_at: string | null
+          max_price: number | null
+          min_rooms: number | null
+          min_space: number | null
+          user_id: string
+          zips: string[] | null
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["listing_kind"]
+          last_notified_at?: string | null
+          max_price?: number | null
+          min_rooms?: number | null
+          min_space?: number | null
+          user_id: string
+          zips?: string[] | null
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["listing_kind"]
+          last_notified_at?: string | null
+          max_price?: number | null
+          min_rooms?: number | null
+          min_space?: number | null
+          user_id?: string
+          zips?: string[] | null
+        }
+        Relationships: []
+      }
+      listing_messages: {
+        Row: {
+          application_id: string
+          body: string
+          created_at: string
+          id: string
+          read_at: string | null
+          sender_user_id: string
+        }
+        Insert: {
+          application_id: string
+          body: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          sender_user_id: string
+        }
+        Update: {
+          application_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          sender_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_messages_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      listing_saves: {
+        Row: {
+          created_at: string
+          listing_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          listing_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          listing_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_saves_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      listings: {
+        Row: {
+          applications_count: number
+          available_from: string | null
+          city: string | null
+          created_at: string
+          deposit: number | null
+          description: string | null
+          energy_class: string | null
+          energy_value: number | null
+          expires_at: string | null
+          features: Json
+          id: string
+          kind: Database["public"]["Enums"]["listing_kind"]
+          living_space: number | null
+          min_term_months: number | null
+          photos: string[]
+          price: number
+          property_id: string | null
+          published_at: string | null
+          rooms: number | null
+          status: Database["public"]["Enums"]["listing_status"]
+          street_public: string | null
+          title: string
+          unit_id: string | null
+          updated_at: string
+          user_id: string
+          utilities: number | null
+          views_count: number
+          zip: string | null
+        }
+        Insert: {
+          applications_count?: number
+          available_from?: string | null
+          city?: string | null
+          created_at?: string
+          deposit?: number | null
+          description?: string | null
+          energy_class?: string | null
+          energy_value?: number | null
+          expires_at?: string | null
+          features?: Json
+          id?: string
+          kind?: Database["public"]["Enums"]["listing_kind"]
+          living_space?: number | null
+          min_term_months?: number | null
+          photos?: string[]
+          price?: number
+          property_id?: string | null
+          published_at?: string | null
+          rooms?: number | null
+          status?: Database["public"]["Enums"]["listing_status"]
+          street_public?: string | null
+          title: string
+          unit_id?: string | null
+          updated_at?: string
+          user_id: string
+          utilities?: number | null
+          views_count?: number
+          zip?: string | null
+        }
+        Update: {
+          applications_count?: number
+          available_from?: string | null
+          city?: string | null
+          created_at?: string
+          deposit?: number | null
+          description?: string | null
+          energy_class?: string | null
+          energy_value?: number | null
+          expires_at?: string | null
+          features?: Json
+          id?: string
+          kind?: Database["public"]["Enums"]["listing_kind"]
+          living_space?: number | null
+          min_term_months?: number | null
+          photos?: string[]
+          price?: number
+          property_id?: string | null
+          published_at?: string | null
+          rooms?: number | null
+          status?: Database["public"]["Enums"]["listing_status"]
+          street_public?: string | null
+          title?: string
+          unit_id?: string | null
+          updated_at?: string
+          user_id?: string
+          utilities?: number | null
+          views_count?: number
+          zip?: string | null
+        }
+        Relationships: []
       }
       market_index: {
         Row: {
@@ -409,6 +649,76 @@ export type Database = {
           verified?: boolean | null
           website?: string | null
           zip?: string | null
+        }
+        Relationships: []
+      }
+      seeker_profiles: {
+        Row: {
+          about_me: string | null
+          completeness_score: number
+          created_at: string
+          employer: string | null
+          employment_type: Database["public"]["Enums"]["employment_type"] | null
+          full_name: string | null
+          has_pets: boolean | null
+          household_size: number | null
+          id: string
+          max_rent: number | null
+          move_in_from: string | null
+          net_income_monthly: number | null
+          phone: string | null
+          preferred_zips: string[] | null
+          profile_photo: string | null
+          schufa_status: Database["public"]["Enums"]["schufa_status"]
+          smoker: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          about_me?: string | null
+          completeness_score?: number
+          created_at?: string
+          employer?: string | null
+          employment_type?:
+            | Database["public"]["Enums"]["employment_type"]
+            | null
+          full_name?: string | null
+          has_pets?: boolean | null
+          household_size?: number | null
+          id?: string
+          max_rent?: number | null
+          move_in_from?: string | null
+          net_income_monthly?: number | null
+          phone?: string | null
+          preferred_zips?: string[] | null
+          profile_photo?: string | null
+          schufa_status?: Database["public"]["Enums"]["schufa_status"]
+          smoker?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          about_me?: string | null
+          completeness_score?: number
+          created_at?: string
+          employer?: string | null
+          employment_type?:
+            | Database["public"]["Enums"]["employment_type"]
+            | null
+          full_name?: string | null
+          has_pets?: boolean | null
+          household_size?: number | null
+          id?: string
+          max_rent?: number | null
+          move_in_from?: string | null
+          net_income_monthly?: number | null
+          phone?: string | null
+          preferred_zips?: string[] | null
+          profile_photo?: string | null
+          schufa_status?: Database["public"]["Enums"]["schufa_status"]
+          smoker?: boolean | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -686,6 +996,15 @@ export type Database = {
         Args: { _annual_rent: number; _living_space: number; _zip: string }
         Returns: Json
       }
+      can_view_seeker_profile: {
+        Args: { _seeker: string; _viewer: string }
+        Returns: boolean
+      }
+      is_app_participant: {
+        Args: { _app_id: string; _user: string }
+        Returns: boolean
+      }
+      listing_inc_view: { Args: { _listing_id: string }; Returns: undefined }
       tenant_portal_report_issue: {
         Args: {
           _category: string
@@ -699,6 +1018,12 @@ export type Database = {
       tenant_portal_resolve: { Args: { _token: string }; Returns: Json }
     }
     Enums: {
+      application_status:
+        | "sent"
+        | "shortlisted"
+        | "rejected"
+        | "accepted"
+        | "withdrawn"
       booking_status:
         | "requested"
         | "quoted"
@@ -707,6 +1032,15 @@ export type Database = {
         | "completed"
         | "cancelled"
         | "disputed"
+      employment_type:
+        | "unbefristet"
+        | "befristet"
+        | "selbststaendig"
+        | "beamter"
+        | "rentner"
+        | "student"
+        | "arbeitslos"
+        | "sonstiges"
       expense_category:
         | "immediate"
         | "depreciable"
@@ -720,6 +1054,8 @@ export type Database = {
         | "in_progress"
         | "resolved"
         | "closed"
+      listing_kind: "rent" | "sale"
+      listing_status: "draft" | "published" | "paused" | "closed"
       payment_kind: "rent_cold" | "utilities" | "deposit" | "other"
       provider_category:
         | "sanitaer"
@@ -734,6 +1070,7 @@ export type Database = {
         | "steuerberater"
         | "jurist"
         | "energieberater"
+      schufa_status: "unverified" | "self_declared" | "document_uploaded"
       vault_category:
         | "kaufvertrag"
         | "mietvertrag"
@@ -874,6 +1211,13 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      application_status: [
+        "sent",
+        "shortlisted",
+        "rejected",
+        "accepted",
+        "withdrawn",
+      ],
       booking_status: [
         "requested",
         "quoted",
@@ -882,6 +1226,16 @@ export const Constants = {
         "completed",
         "cancelled",
         "disputed",
+      ],
+      employment_type: [
+        "unbefristet",
+        "befristet",
+        "selbststaendig",
+        "beamter",
+        "rentner",
+        "student",
+        "arbeitslos",
+        "sonstiges",
       ],
       expense_category: [
         "immediate",
@@ -898,6 +1252,8 @@ export const Constants = {
         "resolved",
         "closed",
       ],
+      listing_kind: ["rent", "sale"],
+      listing_status: ["draft", "published", "paused", "closed"],
       payment_kind: ["rent_cold", "utilities", "deposit", "other"],
       provider_category: [
         "sanitaer",
@@ -913,6 +1269,7 @@ export const Constants = {
         "jurist",
         "energieberater",
       ],
+      schufa_status: ["unverified", "self_declared", "document_uploaded"],
       vault_category: [
         "kaufvertrag",
         "mietvertrag",
