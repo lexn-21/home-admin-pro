@@ -11,11 +11,16 @@ export type AvmResult = {
 };
 
 export async function estimateValue(zip: string, livingSpace: number, annualRent: number): Promise<AvmResult | null> {
-  const { data, error } = await supabase.rpc("avm_estimate", {
+  const call = supabase.rpc("avm_estimate", {
     _zip: zip,
     _living_space: livingSpace,
     _annual_rent: annualRent,
   });
-  if (error) { console.error(error); return null; }
+  // 8s Timeout — sonst hängt die UI ewig
+  const timeout = new Promise<{ data: null; error: Error }>((resolve) =>
+    setTimeout(() => resolve({ data: null, error: new Error("Bewertung dauert zu lange (Server überlastet). Bitte erneut versuchen.") }), 8000),
+  );
+  const { data, error } = (await Promise.race([call, timeout])) as any;
+  if (error) { console.error(error); throw error; }
   return data as unknown as AvmResult;
 }
