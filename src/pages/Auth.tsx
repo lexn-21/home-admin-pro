@@ -29,12 +29,14 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
 
+  const redirect = new URLSearchParams(window.location.search).get("redirect") || "/app";
+
   useEffect(() => {
     document.title = "Anmelden · ImmoNIQ";
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) navigate("/app", { replace: true });
+      if (session) navigate(redirect, { replace: true });
     });
-  }, [navigate]);
+  }, [navigate, redirect]);
 
   const handleGoogle = async () => {
     setOauthLoading(true);
