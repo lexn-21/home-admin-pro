@@ -20,6 +20,7 @@ const Valuation = () => {
   const [monthlyRent, setMonthlyRent] = useState<number>(950);
   const [result, setResult] = useState<AvmResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.from("properties").select("id,name,zip,city").then(async ({ data }) => {
@@ -33,9 +34,15 @@ const Valuation = () => {
   const calc = async () => {
     if (!zip || zip.length < 4) return;
     setLoading(true);
-    const r = await estimateValue(zip, livingSpace, annualRent);
-    setResult(r);
-    setLoading(false);
+    setError(null);
+    try {
+      const r = await estimateValue(zip, livingSpace, annualRent);
+      setResult(r);
+    } catch (e: any) {
+      setError(e.message || "Bewertung fehlgeschlagen.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { if (zip) calc(); /* eslint-disable-next-line */ }, [zip]);
