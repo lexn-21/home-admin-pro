@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { ArrowLeft, ImagePlus, Sparkles, Scale, X } from "lucide-react";
+import { ArrowLeft, ImagePlus, Sparkles, Scale, X, Wand2, Loader2 } from "lucide-react";
 
 const ListingEditor = () => {
   const { id } = useParams();
@@ -130,6 +130,38 @@ const ListingEditor = () => {
     }
     setPhotos(next);
     setUploading(false);
+  };
+
+  const [aiLoading, setAiLoading] = useState(false);
+  const aiGenerate = async () => {
+    if (photos.length === 0) return toast.error("Mindestens 1 Foto hochladen.");
+    setAiLoading(true);
+    try {
+      const urls = photos.map((p) => supabase.storage.from("listing-photos").getPublicUrl(p).data.publicUrl);
+      const { data, error } = await supabase.functions.invoke("ai-listing-from-photos", {
+        body: {
+          photo_urls: urls,
+          context: {
+            rooms: form.rooms, living_space: form.living_space,
+            city: form.city, build_year: properties.find((p) => p.id === form.property_id)?.build_year,
+            cold_rent: form.price,
+          },
+        },
+      });
+      if (error) throw error;
+      setForm((f: any) => ({
+        ...f,
+        title: data.title || f.title,
+        description: data.description || f.description,
+        price: f.price || data.suggested_rent_cold || f.price,
+        features: { ...f.features, ...(data.detected_features ?? {}) },
+      }));
+      toast.success("✨ KI-Vorschlag übernommen", { description: data.highlights?.join(" · ") });
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setAiLoading(false);
+    }
   };
 
   const photoUrl = (p: string) => supabase.storage.from("listing-photos").getPublicUrl(p).data.publicUrl;
@@ -303,7 +335,15 @@ const ListingEditor = () => {
       </Card>
 
       <Card className="p-6 glass space-y-4">
-        <h2 className="font-bold">Fotos</h2>
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <h2 className="font-bold">Fotos</h2>
+          <Button type="button" size="sm" variant="outline" onClick={aiGenerate}
+            disabled={aiLoading || photos.length === 0}
+            className="border-primary/40 text-primary hover:bg-primary/5">
+            {aiLoading ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> : <Wand2 className="h-3.5 w-3.5 mr-1.5" />}
+            KI: Beschreibung & Miete vorschlagen
+          </Button>
+        </div>
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
           {photos.map((p) => (
             <div key={p} className="relative aspect-video rounded-lg overflow-hidden bg-muted group">
