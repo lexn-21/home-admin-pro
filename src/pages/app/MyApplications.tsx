@@ -4,9 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Briefcase, MessageSquare, Heart } from "lucide-react";
+import { Briefcase, MessageSquare, Heart, Loader2, AlertCircle, RefreshCw } from "lucide-react";
 import { eur } from "@/lib/format";
 import ChatDialog from "@/components/market/ChatDialog";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const labelStatus: Record<string, string> = {
   sent: "Gesendet", shortlisted: "Favorit beim Eigentümer", rejected: "Abgelehnt",
@@ -17,13 +18,28 @@ const MyApplications = () => {
   const [apps, setApps] = useState<any[]>([]);
   const [saved, setSaved] = useState<any[]>([]);
   const [chatApp, setChatApp] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => { document.title = "Meine Bewerbungen · ImmoNIQ"; load(); }, []);
   const load = async () => {
-    const { data: a } = await supabase.from("applications").select("*, listings(*)").order("created_at", { ascending: false });
-    setApps(a ?? []);
-    const { data: s } = await supabase.from("listing_saves").select("*, listings(*)");
-    setSaved(s ?? []);
+    setLoading(true); setError(null);
+    try {
+      // Parallel + 10s Timeout, sonst hängt die Seite ewig
+      const timeout = <T,>(p: Promise<T>, ms = 10000) =>
+        Promise.race([p, new Promise<T>((_, rej) => setTimeout(() => rej(new Error("Zeitüberschreitung")), ms))]);
+      const [aRes, sRes] = await Promise.all([
+        timeout(supabase.from("applications").select("*, listings(*)").order("created_at", { ascending: false })),
+        timeout(supabase.from("listing_saves").select("*, listings(*)")),
+      ]);
+      if ((aRes as any).error) throw (aRes as any).error;
+      setApps((aRes as any).data ?? []);
+      setSaved((sRes as any).data ?? []);
+    } catch (e: any) {
+      setError(e.message || "Konnte nicht laden.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
