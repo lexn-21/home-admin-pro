@@ -126,6 +126,13 @@ const Dashboard = () => {
     return "Guten Abend";
   })();
 
+  const intents = [
+    { to: "/app/listings/new", icon: Megaphone, title: "Vermieten", desc: "Inserat in 60 Sek.", tone: "primary" },
+    { to: "/app/properties", icon: Building2, title: "Verwalten", desc: "Objekt anlegen", tone: "default" },
+    { to: "/app/valuation", icon: TrendingUp, title: "Bewerten", desc: "Was ist es wert?", tone: "default" },
+    { to: "/app/vault", icon: Lock, title: "Sichern", desc: "Dokumente schützen", tone: "dark" },
+  ];
+
   return (
     <Stagger className="space-y-8">
       <Item>
@@ -135,13 +142,46 @@ const Dashboard = () => {
               {greeting}{name ? `, ${name.split(" ")[0]}` : ""} 👋
             </p>
             <h1 className="text-3xl lg:text-4xl font-bold tracking-tight mt-1">
-              Deine <span className="text-gradient-gold">Übersicht</span>
+              Was möchtest du <span className="text-gradient-gold">heute tun?</span>
             </h1>
+            <p className="text-sm text-muted-foreground mt-1">Tipp den passenden Weg — wir führen dich Schritt für Schritt.</p>
           </div>
-          <Button asChild className="bg-gradient-gold text-primary-foreground hover:opacity-90 shadow-gold h-10">
-            <Link to="/app/properties"><Plus className="h-4 w-4 mr-2" /> Objekt hinzufügen</Link>
-          </Button>
         </header>
+      </Item>
+
+      {/* Intent-Picker — psychologisch: max 4 klare Wege */}
+      <Item>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {intents.map((it) => (
+            <Tappable key={it.to}>
+              <Link to={it.to}>
+                <Card className={`p-5 h-full interactive-card relative overflow-hidden ${
+                  it.tone === "primary" ? "bg-gradient-gold text-primary-foreground border-transparent shadow-gold"
+                  : it.tone === "dark" ? "vault-surface text-white border-transparent"
+                  : "glass"
+                }`}>
+                  <div className={`h-11 w-11 rounded-xl flex items-center justify-center mb-3 ${
+                    it.tone === "primary" ? "bg-black/15"
+                    : it.tone === "dark" ? "bg-primary/20"
+                    : "bg-gradient-gold-soft border border-primary/15"
+                  }`}>
+                    <it.icon className={`h-5 w-5 ${
+                      it.tone === "primary" ? "text-primary-foreground"
+                      : it.tone === "dark" ? "text-primary"
+                      : "text-primary"
+                    }`} strokeWidth={2.5} />
+                  </div>
+                  <p className="font-bold text-base">{it.title}</p>
+                  <p className={`text-xs mt-1 ${
+                    it.tone === "primary" ? "text-primary-foreground/80"
+                    : it.tone === "dark" ? "text-white/60"
+                    : "text-muted-foreground"
+                  }`}>{it.desc}</p>
+                </Card>
+              </Link>
+            </Tappable>
+          ))}
+        </div>
       </Item>
 
       {isEmpty ? (

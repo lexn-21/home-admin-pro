@@ -85,12 +85,19 @@ export const AskCopilot = () => {
       <motion.button
         onClick={() => setOpen(true)}
         style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 5.5rem)" }}
-        className="fixed right-4 sm:!bottom-6 sm:right-6 z-30 h-14 w-14 rounded-full bg-gradient-gold shadow-gold flex items-center justify-center text-primary-foreground"
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        aria-label="Co-Pilot öffnen"
+        className="fixed right-4 sm:!bottom-6 sm:right-6 z-30 h-12 sm:h-13 pl-3 pr-4 rounded-full bg-gradient-gold shadow-gold flex items-center gap-2 text-primary-foreground font-semibold text-sm"
+        whileHover={{ scale: 1.04 }}
+        whileTap={{ scale: 0.96 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4, type: "spring" }}
+        aria-label="ImmoNIQ-Assistent öffnen"
       >
-        <Sparkles className="h-6 w-6" />
+        <span className="h-8 w-8 rounded-full bg-black/15 flex items-center justify-center">
+          <Sparkles className="h-4 w-4" />
+        </span>
+        <span className="hidden sm:inline">Frag ImmoNIQ</span>
+        <span className="sm:hidden">Hilfe</span>
       </motion.button>
 
       <AnimatePresence>
