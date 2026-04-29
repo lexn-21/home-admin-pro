@@ -214,6 +214,34 @@ const Dashboard = () => {
         </>
       )}
 
+      {/* Markt-Stats Streifen */}
+      {(listings.length > 0 || appsIn > 0 || appsOut > 0) && (
+        <Item>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <Card className="p-4 glass">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Aktive Inserate</p>
+              <p className="text-2xl font-bold tabular mt-1">{listings.filter(l => l.status === "published").length}</p>
+              <Link to="/app/listings" className="text-xs text-primary mt-1 inline-flex items-center gap-1">Verwalten →</Link>
+            </Card>
+            <Card className="p-4 glass">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Profil-Aufrufe</p>
+              <p className="text-2xl font-bold tabular mt-1">{listings.reduce((s, l) => s + Number(l.views_count ?? 0), 0)}</p>
+              <p className="text-xs text-muted-foreground mt-1">Letzte 30 Tage</p>
+            </Card>
+            <Card className="p-4 glass border-primary/30">
+              <p className="text-[10px] uppercase tracking-wider text-primary font-bold">Bewerbungen offen</p>
+              <p className="text-2xl font-bold tabular mt-1">{appsIn}</p>
+              <Link to="/app/applications" className="text-xs text-primary mt-1 inline-flex items-center gap-1">Sichten →</Link>
+            </Card>
+            <Card className="p-4 glass">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Eigene Bewerbungen</p>
+              <p className="text-2xl font-bold tabular mt-1">{appsOut}</p>
+              <Link to="/app/applications" className="text-xs text-primary mt-1 inline-flex items-center gap-1">Status →</Link>
+            </Card>
+          </div>
+        </Item>
+      )}
+
       {/* Markt-CTA */}
       <Item variant="scale">
         <Tappable>
