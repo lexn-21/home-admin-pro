@@ -360,7 +360,7 @@ const Marketplace = () => {
                 <Marker
                   key={p.id}
                   position={[p.lat, p.lng]}
-                  icon={p.premium ? premiumIcon : new L.Icon.Default()}
+                  icon={new L.Icon.Default()}
                   eventHandlers={{
                     click: () => {
                       const el = document.getElementById(`provider-${p.id}`);
