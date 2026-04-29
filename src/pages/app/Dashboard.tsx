@@ -13,9 +13,10 @@ import {
   BarChart3, Briefcase, Megaphone,
 } from "lucide-react";
 
-const KPI = ({ label, value, hint, trend, icon: Icon, tone = "default" }: {
+const KPI = ({ label, value, hint, trend, icon: Icon, tone = "default", progress }: {
   label: string; value: string; hint?: string; trend?: "up" | "down" | null;
   icon: React.ElementType; tone?: "default" | "success" | "warning";
+  progress?: number;
 }) => (
   <Item variant="scale">
     <Card className="p-5 glass hover:shadow-elevated transition-shadow h-full">
@@ -40,6 +41,18 @@ const KPI = ({ label, value, hint, trend, icon: Icon, tone = "default" }: {
           }`} />
         </div>
       </div>
+      {typeof progress === "number" && (
+        <div className="mt-3 h-1.5 w-full bg-muted rounded-full overflow-hidden">
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${Math.max(0, Math.min(100, progress))}%` }}
+            transition={{ duration: 0.9, ease: "easeOut" }}
+            className={`h-full rounded-full ${
+              tone === "success" ? "bg-success" : tone === "warning" ? "bg-warning" : "bg-primary"
+            }`}
+          />
+        </div>
+      )}
     </Card>
   </Item>
 );
