@@ -371,7 +371,7 @@ const Index = () => {
         <div className="container max-w-3xl text-center">
           <FileText className="h-12 w-12 text-primary mx-auto mb-6" />
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
-            Deine Immobilie verdient<br />
+            Deine Immobilie verdient{" "}
             <span className="text-gradient-gold">eine ehrliche App.</span>
           </h2>
           <p className="text-muted-foreground mb-8 text-lg">
