@@ -8,6 +8,7 @@ import {
   LogOut, Settings as SettingsIcon, AlertTriangle, ShieldCheck,
   Lock, Wrench, Bell, Search, CalendarClock, Scale,
   TrendingUp, BarChart3, Briefcase, Megaphone, UserCircle2, Inbox,
+  FileText, Clock,
 } from "lucide-react";
 
 type NavItem = { to: string; label: string; icon: any; end?: boolean; badge?: string };
@@ -47,8 +48,17 @@ const groups: NavGroup[] = [
     ],
   },
   {
+    title: "Verwaltung",
+    items: [
+      { to: "/app/tasks", label: "Aufgaben", icon: Clock },
+      { to: "/app/vault", label: "Tresor", icon: Lock, badge: "Zero-Knowledge" },
+      { to: "/app/templates", label: "Vorlagen", icon: FileText },
+    ],
+  },
+  {
     title: "Finanzen & Steuer",
     items: [
+      { to: "/app/calculator", label: "Rechner", icon: Calculator, badge: "neu" },
       { to: "/app/tax", label: "Steuer-Brücke", icon: Calculator },
       { to: "/app/advisor", label: "Steuerberater", icon: ShieldCheck },
     ],
@@ -56,8 +66,7 @@ const groups: NavGroup[] = [
   {
     title: "Werkzeuge",
     items: [
-      { to: "/app/vault", label: "Tresor", icon: Lock, badge: "Zero-Knowledge" },
-      { to: "/app/bookings", label: "Aufträge", icon: Briefcase, badge: "neu" },
+      { to: "/app/bookings", label: "Aufträge", icon: Briefcase },
       { to: "/app/marketplace", label: "Marktplatz", icon: Wrench },
       { to: "/app/law", label: "Rechts-Ecke", icon: Scale },
     ],

@@ -33,6 +33,9 @@ import ListingEditor from "./pages/app/ListingEditor";
 import ListingApplications from "./pages/app/ListingApplications";
 import SeekerProfile from "./pages/app/SeekerProfile";
 import MyApplications from "./pages/app/MyApplications";
+import Calculator from "./pages/app/Calculator";
+import Tasks from "./pages/app/Tasks";
+import Templates from "./pages/app/Templates";
 import AppLayout from "./pages/app/AppLayout";
 import NotFound from "./pages/NotFound";
 
@@ -87,6 +90,9 @@ const App = () => (
             <Route path="profile-seeker" element={<SeekerProfile />} />
             <Route path="applications" element={<MyApplications />} />
             <Route path="marketplace" element={<Marketplace />} />
+            <Route path="calculator" element={<Calculator />} />
+            <Route path="tasks" element={<Tasks />} />
+            <Route path="templates" element={<Templates />} />
             <Route path="deadlines" element={<Deadlines />} />
             <Route path="law" element={<LawCorner />} />
             <Route path="settings" element={<Settings />} />
