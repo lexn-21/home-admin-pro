@@ -409,6 +409,15 @@ const Marketplace = () => {
           </div>
         </Item>
 
+        {cat !== "all" && (
+          <Item>
+            <div className="mb-3">
+              <SponsoredSlot placement="marketplace_category" kind={null} limit={1} />
+            </div>
+          </Item>
+        )}
+
+
         {filtered.length === 0 ? (
           <Item>
             <Card className="p-10 glass text-center">
