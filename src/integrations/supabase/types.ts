@@ -1195,6 +1195,7 @@ export type Database = {
         Args: { _seeker: string; _viewer: string }
         Returns: boolean
       }
+      ensure_default_unit: { Args: { _property_id: string }; Returns: string }
       is_app_participant: {
         Args: { _app_id: string; _user: string }
         Returns: boolean
