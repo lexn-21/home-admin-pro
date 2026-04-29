@@ -36,6 +36,9 @@ import MyApplications from "./pages/app/MyApplications";
 import Calculator from "./pages/app/Calculator";
 import Tasks from "./pages/app/Tasks";
 import Templates from "./pages/app/Templates";
+import Impressum from "./pages/Impressum";
+import Datenschutz from "./pages/Datenschutz";
+import AGB from "./pages/AGB";
 import AppLayout from "./pages/app/AppLayout";
 import NotFound from "./pages/NotFound";
 
@@ -54,6 +57,9 @@ const App = () => (
           <Route path="/mieter/:token" element={<TenantPortal />} />
           <Route path="/markt" element={<Markt />} />
           <Route path="/markt/:id" element={<MarktDetail />} />
+          <Route path="/impressum" element={<Impressum />} />
+          <Route path="/datenschutz" element={<Datenschutz />} />
+          <Route path="/agb" element={<AGB />} />
           <Route
             path="/app/onboarding"
             element={

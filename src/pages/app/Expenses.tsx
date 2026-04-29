@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Receipt, Paperclip, Info } from "lucide-react";
+import { Plus, Receipt, Paperclip, Info, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { eur, date } from "@/lib/format";
 import { z } from "zod";
@@ -86,6 +86,23 @@ const Expenses = () => {
 
   const total = items.reduce((s, e) => s + Number(e.amount), 0);
 
+  // §6(1)1a EStG — Anschaffungsnahe Herstellungskosten Check
+  const warnings = useMemo(() => {
+    const out: { propertyName: string; spent: number; limit: number }[] = [];
+    for (const p of props as any[]) {
+      if (!p.purchase_price || !p.purchase_date) continue;
+      const purchase = new Date(p.purchase_date);
+      const threeYearLimit = new Date(purchase); threeYearLimit.setFullYear(purchase.getFullYear() + 3);
+      const buildingAk = Number(p.purchase_price) * 0.8;
+      const limit = buildingAk * 0.15;
+      const spent = items
+        .filter(i => i.property_id === p.id && new Date(i.spent_on) >= purchase && new Date(i.spent_on) <= threeYearLimit)
+        .reduce((s, i) => s + Number(i.amount), 0);
+      if (spent > limit && limit > 0) out.push({ propertyName: p.name, spent, limit });
+    }
+    return out;
+  }, [items, props]);
+
   return (
     <div className="space-y-6">
       <header className="flex items-center justify-between">
@@ -137,6 +154,33 @@ const Expenses = () => {
           <Receipt className="h-8 w-8 text-primary" />
         </div>
       </Card>
+
+      {warnings.length > 0 && (
+        <Card className="p-5 glass border-destructive/40 bg-destructive/5">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+            <div className="text-sm space-y-2 flex-1">
+              <p className="font-semibold text-destructive">Achtung: Anschaffungsnahe Herstellungskosten möglich</p>
+              <p className="text-muted-foreground">
+                Folgende Objekte überschreiten in den ersten 3 Jahren nach Kauf die 15 %-Grenze
+                der Gebäude-AK gem. <strong className="text-foreground">§ 6 Abs. 1 Nr. 1a EStG</strong>.
+                Diese Kosten müssen aktiviert (über AfA verteilt) statt sofort abgezogen werden.
+                Bitte mit Steuerberater klären.
+              </p>
+              <ul className="space-y-1 mt-2">
+                {warnings.map((w, i) => (
+                  <li key={i} className="flex justify-between bg-background/40 rounded-lg px-3 py-2">
+                    <span className="font-medium">{w.propertyName}</span>
+                    <span className="text-muted-foreground">
+                      <span className="text-destructive font-semibold">{eur(w.spent)}</span> / Grenze {eur(w.limit)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </Card>
+      )}
 
       {items.length === 0 ? (
         <Card className="p-10 text-center glass"><p className="text-sm text-muted-foreground">Noch keine Belege.</p></Card>

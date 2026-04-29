@@ -17,15 +17,23 @@ const schema = z.object({
   zip: z.string().trim().max(10).optional().or(z.literal("")),
   city: z.string().trim().max(80).optional().or(z.literal("")),
   build_year: z.number().int().min(1800).max(2100).optional(),
+  area_sqm: z.number().min(0).max(100000).optional(),
+  rooms: z.number().min(0).max(50).optional(),
   purchase_price: z.number().min(0).max(99999999).optional(),
   purchase_date: z.string().optional().or(z.literal("")),
   afa_rate: z.number().min(0).max(20).optional(),
+  sonderafa_7b: z.boolean().optional(),
+  cold_rent: z.number().min(0).max(999999).optional(),
+  utilities: z.number().min(0).max(999999).optional(),
+  deposit: z.number().min(0).max(9999999).optional(),
 });
+
+const empty = { name: "", street: "", zip: "", city: "", build_year: "", area_sqm: "", rooms: "", purchase_price: "", purchase_date: "", afa_rate: "2", sonderafa_7b: false, cold_rent: "", utilities: "", deposit: "" };
 
 const Properties = () => {
   const [items, setItems] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ name: "", street: "", zip: "", city: "", build_year: "", purchase_price: "", purchase_date: "", afa_rate: "2" });
+  const [form, setForm] = useState<any>(empty);
 
   useEffect(() => { document.title = "Objekte · ImmoNIQ"; load(); }, []);
 
@@ -35,31 +43,26 @@ const Properties = () => {
   };
 
   const submit = async () => {
+    const num = (v: string) => v ? Number(v) : undefined;
     const parsed = schema.safeParse({
-      name: form.name,
-      street: form.street,
-      zip: form.zip,
-      city: form.city,
-      build_year: form.build_year ? Number(form.build_year) : undefined,
-      purchase_price: form.purchase_price ? Number(form.purchase_price) : undefined,
-      purchase_date: form.purchase_date,
-      afa_rate: form.afa_rate ? Number(form.afa_rate) : undefined,
+      name: form.name, street: form.street, zip: form.zip, city: form.city,
+      build_year: num(form.build_year), area_sqm: num(form.area_sqm), rooms: num(form.rooms),
+      purchase_price: num(form.purchase_price), purchase_date: form.purchase_date,
+      afa_rate: num(form.afa_rate), sonderafa_7b: !!form.sonderafa_7b,
+      cold_rent: num(form.cold_rent), utilities: num(form.utilities), deposit: num(form.deposit),
     });
     if (!parsed.success) return toast.error(parsed.error.issues[0].message);
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return toast.error("Nicht angemeldet.");
     const payload: any = { ...parsed.data, user_id: user.id };
-    if (!payload.purchase_date) delete payload.purchase_date;
-    if (!payload.street) delete payload.street;
-    if (!payload.zip) delete payload.zip;
-    if (!payload.city) delete payload.city;
+    Object.keys(payload).forEach(k => { if (payload[k] === "" || payload[k] === undefined) delete payload[k]; });
 
     const { error } = await supabase.from("properties").insert(payload);
     if (error) return toast.error(error.message);
-    toast.success("Objekt angelegt.");
+    toast.success("Objekt angelegt — 4 Standard-Fristen wurden automatisch erzeugt.");
     setOpen(false);
-    setForm({ name: "", street: "", zip: "", city: "", build_year: "", purchase_price: "", purchase_date: "", afa_rate: "2" });
+    setForm(empty);
     load();
   };
 
@@ -74,19 +77,39 @@ const Properties = () => {
           <DialogTrigger asChild>
             <Button className="bg-gradient-gold text-primary-foreground hover:opacity-90 shadow-gold"><Plus className="h-4 w-4 mr-2" /> Neues Objekt</Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-lg">
+          <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader><DialogTitle>Neues Objekt anlegen</DialogTitle></DialogHeader>
+
+            <p className="text-xs font-semibold uppercase tracking-wider text-primary mt-2">Stammdaten</p>
             <div className="grid grid-cols-2 gap-3">
               <div className="col-span-2"><Label>Name *</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="MFH Hauptstraße" /></div>
               <div className="col-span-2"><Label>Straße & Nr.</Label><Input value={form.street} onChange={(e) => setForm({ ...form, street: e.target.value })} /></div>
               <div><Label>PLZ</Label><Input value={form.zip} onChange={(e) => setForm({ ...form, zip: e.target.value })} /></div>
               <div><Label>Ort</Label><Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} /></div>
               <div><Label>Baujahr</Label><Input type="number" value={form.build_year} onChange={(e) => setForm({ ...form, build_year: e.target.value })} /></div>
+              <div><Label>Wohnfläche (m²)</Label><Input type="number" step="0.1" value={form.area_sqm} onChange={(e) => setForm({ ...form, area_sqm: e.target.value })} /></div>
+              <div><Label>Zimmer</Label><Input type="number" step="0.5" value={form.rooms} onChange={(e) => setForm({ ...form, rooms: e.target.value })} /></div>
+            </div>
+
+            <p className="text-xs font-semibold uppercase tracking-wider text-primary mt-4">Steuerliche Daten</p>
+            <div className="grid grid-cols-2 gap-3">
               <div><Label>Kaufpreis (€)</Label><Input type="number" step="0.01" value={form.purchase_price} onChange={(e) => setForm({ ...form, purchase_price: e.target.value })} /></div>
               <div><Label>Kaufdatum</Label><Input type="date" value={form.purchase_date} onChange={(e) => setForm({ ...form, purchase_date: e.target.value })} /></div>
               <div><Label>AfA-Satz % (§ 7 EStG)</Label><Input type="number" step="0.01" value={form.afa_rate} onChange={(e) => setForm({ ...form, afa_rate: e.target.value })} /></div>
+              <div className="flex items-end gap-2 pb-2">
+                <input type="checkbox" id="s7b" checked={form.sonderafa_7b} onChange={(e) => setForm({ ...form, sonderafa_7b: e.target.checked })} className="h-4 w-4 accent-primary" />
+                <Label htmlFor="s7b" className="text-sm font-normal cursor-pointer">Sonder-AfA § 7b prüfen</Label>
+              </div>
             </div>
-            <DialogFooter><Button onClick={submit} className="bg-gradient-gold text-primary-foreground shadow-gold">Anlegen</Button></DialogFooter>
+
+            <p className="text-xs font-semibold uppercase tracking-wider text-primary mt-4">Miete & Kaution (optional)</p>
+            <div className="grid grid-cols-3 gap-3">
+              <div><Label>Kaltmiete (€/Mo)</Label><Input type="number" step="0.01" value={form.cold_rent} onChange={(e) => setForm({ ...form, cold_rent: e.target.value })} /></div>
+              <div><Label>NK (€/Mo)</Label><Input type="number" step="0.01" value={form.utilities} onChange={(e) => setForm({ ...form, utilities: e.target.value })} /></div>
+              <div><Label>Kaution (€)</Label><Input type="number" step="0.01" value={form.deposit} onChange={(e) => setForm({ ...form, deposit: e.target.value })} /></div>
+            </div>
+
+            <DialogFooter className="mt-4"><Button onClick={submit} className="bg-gradient-gold text-primary-foreground shadow-gold">Anlegen</Button></DialogFooter>
           </DialogContent>
         </Dialog>
       </header>
