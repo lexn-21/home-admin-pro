@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      advisor_directory: {
+        Row: {
+          active: boolean
+          address: string | null
+          city: string | null
+          created_at: string
+          email: string | null
+          firm: string | null
+          id: string
+          immobilien_focus: boolean
+          name: string
+          partner_status: string | null
+          phone: string | null
+          website: string | null
+          zip: string | null
+        }
+        Insert: {
+          active?: boolean
+          address?: string | null
+          city?: string | null
+          created_at?: string
+          email?: string | null
+          firm?: string | null
+          id?: string
+          immobilien_focus?: boolean
+          name: string
+          partner_status?: string | null
+          phone?: string | null
+          website?: string | null
+          zip?: string | null
+        }
+        Update: {
+          active?: boolean
+          address?: string | null
+          city?: string | null
+          created_at?: string
+          email?: string | null
+          firm?: string | null
+          id?: string
+          immobilien_focus?: boolean
+          name?: string
+          partner_status?: string | null
+          phone?: string | null
+          website?: string | null
+          zip?: string | null
+        }
+        Relationships: []
+      }
       advisor_links: {
         Row: {
           access_count: number
@@ -180,16 +228,61 @@ export type Database = {
           },
         ]
       }
+      contract_templates: {
+        Row: {
+          active: boolean
+          category: string | null
+          created_at: string
+          description: string | null
+          format: string | null
+          id: string
+          is_free: boolean
+          sort_order: number
+          source: string | null
+          title: string
+          url: string | null
+        }
+        Insert: {
+          active?: boolean
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          format?: string | null
+          id?: string
+          is_free?: boolean
+          sort_order?: number
+          source?: string | null
+          title: string
+          url?: string | null
+        }
+        Update: {
+          active?: boolean
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          format?: string | null
+          id?: string
+          is_free?: boolean
+          sort_order?: number
+          source?: string | null
+          title?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
       expenses: {
         Row: {
           amount: number
           category: Database["public"]["Enums"]["expense_category"]
+          classification: Database["public"]["Enums"]["expense_classification"]
+          contractor: string | null
           created_at: string
           description: string | null
           id: string
           property_id: string | null
           receipt_path: string | null
           spent_on: string
+          type: string | null
           unit_id: string | null
           updated_at: string
           user_id: string
@@ -198,12 +291,15 @@ export type Database = {
         Insert: {
           amount: number
           category?: Database["public"]["Enums"]["expense_category"]
+          classification?: Database["public"]["Enums"]["expense_classification"]
+          contractor?: string | null
           created_at?: string
           description?: string | null
           id?: string
           property_id?: string | null
           receipt_path?: string | null
           spent_on: string
+          type?: string | null
           unit_id?: string | null
           updated_at?: string
           user_id: string
@@ -212,12 +308,15 @@ export type Database = {
         Update: {
           amount?: number
           category?: Database["public"]["Enums"]["expense_category"]
+          classification?: Database["public"]["Enums"]["expense_classification"]
+          contractor?: string | null
           created_at?: string
           description?: string | null
           id?: string
           property_id?: string | null
           receipt_path?: string | null
           spent_on?: string
+          type?: string | null
           unit_id?: string | null
           updated_at?: string
           user_id?: string
@@ -478,10 +577,15 @@ export type Database = {
           created_at: string
           id: string
           kind: Database["public"]["Enums"]["payment_kind"]
+          month: string | null
           note: string | null
+          notes: string | null
           paid_on: string
+          property_id: string | null
+          status: Database["public"]["Enums"]["payment_status_simple"] | null
           tenant_id: string | null
-          unit_id: string
+          type: string | null
+          unit_id: string | null
           user_id: string
         }
         Insert: {
@@ -489,10 +593,15 @@ export type Database = {
           created_at?: string
           id?: string
           kind?: Database["public"]["Enums"]["payment_kind"]
+          month?: string | null
           note?: string | null
+          notes?: string | null
           paid_on: string
+          property_id?: string | null
+          status?: Database["public"]["Enums"]["payment_status_simple"] | null
           tenant_id?: string | null
-          unit_id: string
+          type?: string | null
+          unit_id?: string | null
           user_id: string
         }
         Update: {
@@ -500,10 +609,15 @@ export type Database = {
           created_at?: string
           id?: string
           kind?: Database["public"]["Enums"]["payment_kind"]
+          month?: string | null
           note?: string | null
+          notes?: string | null
           paid_on?: string
+          property_id?: string | null
+          status?: Database["public"]["Enums"]["payment_status_simple"] | null
           tenant_id?: string | null
-          unit_id?: string
+          type?: string | null
+          unit_id?: string | null
           user_id?: string
         }
         Relationships: [
@@ -550,44 +664,71 @@ export type Database = {
       properties: {
         Row: {
           afa_rate: number | null
+          area_sqm: number | null
           build_year: number | null
           city: string | null
+          cold_rent: number | null
           created_at: string
+          deposit: number | null
           id: string
+          image_url: string | null
           name: string
+          notes: string | null
           purchase_date: string | null
           purchase_price: number | null
+          rooms: number | null
+          sonderafa_7b: boolean
+          status: string
           street: string | null
           updated_at: string
           user_id: string
+          utilities: number | null
           zip: string | null
         }
         Insert: {
           afa_rate?: number | null
+          area_sqm?: number | null
           build_year?: number | null
           city?: string | null
+          cold_rent?: number | null
           created_at?: string
+          deposit?: number | null
           id?: string
+          image_url?: string | null
           name: string
+          notes?: string | null
           purchase_date?: string | null
           purchase_price?: number | null
+          rooms?: number | null
+          sonderafa_7b?: boolean
+          status?: string
           street?: string | null
           updated_at?: string
           user_id: string
+          utilities?: number | null
           zip?: string | null
         }
         Update: {
           afa_rate?: number | null
+          area_sqm?: number | null
           build_year?: number | null
           city?: string | null
+          cold_rent?: number | null
           created_at?: string
+          deposit?: number | null
           id?: string
+          image_url?: string | null
           name?: string
+          notes?: string | null
           purchase_date?: string | null
           purchase_price?: number | null
+          rooms?: number | null
+          sonderafa_7b?: boolean
+          status?: string
           street?: string | null
           updated_at?: string
           user_id?: string
+          utilities?: number | null
           zip?: string | null
         }
         Relationships: []
@@ -722,6 +863,51 @@ export type Database = {
         }
         Relationships: []
       }
+      tasks: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          done: boolean
+          due_date: string | null
+          id: string
+          legal_ref: string | null
+          legal_url: string | null
+          property_id: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          done?: boolean
+          due_date?: string | null
+          id?: string
+          legal_ref?: string | null
+          legal_url?: string | null
+          property_id?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          done?: boolean
+          due_date?: string | null
+          id?: string
+          legal_ref?: string | null
+          legal_url?: string | null
+          property_id?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       tenant_issues: {
         Row: {
           category: string
@@ -812,8 +998,11 @@ export type Database = {
           id: string
           lease_end: string | null
           lease_start: string | null
+          notes: string | null
           phone: string | null
-          unit_id: string
+          property_id: string | null
+          since: string | null
+          unit_id: string | null
           updated_at: string
           user_id: string
         }
@@ -825,8 +1014,11 @@ export type Database = {
           id?: string
           lease_end?: string | null
           lease_start?: string | null
+          notes?: string | null
           phone?: string | null
-          unit_id: string
+          property_id?: string | null
+          since?: string | null
+          unit_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -838,8 +1030,11 @@ export type Database = {
           id?: string
           lease_end?: string | null
           lease_start?: string | null
+          notes?: string | null
           phone?: string | null
-          unit_id?: string
+          property_id?: string | null
+          since?: string | null
+          unit_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -1047,6 +1242,7 @@ export type Database = {
         | "utilities_passthrough"
         | "financing"
         | "other"
+      expense_classification: "maintenance" | "production" | "anschaffungsnah"
       issue_severity: "info" | "minor" | "major" | "urgent"
       issue_status:
         | "open"
@@ -1057,6 +1253,7 @@ export type Database = {
       listing_kind: "rent" | "sale"
       listing_status: "draft" | "published" | "paused" | "closed"
       payment_kind: "rent_cold" | "utilities" | "deposit" | "other"
+      payment_status_simple: "paid" | "open" | "late"
       provider_category:
         | "sanitaer"
         | "elektrik"
@@ -1244,6 +1441,7 @@ export const Constants = {
         "financing",
         "other",
       ],
+      expense_classification: ["maintenance", "production", "anschaffungsnah"],
       issue_severity: ["info", "minor", "major", "urgent"],
       issue_status: [
         "open",
@@ -1255,6 +1453,7 @@ export const Constants = {
       listing_kind: ["rent", "sale"],
       listing_status: ["draft", "published", "paused", "closed"],
       payment_kind: ["rent_cold", "utilities", "deposit", "other"],
+      payment_status_simple: ["paid", "open", "late"],
       provider_category: [
         "sanitaer",
         "elektrik",
