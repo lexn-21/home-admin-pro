@@ -121,19 +121,15 @@ async function processPage(p: Page): Promise<string> {
 
 /** PDF aus Pages bauen (A4, Bilder eingepasst) */
 async function buildPdf(pages: Page[]): Promise<Blob> {
-  const pdf = new jsPDF({ unit: "pt", format: "a4", orientation: "portrait" });
-  const pageW = pdf.internal.pageSize.getWidth();
-  const pageH = pdf.internal.pageSize.getHeight();
+  let pdf: jsPDF | null = null;
   for (let i = 0; i < pages.length; i++) {
     const data = pages[i].edited;
     const img = await loadImage(data);
-    const isLandscape = img.width > img.height;
-    const orient = isLandscape ? "landscape" : "portrait";
-    if (i > 0) pdf.addPage("a4", orient);
-    else if (isLandscape) {
-      // erste Seite ggf. landscape
-      pdf.deletePage(1);
-      pdf.addPage("a4", "landscape");
+    const orient: "landscape" | "portrait" = img.width > img.height ? "landscape" : "portrait";
+    if (!pdf) {
+      pdf = new jsPDF({ unit: "pt", format: "a4", orientation: orient });
+    } else {
+      pdf.addPage("a4", orient);
     }
     const pw = pdf.internal.pageSize.getWidth();
     const ph = pdf.internal.pageSize.getHeight();
@@ -147,11 +143,7 @@ async function buildPdf(pages: Page[]): Promise<Blob> {
     const y = (ph - h) / 2;
     pdf.addImage(data, "JPEG", x, y, w, h, undefined, "FAST");
   }
-  // hack: erste leere Seite entfernen falls vorhanden
-  if (pages.length > 0) {
-    // nichts — jsPDF startet mit 1 Seite, die wir bereits genutzt haben
-  }
-  return pdf.output("blob");
+  return pdf!.output("blob");
 }
 
 /* ------------------------------ Component ------------------------------ */
