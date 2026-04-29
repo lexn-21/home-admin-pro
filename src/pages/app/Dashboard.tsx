@@ -204,6 +204,40 @@ const Dashboard = () => {
         </>
       )}
 
+      {/* Tresor Hero — der Magnet */}
+      <Item variant="scale">
+        <Tappable>
+          <Link to="/app/vault">
+            <Card className="vault-surface text-white p-6 lg:p-8 relative overflow-hidden cursor-pointer">
+              <motion.div
+                className="absolute -right-20 -top-20 w-72 h-72 rounded-full bg-primary/20 blur-3xl pointer-events-none"
+                animate={{ scale: [1, 1.15, 1], opacity: [0.4, 0.6, 0.4] }}
+                transition={{ duration: 5, repeat: Infinity }}
+              />
+              <div className="relative flex items-center gap-5">
+                <motion.div
+                  className="h-14 w-14 rounded-2xl bg-gradient-gold flex items-center justify-center shadow-gold flex-shrink-0 vault-lock"
+                  whileHover={{ rotate: [0, -5, 5, 0] }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <Lock className="h-7 w-7 text-black" strokeWidth={2.5} />
+                </motion.div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-primary">Zero-Knowledge · AES-256</p>
+                  </div>
+                  <h2 className="text-xl lg:text-2xl font-bold text-white">Dein Eigentum. Sicher verwahrt.</h2>
+                  <p className="text-sm text-white/70 mt-1 hidden sm:block">
+                    Kaufverträge, Mietverträge, Steuerbescheide — verschlüsselt auf deinem Gerät, in Sekunden findbar.
+                  </p>
+                </div>
+                <ArrowUpRight className="h-5 w-5 text-white/60 flex-shrink-0" />
+              </div>
+            </Card>
+          </Link>
+        </Tappable>
+      </Item>
+
       {/* Schnellaktionen */}
       <div>
         <Item>
