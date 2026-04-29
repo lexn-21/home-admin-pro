@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Plus, Building2, MapPin, ArrowRight } from "lucide-react";
+import { Plus, Building2, MapPin, ArrowRight, Megaphone } from "lucide-react";
 import { toast } from "sonner";
 import { eur } from "@/lib/format";
 import { z } from "zod";
@@ -122,8 +122,8 @@ const Properties = () => {
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {items.map(p => (
-            <Link to={`/app/properties/${p.id}`} key={p.id}>
-              <Card className="p-6 glass hover:shadow-gold transition group">
+            <Card key={p.id} className="p-6 glass hover:shadow-gold transition group relative">
+              <Link to={`/app/properties/${p.id}`} className="block">
                 <div className="flex items-start justify-between mb-3">
                   <div className="h-10 w-10 rounded-xl bg-gradient-gold flex items-center justify-center shadow-gold">
                     <Building2 className="h-5 w-5 text-primary-foreground" />
@@ -140,8 +140,13 @@ const Properties = () => {
                   <span className="text-muted-foreground">Bj. {p.build_year ?? "—"}</span>
                   <span className="font-medium">{p.purchase_price ? eur(p.purchase_price) : "—"}</span>
                 </div>
-              </Card>
-            </Link>
+              </Link>
+              <Button asChild size="sm" variant="outline" className="w-full mt-3 border-primary/30 hover:bg-primary/5">
+                <Link to={`/app/listings/new?property=${p.id}`}>
+                  <Megaphone className="h-3.5 w-3.5 mr-1.5 text-primary" /> Vermarkten
+                </Link>
+              </Button>
+            </Card>
           ))}
         </div>
       )}
