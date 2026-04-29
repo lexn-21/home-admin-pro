@@ -224,10 +224,22 @@ const Marketplace = () => {
               Anzeigen sind klar gekennzeichnet und maximal eine pro Kategorie.
             </p>
           </div>
-          <div className="text-xs text-muted-foreground flex items-center gap-2 px-3 py-1.5 rounded-full glass">
-            <ShieldCheck className="h-3.5 w-3.5 text-success" />
-            {filtered.filter((f) => f.verified).length} verifiziert
-          </div>
+          <TooltipProvider delayDuration={150}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button className="text-xs text-muted-foreground flex items-center gap-2 px-3 py-1.5 rounded-full glass hover:bg-muted/40 transition cursor-help">
+                  <ShieldCheck className="h-3.5 w-3.5 text-success" />
+                  {filtered.filter((f) => f.verified).length} verifiziert
+                  <Info className="h-3 w-3 opacity-60" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="max-w-xs text-xs">
+                <strong className="block mb-1">Was heißt „verifiziert"?</strong>
+                Gewerbeschein, Handwerkskammer- oder Steuerberaterkammer-Eintrag wurde geprüft.
+                Nicht-verifizierte Einträge sind erlaubt, aber klar gekennzeichnet.
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </Item>
 
