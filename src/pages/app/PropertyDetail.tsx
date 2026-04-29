@@ -86,6 +86,14 @@ const PropertyDetail = () => {
         </div>
       </Card>
 
+      <NeighborhoodInsight
+        zip={property.zip}
+        city={property.city}
+        kind="rent"
+        label={property.name}
+        radiusKm={10}
+      />
+
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold">Wohneinheiten</h2>
         <Dialog open={open} onOpenChange={setOpen}>
