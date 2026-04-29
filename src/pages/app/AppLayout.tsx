@@ -336,23 +336,59 @@ const AppLayout = () => {
               <p className="text-sm text-muted-foreground">In wenigen Sekunden erledigt.</p>
             </DialogHeader>
             <div className="grid grid-cols-2 gap-2 mt-2">
-              {QUICK_CREATE.map((q) => (
-                <Link
-                  key={q.to}
-                  to={q.to}
-                  onClick={() => setCreateOpen(false)}
-                  className="p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition group"
-                >
-                  <div className="h-10 w-10 rounded-xl bg-gradient-gold-soft flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
-                    <q.icon className="h-5 w-5 text-primary" />
-                  </div>
-                  <p className="font-semibold text-sm">{q.label}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{q.desc}</p>
-                </Link>
-              ))}
+              {QUICK_CREATE.map((q) => {
+                const Inner = (
+                  <>
+                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center mb-2 group-hover:scale-105 transition-transform ${q.highlight ? "bg-gradient-gold shadow-gold" : "bg-gradient-gold-soft"}`}>
+                      <q.icon className={`h-5 w-5 ${q.highlight ? "text-primary-foreground" : "text-primary"}`} />
+                    </div>
+                    <p className="font-semibold text-sm flex items-center gap-1.5">
+                      {q.label}
+                      {q.highlight && (
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-primary/15 text-primary">NEU</span>
+                      )}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{q.desc}</p>
+                  </>
+                );
+                const cls = "p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition group text-left";
+                if (q.kind === "action" && q.id === "scan") {
+                  return (
+                    <button
+                      key="scan"
+                      type="button"
+                      onClick={() => { setCreateOpen(false); setScannerOpen(true); }}
+                      className={cls}
+                    >
+                      {Inner}
+                    </button>
+                  );
+                }
+                return (
+                  <Link
+                    key={q.to}
+                    to={q.to}
+                    onClick={() => setCreateOpen(false)}
+                    className={cls}
+                  >
+                    {Inner}
+                  </Link>
+                );
+              })}
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Document Scanner */}
+        <DocScanner
+          open={scannerOpen}
+          onClose={() => setScannerOpen(false)}
+          suggestedName="Scan"
+          onComplete={async (file) => {
+            pendingIngest.set(file);
+            navigate("/app/vault?ingest=1");
+          }}
+        />
 
         <AskCopilot />
       </div>
