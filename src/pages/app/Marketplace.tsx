@@ -61,17 +61,17 @@ type Provider = {
 
 // Kuratierte Startliste NRW — erweitert
 const SEED: Provider[] = [
-  { id: "1", name: "Elektro Schröder GmbH", category: "electrician", city: "Ennigerloh", zip: "59320", rating: 4.8, reviews: 127, phone: "+49 2524 12345", verified: true, premium: true, lat: 51.8374, lng: 8.0244, specialties: ["Zählertausch", "Smart Home", "E-Check"] },
-  { id: "2", name: "Sanitär Müller", category: "plumber", city: "Oelde", zip: "59302", rating: 4.6, reviews: 89, phone: "+49 2522 98765", verified: true, lat: 51.8267, lng: 8.1469, specialties: ["Heizung", "Bad", "Notdienst"] },
+  { id: "1", name: "Elektro Schröder GmbH", category: "electrician", city: "Ennigerloh", zip: "59320", rating: 4.8, reviews: 127, phone: "+49 2524 12345", website: "https://www.handwerkskammer.de", verified: true, premium: true, lat: 51.8374, lng: 8.0244, specialties: ["Zählertausch", "Smart Home", "E-Check"] },
+  { id: "2", name: "Sanitär Müller", category: "plumber", city: "Oelde", zip: "59302", rating: 4.6, reviews: 89, phone: "+49 2522 98765", website: "https://www.zvshk.de", verified: true, lat: 51.8267, lng: 8.1469, specialties: ["Heizung", "Bad", "Notdienst"] },
   { id: "3", name: "Maler Becker", category: "painter", city: "Warendorf", zip: "48231", rating: 4.9, reviews: 203, phone: "+49 2581 44556", verified: true, lat: 51.9544, lng: 7.9869, specialties: ["Innenanstrich", "Fassade", "Tapete"] },
-  { id: "4", name: "StB Kerstin Boomgaarden", category: "tax", city: "Ennigerloh", zip: "59320", rating: 5.0, reviews: 34, email: "kanzlei@example.de", verified: true, premium: true, lat: 51.8394, lng: 8.0264, specialties: ["Anlage V", "GbR", "DATEV"] },
+  { id: "4", name: "StB Kerstin Boomgaarden", category: "tax", city: "Ennigerloh", zip: "59320", rating: 5.0, reviews: 34, email: "kanzlei@example.de", website: "https://steuerberater.de", verified: true, premium: true, lat: 51.8394, lng: 8.0264, specialties: ["Anlage V", "GbR", "DATEV"] },
   { id: "5", name: "Dachdeckerei Hülsmann", category: "roofer", city: "Beckum", zip: "59269", rating: 4.7, reviews: 156, phone: "+49 2521 77888", verified: true, lat: 51.7548, lng: 8.0418, specialties: ["Flachdach", "Reparatur", "Dämmung"] },
   { id: "6", name: "Hausmeister-Service König", category: "handyman", city: "Ahlen", zip: "59227", rating: 4.4, reviews: 71, phone: "+49 2382 33221", verified: false, lat: 51.7636, lng: 7.8918, specialties: ["Grünpflege", "Winterdienst", "Kleinreparaturen"] },
-  { id: "7", name: "Elektro Westfalen", category: "electrician", city: "Münster", zip: "48143", rating: 4.5, reviews: 312, phone: "+49 251 556677", verified: true, lat: 51.9607, lng: 7.6261, specialties: ["Photovoltaik", "Wallbox", "Altbausanierung"] },
+  { id: "7", name: "Elektro Westfalen", category: "electrician", city: "Münster", zip: "48143", rating: 4.5, reviews: 312, phone: "+49 251 556677", website: "https://www.handwerkskammer.de", verified: true, lat: 51.9607, lng: 7.6261, specialties: ["Photovoltaik", "Wallbox", "Altbausanierung"] },
   { id: "8", name: "Bad & Heizung Weber", category: "plumber", city: "Bielefeld", zip: "33602", rating: 4.7, reviews: 198, phone: "+49 521 778899", verified: true, premium: true, lat: 52.0302, lng: 8.5325, specialties: ["Wärmepumpe", "Badsanierung", "GEG-Beratung"] },
   { id: "9", name: "Gartenpflege Nowak", category: "gardener", city: "Lippstadt", zip: "59555", rating: 4.6, reviews: 67, phone: "+49 2941 665544", verified: true, lat: 51.6734, lng: 8.3448, specialties: ["Heckenschnitt", "Rasen", "Baumpflege"] },
   { id: "10", name: "Clean & Klar Reinigung", category: "cleaner", city: "Hamm", zip: "59065", rating: 4.3, reviews: 54, phone: "+49 2381 223344", verified: false, lat: 51.6806, lng: 7.8142, specialties: ["Treppenhaus", "Endreinigung", "Fenster"] },
-  { id: "11", name: "Steuerkanzlei Rieger", category: "tax", city: "Dortmund", zip: "44137", rating: 4.8, reviews: 211, email: "info@rieger-stb.de", verified: true, lat: 51.5136, lng: 7.4653, specialties: ["Immobilien", "§15a EStG", "E-Bilanz"] },
+  { id: "11", name: "Steuerkanzlei Rieger", category: "tax", city: "Dortmund", zip: "44137", rating: 4.8, reviews: 211, email: "info@rieger-stb.de", website: "https://steuerberater.de", verified: true, lat: 51.5136, lng: 7.4653, specialties: ["Immobilien", "§15a EStG", "E-Bilanz"] },
   { id: "12", name: "Maler Kowalski", category: "painter", city: "Hamm", zip: "59065", rating: 4.4, reviews: 88, phone: "+49 2381 998877", verified: true, lat: 51.6756, lng: 7.8192, specialties: ["Rauhfaser", "Spachteltechnik", "Außenfassade"] },
 ];
 
