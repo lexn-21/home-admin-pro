@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
@@ -93,7 +93,7 @@ const AppLayout = () => {
 
       {/* Sidebar (desktop) */}
       <aside className="hidden lg:flex fixed inset-y-0 left-0 w-64 flex-col border-r border-border/60 bg-sidebar/80 backdrop-blur-xl z-30">
-        <div className="p-6"><Logo /></div>
+        <div className="p-6"><Link to="/app" aria-label="Zum Dashboard"><Logo /></Link></div>
         <nav className="flex-1 px-3 space-y-6 overflow-y-auto">
           {groups.map((g) => (
             <div key={g.title}>
@@ -167,7 +167,7 @@ const AppLayout = () => {
       {/* Mobile top bar */}
       <header className="lg:hidden sticky top-0 z-40 glass border-b border-border/60">
         <div className="flex items-center justify-between px-4 h-14">
-          <Logo />
+          <Link to="/app" aria-label="Zum Dashboard"><Logo /></Link>
           <div className="flex items-center gap-1">
             <Button variant="ghost" size="icon" className="h-9 w-9">
               <Search className="h-4 w-4" />
