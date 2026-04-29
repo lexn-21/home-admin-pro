@@ -8,8 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Logo } from "@/components/Logo";
 import { eur } from "@/lib/format";
-import { ArrowLeft, MapPin, Bed, Maximize2, Calendar, Euro, ShieldCheck, Heart } from "lucide-react";
+import { ArrowLeft, MapPin, Bed, Maximize2, Calendar, Euro, ShieldCheck, Heart, Target } from "lucide-react";
 import { toast } from "sonner";
+import { SponsoredSlot } from "@/components/market/SponsoredSlot";
 
 const MarktDetail = () => {
   const { id } = useParams();
