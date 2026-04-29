@@ -10,9 +10,10 @@ import "leaflet/dist/leaflet.css";
 import { toast } from "sonner";
 import {
   Wrench, Search, MapPin, Star, Phone, Mail, ShieldCheck, Filter, Crosshair,
-  Calculator, Paintbrush, Zap, Droplets, Hammer, HardHat, Building2, X,
+  Calculator, Paintbrush, Zap, Droplets, Hammer, HardHat, Building2, X, Globe, Info,
 } from "lucide-react";
 import { SponsoredSlot } from "@/components/market/SponsoredSlot";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 // Fix default marker icons
 delete (L.Icon.Default.prototype as any)._getIconUrl;
