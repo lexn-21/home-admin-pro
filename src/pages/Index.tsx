@@ -117,8 +117,8 @@ const Index = () => {
               <Sparkles className="h-3 w-3 text-primary" />
               All-in-One für deine Immobilie · Made in Germany · DSGVO
             </div>
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.05] mb-6">
-              Alles rund um deine<br />
+            <h1 className="text-[2.25rem] leading-[1.1] sm:text-5xl md:text-7xl font-bold tracking-tight mb-6">
+              Alles rund um deine{" "}
               <span className="text-gradient-gold">Immobilie.</span> An einem Ort.
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed">
