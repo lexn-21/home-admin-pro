@@ -90,7 +90,7 @@ const Index = () => {
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* NAV */}
       <header className="sticky top-0 z-50 glass">
-        <div className="container flex h-16 items-center justify-between">
+        <div className="container flex h-16 items-center justify-between gap-2">
           <Logo />
           <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
             <a href="#fuer-wen" className="hover:text-foreground transition">Für wen</a>
@@ -98,11 +98,11 @@ const Index = () => {
             <a href="#warum" className="hover:text-foreground transition">Warum</a>
             <a href="#preise" className="hover:text-foreground transition">Preise</a>
           </nav>
-          <div className="flex items-center gap-2">
-            <Button asChild variant="ghost" size="sm"><Link to="/markt">Markt</Link></Button>
+          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+            <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex"><Link to="/markt">Markt</Link></Button>
             <Button asChild variant="ghost" size="sm"><Link to="/auth">Anmelden</Link></Button>
             <Button asChild size="sm" className="bg-gradient-gold text-primary-foreground hover:opacity-90 shadow-gold">
-              <Link to="/auth">Kostenlos starten</Link>
+              <Link to="/auth"><span className="hidden sm:inline">Kostenlos starten</span><span className="sm:hidden">Starten</span></Link>
             </Button>
           </div>
         </div>
@@ -117,8 +117,8 @@ const Index = () => {
               <Sparkles className="h-3 w-3 text-primary" />
               All-in-One für deine Immobilie · Made in Germany · DSGVO
             </div>
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.05] mb-6">
-              Alles rund um deine<br />
+            <h1 className="text-[2.25rem] leading-[1.1] sm:text-5xl md:text-7xl font-bold tracking-tight mb-6">
+              Alles rund um deine{" "}
               <span className="text-gradient-gold">Immobilie.</span> An einem Ort.
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed">
@@ -185,7 +185,7 @@ const Index = () => {
         <div className="container">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <p className="text-sm text-primary font-semibold uppercase tracking-wider mb-4">Was drin ist</p>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
               Sechs Bausteine. <span className="text-gradient-gold">Du nutzt, was du brauchst.</span>
             </h2>
             <p className="text-muted-foreground">
@@ -218,7 +218,7 @@ const Index = () => {
         <div className="container max-w-5xl">
           <div className="text-center mb-12">
             <p className="text-sm text-primary font-semibold uppercase tracking-wider mb-4">Warum überhaupt</p>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
               Deine Immobilien-Sachen liegen in <span className="text-gradient-gold">10 Ordnern, 4 Apps und 1 Schuhkarton.</span>
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -246,7 +246,7 @@ const Index = () => {
         <div className="container max-w-5xl">
           <div className="text-center mb-16">
             <p className="text-sm text-primary font-semibold uppercase tracking-wider mb-4">Warum ImmoNIQ</p>
-            <h2 className="text-4xl md:text-5xl font-bold">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold">
               Andere verwalten. <span className="text-gradient-gold">Wir denken mit.</span>
             </h2>
           </div>
@@ -292,7 +292,7 @@ const Index = () => {
         <div className="container max-w-5xl">
           <div className="text-center mb-12">
             <p className="text-sm text-primary font-semibold uppercase tracking-wider mb-4">Preise</p>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
               Privat <span className="text-gradient-gold">kostenlos.</span> Vermieten ab 4,99 €.
             </h2>
             <p className="text-muted-foreground">14 Tage volle Funktionen testen. Monatlich kündbar. Keine versteckten Kosten.</p>
@@ -370,8 +370,8 @@ const Index = () => {
       <section className="py-24 bg-muted/30 border-t border-border">
         <div className="container max-w-3xl text-center">
           <FileText className="h-12 w-12 text-primary mx-auto mb-6" />
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Deine Immobilie verdient<br />
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
+            Deine Immobilie verdient{" "}
             <span className="text-gradient-gold">eine ehrliche App.</span>
           </h2>
           <p className="text-muted-foreground mb-8 text-lg">
