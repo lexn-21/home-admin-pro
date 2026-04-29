@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,8 @@ import { ArrowLeft, ImagePlus, Sparkles, Scale, X } from "lucide-react";
 const ListingEditor = () => {
   const { id } = useParams();
   const nav = useNavigate();
+  const [search] = useSearchParams();
+  const presetProperty = search.get("property") ?? "";
   const editing = id && id !== "new";
 
   const [properties, setProperties] = useState<any[]>([]);
@@ -52,6 +54,23 @@ const ListingEditor = () => {
             features: data.features ?? form.features,
           });
           setPhotos(data.photos ?? []);
+        }
+      } else if (presetProperty) {
+        const prop = (p.data ?? []).find((x: any) => x.id === presetProperty);
+        if (prop) {
+          setForm((f: any) => ({
+            ...f,
+            property_id: prop.id,
+            living_space: prop.area_sqm ?? f.living_space,
+            rooms: prop.rooms ?? f.rooms,
+            price: f.price || prop.cold_rent || "",
+            utilities: f.utilities || prop.utilities || "",
+            deposit: f.deposit || prop.deposit || "",
+            zip: f.zip || prop.zip || "",
+            city: f.city || prop.city || "",
+            street_public: f.street_public || prop.street || "",
+            title: f.title || `${prop.rooms ? prop.rooms + "-Zi-" : ""}Wohnung in ${prop.city ?? ""}`.trim(),
+          }));
         }
       }
     })();
