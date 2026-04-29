@@ -1,0 +1,196 @@
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Logo } from "@/components/Logo";
+import { eur } from "@/lib/format";
+import { ArrowLeft, MapPin, Bed, Maximize2, Calendar, Euro, ShieldCheck, Heart } from "lucide-react";
+import { toast } from "sonner";
+
+const MarktDetail = () => {
+  const { id } = useParams();
+  const nav = useNavigate();
+  const [l, setL] = useState<any>(null);
+  const [user, setUser] = useState<any>(null);
+  const [seeker, setSeeker] = useState<any>(null);
+  const [applied, setApplied] = useState(false);
+  const [dlg, setDlg] = useState(false);
+  const [msg, setMsg] = useState("");
+
+  useEffect(() => {
+    if (!id) return;
+    (async () => {
+      const { data } = await supabase.from("listings").select("*").eq("id", id).maybeSingle();
+      setL(data);
+      if (data) document.title = `${data.title} · ImmoNIQ`;
+      await supabase.rpc("listing_inc_view", { _listing_id: id });
+
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+      if (user) {
+        const [{ data: sp }, { data: ap }] = await Promise.all([
+          supabase.from("seeker_profiles").select("*").eq("user_id", user.id).maybeSingle(),
+          supabase.from("applications").select("id").eq("listing_id", id).eq("seeker_user_id", user.id).maybeSingle(),
+        ]);
+        setSeeker(sp);
+        setApplied(!!ap);
+      }
+    })();
+  }, [id]);
+
+  const photoUrl = (p?: string) =>
+    p ? supabase.storage.from("listing-photos").getPublicUrl(p).data.publicUrl : null;
+
+  const apply = async () => {
+    if (!user) { nav(`/auth?redirect=/markt/${id}`); return; }
+    if (!seeker || !seeker.full_name) {
+      toast.error("Bitte erst Bewerber-Profil ausfüllen.");
+      nav("/app/profile-seeker");
+      return;
+    }
+    const { error } = await supabase.from("applications").insert({
+      listing_id: l.id,
+      seeker_user_id: user.id,
+      owner_user_id: l.user_id,
+      cover_message: msg || null,
+      snapshot_profile: seeker,
+    });
+    if (error) return toast.error(error.message);
+    setApplied(true);
+    setDlg(false);
+    toast.success("Bewerbung gesendet!");
+  };
+
+  const save = async () => {
+    if (!user) { nav(`/auth?redirect=/markt/${id}`); return; }
+    const { error } = await supabase.from("listing_saves").insert({ user_id: user.id, listing_id: l.id });
+    if (error) toast.error(error.message); else toast.success("Gespeichert");
+  };
+
+  if (!l) return <div className="container py-10 text-muted-foreground">Lade…</div>;
+
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="sticky top-0 z-30 glass border-b border-border/60">
+        <div className="container max-w-5xl flex items-center justify-between h-14">
+          <Link to="/markt" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="h-4 w-4" /> Markt
+          </Link>
+          <Logo />
+          <div className="w-12" />
+        </div>
+      </header>
+
+      <main className="container max-w-5xl py-6 space-y-6">
+        {l.photos?.length ? (
+          <div className="grid grid-cols-4 gap-2 rounded-xl overflow-hidden">
+            <div className="col-span-4 sm:col-span-3 aspect-video bg-muted">
+              <img src={photoUrl(l.photos[0])!} alt="" className="w-full h-full object-cover" />
+            </div>
+            <div className="hidden sm:grid grid-cols-1 gap-2">
+              {l.photos.slice(1, 3).map((p: string) => (
+                <div key={p} className="aspect-video bg-muted"><img src={photoUrl(p)!} className="w-full h-full object-cover" alt="" /></div>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        <div className="grid lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <div>
+              <div className="flex gap-2 mb-2">
+                <Badge>{l.kind === "rent" ? "Zur Miete" : "Zum Kauf"}</Badge>
+                {l.energy_class && <Badge variant="outline">Energie {l.energy_class}</Badge>}
+              </div>
+              <h1 className="text-3xl font-bold">{l.title}</h1>
+              <p className="text-muted-foreground flex items-center gap-1 mt-1">
+                <MapPin className="h-4 w-4" /> {[l.street_public, l.zip, l.city].filter(Boolean).join(", ")}
+              </p>
+            </div>
+
+            <Card className="p-5 glass grid grid-cols-3 gap-4 text-sm">
+              <div><p className="text-muted-foreground text-xs">Zimmer</p><p className="font-semibold flex items-center gap-1"><Bed className="h-3 w-3" /> {l.rooms ?? "—"}</p></div>
+              <div><p className="text-muted-foreground text-xs">Wohnfläche</p><p className="font-semibold flex items-center gap-1"><Maximize2 className="h-3 w-3" /> {l.living_space ?? "—"} m²</p></div>
+              <div><p className="text-muted-foreground text-xs">Verfügbar</p><p className="font-semibold flex items-center gap-1"><Calendar className="h-3 w-3" /> {l.available_from ? new Date(l.available_from).toLocaleDateString("de-DE") : "sofort"}</p></div>
+            </Card>
+
+            {l.description && (
+              <Card className="p-6 glass">
+                <h2 className="font-bold mb-2">Beschreibung</h2>
+                <p className="text-sm whitespace-pre-line text-muted-foreground">{l.description}</p>
+              </Card>
+            )}
+
+            {l.features && Object.values(l.features).some(Boolean) && (
+              <Card className="p-6 glass">
+                <h2 className="font-bold mb-3">Ausstattung</h2>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(l.features).filter(([, v]) => v).map(([k]) => (
+                    <Badge key={k} variant="secondary" className="capitalize">{k.replace("_", " ")}</Badge>
+                  ))}
+                </div>
+              </Card>
+            )}
+
+            {l.energy_class && (
+              <Card className="p-6 glass">
+                <h2 className="font-bold mb-2">Energieausweis</h2>
+                <p className="text-sm">Klasse <strong>{l.energy_class}</strong>{l.energy_value ? ` · ${l.energy_value} kWh/m²·a` : ""}</p>
+                <p className="text-[11px] text-muted-foreground mt-1">Pflichtangabe nach <a className="underline" href="https://www.gesetze-im-internet.de/geg/" target="_blank" rel="noreferrer">GEG § 87</a>.</p>
+              </Card>
+            )}
+          </div>
+
+          <aside className="space-y-4">
+            <Card className="p-6 glass sticky top-20">
+              <p className="text-3xl font-bold text-gradient-gold">{eur(l.price)}<span className="text-sm text-muted-foreground font-normal">{l.kind === "rent" ? " / Monat" : ""}</span></p>
+              {l.kind === "rent" && (
+                <div className="text-xs text-muted-foreground mt-2 space-y-1">
+                  {l.utilities ? <p className="flex justify-between"><span>Nebenkosten</span><span>{eur(l.utilities)}</span></p> : null}
+                  {l.deposit ? <p className="flex justify-between"><span>Kaution</span><span>{eur(l.deposit)}</span></p> : null}
+                </div>
+              )}
+              <div className="space-y-2 mt-4">
+                {applied ? (
+                  <Button disabled className="w-full">Bereits beworben ✓</Button>
+                ) : (
+                  <Button onClick={() => setDlg(true)} className="w-full bg-gradient-gold text-primary-foreground shadow-gold">
+                    Jetzt bewerben
+                  </Button>
+                )}
+                <Button variant="outline" onClick={save} className="w-full"><Heart className="h-4 w-4 mr-2" /> Speichern</Button>
+              </div>
+              <p className="text-[11px] text-muted-foreground mt-4 flex items-center gap-1">
+                <ShieldCheck className="h-3 w-3 text-primary" /> Direkt vom Eigentümer · keine Maklerprovision
+              </p>
+            </Card>
+          </aside>
+        </div>
+      </main>
+
+      <Dialog open={dlg} onOpenChange={setDlg}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Bewerbung senden</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Dein Bewerber-Profil wird sicher übermittelt. Der Eigentümer sieht: Name, Einkommen, Beschäftigung, Haushaltsgröße, SCHUFA-Status.
+            </p>
+            <Textarea rows={5} placeholder="Persönliche Nachricht (optional)…" value={msg} onChange={(e) => setMsg(e.target.value)} />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDlg(false)}>Abbrechen</Button>
+            <Button onClick={apply} className="bg-gradient-gold text-primary-foreground shadow-gold">
+              <Euro className="h-4 w-4 mr-1" /> Bewerbung senden
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default MarktDetail;
