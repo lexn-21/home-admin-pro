@@ -12,6 +12,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { num, date } from "@/lib/format";
+import { pendingIngest } from "@/lib/ingest";
+import { useSearchParams } from "react-router-dom";
 import {
   Lock, ShieldCheck, KeyRound, FileText, Eye, EyeOff,
   Fingerprint, ServerCrash, CheckCircle2, AlertTriangle,
@@ -91,6 +93,23 @@ const Vault = () => {
   const [dragOver, setDragOver] = useState(false);
 
   useEffect(() => { document.title = "Tresor · ImmoNIQ"; loadSettings(); }, []);
+
+  // Wenn Scanner / externer Flow eine Datei "geliefert" hat, automatisch nach Unlock speichern.
+  const [searchParams, setSearchParams] = useSearchParams();
+  useEffect(() => {
+    if (unlocked && searchParams.get("ingest") === "1" && pendingIngest.has()) {
+      const file = pendingIngest.take();
+      if (file) {
+        // kleine Verzögerung damit Vault-Daten geladen sind
+        setTimeout(() => quickSaveFile(file), 200);
+      }
+      // Param wieder entfernen
+      const next = new URLSearchParams(searchParams);
+      next.delete("ingest");
+      setSearchParams(next, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [unlocked, searchParams]);
 
   const loadSettings = async () => {
     const { data } = await supabase.from("vault_settings").select("*").maybeSingle();

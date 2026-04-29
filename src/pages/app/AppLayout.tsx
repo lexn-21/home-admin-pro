@@ -9,9 +9,11 @@ import {
   LogOut, Settings as SettingsIcon, ShieldCheck,
   Lock, Wrench, Bell, Search, Scale,
   TrendingUp, Megaphone, Inbox,
-  FileText, Plus, Home, Menu, X, CalendarCheck, Search as SearchIcon,
+  FileText, Plus, Home, Menu, X, CalendarCheck, Search as SearchIcon, ScanLine,
 } from "lucide-react";
 import { AskCopilot } from "@/components/AskCopilot";
+import { DocScanner } from "@/components/DocScanner";
+import { pendingIngest } from "@/lib/ingest";
 import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from "@/components/ui/tooltip";
@@ -82,13 +84,18 @@ const bottomRight: NavItem[] = [
   { to: "/app/vault", label: "Tresor", icon: Lock },
 ];
 
-const QUICK_CREATE = [
-  { to: "/app/properties", icon: Building2, label: "Objekt anlegen", desc: "Wohnung, Haus, MFH" },
-  { to: "/app/listings/new", icon: Megaphone, label: "Inserat erstellen", desc: "Vermieten in 60 Sek." },
-  { to: "/app/payments", icon: Wallet, label: "Zahlung erfassen", desc: "Mieteingang buchen" },
-  { to: "/app/expenses", icon: Receipt, label: "Beleg hochladen", desc: "Steuer-relevant" },
-  { to: "/app/tenants", icon: Users, label: "Mieter hinzufügen", desc: "Mit Vertrag" },
-  { to: "/app/vault", icon: Lock, label: "Dokument sichern", desc: "Verschlüsselt" },
+type QuickAction =
+  | { kind: "link"; to: string; icon: any; label: string; desc: string; highlight?: boolean }
+  | { kind: "action"; id: "scan"; icon: any; label: string; desc: string; highlight?: boolean };
+
+const QUICK_CREATE: QuickAction[] = [
+  { kind: "action", id: "scan", icon: ScanLine, label: "Dokument scannen", desc: "Mit Kamera in den Tresor", highlight: true },
+  { kind: "link", to: "/app/properties", icon: Building2, label: "Objekt anlegen", desc: "Wohnung, Haus, MFH" },
+  { kind: "link", to: "/app/listings/new", icon: Megaphone, label: "Inserat erstellen", desc: "Vermieten in 60 Sek." },
+  { kind: "link", to: "/app/payments", icon: Wallet, label: "Zahlung erfassen", desc: "Mieteingang buchen" },
+  { kind: "link", to: "/app/expenses", icon: Receipt, label: "Beleg hochladen", desc: "Steuer-relevant" },
+  { kind: "link", to: "/app/tenants", icon: Users, label: "Mieter hinzufügen", desc: "Mit Vertrag" },
+  { kind: "link", to: "/app/vault", icon: Lock, label: "Dokument sichern", desc: "Verschlüsselt" },
 ];
 
 const AppLayout = () => {
@@ -97,6 +104,7 @@ const AppLayout = () => {
   const location = useLocation();
   const [createOpen, setCreateOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [scannerOpen, setScannerOpen] = useState(false);
   const handleSignOut = async () => { await signOut(); navigate("/", { replace: true }); };
 
   // Schließe Drawer bei Routenwechsel
@@ -328,23 +336,59 @@ const AppLayout = () => {
               <p className="text-sm text-muted-foreground">In wenigen Sekunden erledigt.</p>
             </DialogHeader>
             <div className="grid grid-cols-2 gap-2 mt-2">
-              {QUICK_CREATE.map((q) => (
-                <Link
-                  key={q.to}
-                  to={q.to}
-                  onClick={() => setCreateOpen(false)}
-                  className="p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition group"
-                >
-                  <div className="h-10 w-10 rounded-xl bg-gradient-gold-soft flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
-                    <q.icon className="h-5 w-5 text-primary" />
-                  </div>
-                  <p className="font-semibold text-sm">{q.label}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{q.desc}</p>
-                </Link>
-              ))}
+              {QUICK_CREATE.map((q) => {
+                const Inner = (
+                  <>
+                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center mb-2 group-hover:scale-105 transition-transform ${q.highlight ? "bg-gradient-gold shadow-gold" : "bg-gradient-gold-soft"}`}>
+                      <q.icon className={`h-5 w-5 ${q.highlight ? "text-primary-foreground" : "text-primary"}`} />
+                    </div>
+                    <p className="font-semibold text-sm flex items-center gap-1.5">
+                      {q.label}
+                      {q.highlight && (
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-primary/15 text-primary">NEU</span>
+                      )}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{q.desc}</p>
+                  </>
+                );
+                const cls = "p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition group text-left";
+                if (q.kind === "link") {
+                  return (
+                    <Link
+                      key={q.to}
+                      to={q.to}
+                      onClick={() => setCreateOpen(false)}
+                      className={cls}
+                    >
+                      {Inner}
+                    </Link>
+                  );
+                }
+                return (
+                  <button
+                    key="scan"
+                    type="button"
+                    onClick={() => { setCreateOpen(false); setScannerOpen(true); }}
+                    className={cls}
+                  >
+                    {Inner}
+                  </button>
+                );
+              })}
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Document Scanner */}
+        <DocScanner
+          open={scannerOpen}
+          onClose={() => setScannerOpen(false)}
+          suggestedName="Scan"
+          onComplete={async (file) => {
+            pendingIngest.set(file);
+            navigate("/app/vault?ingest=1");
+          }}
+        />
 
         <AskCopilot />
       </div>
