@@ -14,6 +14,104 @@ export type Database = {
   }
   public: {
     Tables: {
+      ad_events: {
+        Row: {
+          ad_id: string
+          context_city: string | null
+          context_listing_id: string | null
+          context_zip: string | null
+          created_at: string
+          event_type: string
+          id: string
+        }
+        Insert: {
+          ad_id: string
+          context_city?: string | null
+          context_listing_id?: string | null
+          context_zip?: string | null
+          created_at?: string
+          event_type: string
+          id?: string
+        }
+        Update: {
+          ad_id?: string
+          context_city?: string | null
+          context_listing_id?: string | null
+          context_zip?: string | null
+          created_at?: string
+          event_type?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_events_ad_id_fkey"
+            columns: ["ad_id"]
+            isOneToOne: false
+            referencedRelation: "ad_slots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ad_slots: {
+        Row: {
+          active: boolean
+          click_url: string
+          created_at: string
+          cta_label: string | null
+          ends_at: string | null
+          id: string
+          image_url: string | null
+          placement: string
+          priority: number
+          sponsor_name: string | null
+          starts_at: string
+          subtitle: string | null
+          target_cities: string[] | null
+          target_kind: string | null
+          target_zips: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          click_url: string
+          created_at?: string
+          cta_label?: string | null
+          ends_at?: string | null
+          id?: string
+          image_url?: string | null
+          placement?: string
+          priority?: number
+          sponsor_name?: string | null
+          starts_at?: string
+          subtitle?: string | null
+          target_cities?: string[] | null
+          target_kind?: string | null
+          target_zips?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          click_url?: string
+          created_at?: string
+          cta_label?: string | null
+          ends_at?: string | null
+          id?: string
+          image_url?: string | null
+          placement?: string
+          priority?: number
+          sponsor_name?: string | null
+          starts_at?: string
+          subtitle?: string | null
+          target_cities?: string[] | null
+          target_kind?: string | null
+          target_zips?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       advisor_directory: {
         Row: {
           active: boolean
@@ -525,7 +623,9 @@ export type Database = {
           features: Json
           id: string
           kind: Database["public"]["Enums"]["listing_kind"]
+          lat: number | null
           living_space: number | null
+          lng: number | null
           min_term_months: number | null
           photos: string[]
           price: number
@@ -558,7 +658,9 @@ export type Database = {
           features?: Json
           id?: string
           kind?: Database["public"]["Enums"]["listing_kind"]
+          lat?: number | null
           living_space?: number | null
+          lng?: number | null
           min_term_months?: number | null
           photos?: string[]
           price?: number
@@ -591,7 +693,9 @@ export type Database = {
           features?: Json
           id?: string
           kind?: Database["public"]["Enums"]["listing_kind"]
+          lat?: number | null
           living_space?: number | null
+          lng?: number | null
           min_term_months?: number | null
           photos?: string[]
           price?: number
@@ -1262,6 +1366,40 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      ad_slots_for: {
+        Args: {
+          _city?: string
+          _kind?: string
+          _limit?: number
+          _placement: string
+          _zip?: string
+        }
+        Returns: {
+          active: boolean
+          click_url: string
+          created_at: string
+          cta_label: string | null
+          ends_at: string | null
+          id: string
+          image_url: string | null
+          placement: string
+          priority: number
+          sponsor_name: string | null
+          starts_at: string
+          subtitle: string | null
+          target_cities: string[] | null
+          target_kind: string | null
+          target_zips: string[] | null
+          title: string
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "ad_slots"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       advisor_get_data: { Args: { _token: string }; Returns: Json }
       advisor_owner_for_token: { Args: { _token: string }; Returns: string }
       advisor_touch_token: { Args: { _token: string }; Returns: string }
@@ -1279,6 +1417,32 @@ export type Database = {
         Returns: boolean
       }
       listing_inc_view: { Args: { _listing_id: string }; Returns: undefined }
+      listings_nearby: {
+        Args: {
+          _exclude_id?: string
+          _kind?: string
+          _lat: number
+          _limit?: number
+          _lng: number
+          _radius_km?: number
+        }
+        Returns: {
+          city: string
+          distance_km: number
+          id: string
+          kind: string
+          lat: number
+          living_space: number
+          lng: number
+          photos: string[]
+          price: number
+          published_at: string
+          rooms: number
+          status: string
+          title: string
+          zip: string
+        }[]
+      }
       tenant_portal_report_issue: {
         Args: {
           _category: string

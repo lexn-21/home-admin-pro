@@ -8,8 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Logo } from "@/components/Logo";
 import { eur } from "@/lib/format";
-import { ArrowLeft, MapPin, Bed, Maximize2, Calendar, Euro, ShieldCheck, Heart } from "lucide-react";
+import { ArrowLeft, MapPin, Bed, Maximize2, Calendar, Euro, ShieldCheck, Heart, Target } from "lucide-react";
 import { toast } from "sonner";
+import { SponsoredSlot } from "@/components/market/SponsoredSlot";
 
 const MarktDetail = () => {
   const { id } = useParams();
@@ -163,11 +164,31 @@ const MarktDetail = () => {
                   </Button>
                 )}
                 <Button variant="outline" onClick={save} className="w-full"><Heart className="h-4 w-4 mr-2" /> Speichern</Button>
+                <Link to={`/markt?near=${l.id}&r=10`}>
+                  <Button variant="ghost" className="w-full"><Target className="h-4 w-4 mr-2" /> Ähnliche in der Nähe</Button>
+                </Link>
               </div>
               <p className="text-[11px] text-muted-foreground mt-4 flex items-center gap-1">
                 <ShieldCheck className="h-3 w-3 text-primary" /> Direkt vom Eigentümer · keine Maklerprovision
               </p>
             </Card>
+            <SponsoredSlot
+              placement="listing_sidebar"
+              zip={l.zip}
+              city={l.city}
+              kind={l.kind}
+              contextListingId={l.id}
+              variant="banner"
+              limit={1}
+            />
+            <SponsoredSlot
+              placement="listing_detail"
+              zip={l.zip}
+              city={l.city}
+              kind={l.kind}
+              contextListingId={l.id}
+              limit={2}
+            />
           </aside>
         </div>
       </main>
