@@ -17,9 +17,15 @@ const schema = z.object({
   zip: z.string().trim().max(10).optional().or(z.literal("")),
   city: z.string().trim().max(80).optional().or(z.literal("")),
   build_year: z.number().int().min(1800).max(2100).optional(),
+  area_sqm: z.number().min(0).max(100000).optional(),
+  rooms: z.number().min(0).max(50).optional(),
   purchase_price: z.number().min(0).max(99999999).optional(),
   purchase_date: z.string().optional().or(z.literal("")),
   afa_rate: z.number().min(0).max(20).optional(),
+  sonderafa_7b: z.boolean().optional(),
+  cold_rent: z.number().min(0).max(999999).optional(),
+  utilities: z.number().min(0).max(999999).optional(),
+  deposit: z.number().min(0).max(9999999).optional(),
 });
 
 const Properties = () => {
