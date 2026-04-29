@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import {
-  LayoutDashboard, Building2, Users, Wallet, Receipt, Calculator,
-  LogOut, Settings as SettingsIcon, AlertTriangle, ShieldCheck,
-  Lock, Wrench, Bell, Search, CalendarClock, Scale,
-  TrendingUp, BarChart3, Briefcase, Megaphone, UserCircle2, Inbox,
-  FileText, Clock, Plus, Home, Menu, X, HelpCircle,
+  Building2, Users, Wallet, Receipt, Calculator,
+  LogOut, Settings as SettingsIcon, ShieldCheck,
+  Lock, Wrench, Bell, Search, Scale,
+  TrendingUp, Megaphone, Inbox,
+  FileText, Plus, Home, Menu, X, CalendarCheck, Search as SearchIcon,
 } from "lucide-react";
 import { AskCopilot } from "@/components/AskCopilot";
 import {
