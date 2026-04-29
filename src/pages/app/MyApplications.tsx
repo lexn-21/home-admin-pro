@@ -67,7 +67,11 @@ const MyApplications = () => {
 
       <section className="space-y-3">
         <h2 className="font-bold">Aktive Bewerbungen</h2>
-        {apps.length === 0 ? (
+        {loading ? (
+          <div className="space-y-2">
+            {[0, 1, 2].map((i) => <Skeleton key={i} className="h-20 w-full rounded-xl" />)}
+          </div>
+        ) : apps.length === 0 ? (
           <Card className="p-8 glass text-center text-sm text-muted-foreground">
             Noch keine Bewerbungen. <Link to="/markt" className="text-primary underline">Im Markt stöbern</Link>.
           </Card>
