@@ -18,16 +18,21 @@ const Markt = () => {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
-  const [kind, setKind] = useState("rent");
+  const [kind, setKind] = useState<"rent" | "sale">("rent");
   const [maxPrice, setMaxPrice] = useState("");
   const [minRooms, setMinRooms] = useState("");
 
-  // Anker für Umkreissuche
+  // Anker für Umkreissuche — entweder Listing-ID, oder PLZ+kind (z.B. eigenes Property)
   const anchorId = params.get("near");
+  const anchorZip = params.get("zip");
+  const anchorKindParam = (params.get("kind") as "rent" | "sale" | null) ?? null;
+  const anchorLabel = params.get("label");
   const [anchor, setAnchor] = useState<any>(null);
   const [radiusKm, setRadiusKm] = useState<number>(Number(params.get("r") ?? 10));
   const [nearbyResults, setNearbyResults] = useState<any[] | null>(null);
   const [nearbyLoading, setNearbyLoading] = useState(false);
+
+  const hasAnchor = !!anchorId || !!anchorZip;
 
   useEffect(() => {
     document.title = "Markt — Wohnen & Kaufen · ImmoNIQ";
@@ -45,21 +50,35 @@ const Markt = () => {
 
   // Anker laden + Umkreissuche
   useEffect(() => {
-    if (!anchorId) {
+    if (!hasAnchor) {
       setAnchor(null);
       setNearbyResults(null);
       return;
     }
     (async () => {
       setNearbyLoading(true);
-      const { data: a } = await supabase.from("listings").select("*").eq("id", anchorId).maybeSingle();
+      let a: any = null;
+      if (anchorId) {
+        const { data } = await supabase.from("listings").select("*").eq("id", anchorId).maybeSingle();
+        a = data;
+      } else if (anchorZip) {
+        a = {
+          id: null,
+          title: anchorLabel || `Umgebung ${anchorZip}`,
+          zip: anchorZip,
+          city: null,
+          kind: anchorKindParam ?? "rent",
+          lat: null,
+          lng: null,
+        };
+      }
       setAnchor(a);
       if (!a) {
         setNearbyResults([]);
         setNearbyLoading(false);
         return;
       }
-      // 1) Echter Radius via lat/lng (am Anker oder via PLZ-Fallback)
+
       const center =
         a.lat && a.lng
           ? { lat: Number(a.lat), lng: Number(a.lng) }
@@ -77,18 +96,19 @@ const Markt = () => {
         });
         nearby = rpc ?? [];
       }
-      // 2) PLZ-Fallback ergänzen (falls Listings keine lat/lng haben)
+      // PLZ-Fallback ergänzen
       const have = new Set(nearby.map((n: any) => n.id));
       const prefix = a.zip ? a.zip.slice(0, 3) : null;
       if (prefix) {
-        const { data: byZip } = await supabase
+        let qb = supabase
           .from("listings")
           .select("*")
           .eq("status", "published")
           .eq("kind", a.kind)
-          .neq("id", a.id)
           .like("zip", `${prefix}%`)
           .limit(40);
+        if (a.id) qb = qb.neq("id", a.id);
+        const { data: byZip } = await qb;
         (byZip ?? []).forEach((l: any) => {
           if (!have.has(l.id)) {
             nearby.push({ ...l, distance_km: null });
@@ -99,7 +119,7 @@ const Markt = () => {
       setNearbyResults(nearby);
       setNearbyLoading(false);
     })();
-  }, [anchorId, radiusKm]);
+  }, [anchorId, anchorZip, anchorKindParam, anchorLabel, radiusKm, hasAnchor]);
 
   const filtered = useMemo(() => {
     return items.filter((l) => {
@@ -123,10 +143,21 @@ const Markt = () => {
   const adCity = anchor?.city ?? null;
   const adKind = (anchor?.kind ?? kind) as "rent" | "sale";
 
-  const setNear = (id: string | null) => {
+  const clearAnchor = () => {
     const next = new URLSearchParams(params);
-    if (id) next.set("near", id);
-    else next.delete("near");
+    next.delete("near");
+    next.delete("zip");
+    next.delete("kind");
+    next.delete("label");
+    setParams(next, { replace: true });
+  };
+
+  const setNear = (id: string) => {
+    const next = new URLSearchParams(params);
+    next.set("near", id);
+    next.delete("zip");
+    next.delete("kind");
+    next.delete("label");
     setParams(next, { replace: true });
   };
 
@@ -136,16 +167,6 @@ const Markt = () => {
     next.set("r", String(v));
     setParams(next, { replace: true });
   };
-
-  // Anzeigen alle 6 Karten einstreuen
-  const interleaved = useMemo(() => {
-    const out: Array<{ type: "listing"; data: any } | { type: "ad"; key: string }> = [];
-    displayList.forEach((l, i) => {
-      out.push({ type: "listing", data: l });
-      if ((i + 1) % 6 === 0) out.push({ type: "ad", key: `ad-${i}` });
-    });
-    return out;
-  }, [displayList]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -162,11 +183,10 @@ const Markt = () => {
       <section className="container max-w-6xl py-8 space-y-6">
         <div>
           <h1 className="text-4xl font-bold tracking-tight">Der Markt für ehrliches Wohnen.</h1>
-          <p className="text-muted-foreground mt-2">Direkt vom Eigentümer. Keine Maklergebühr nach Bestellerprinzip.</p>
+          <p className="text-muted-foreground mt-2">
+            Direkt vom Eigentümer. Keine Maklergebühr nach Bestellerprinzip. Keine bezahlten Plätze in den Ergebnissen.
+          </p>
         </div>
-
-        {/* Top-Banner Anzeige */}
-        <SponsoredSlot placement="market_top" zip={adZip} city={adCity} kind={adKind} variant="banner" limit={1} />
 
         {/* Anker-Banner */}
         {anchor && (
@@ -193,7 +213,7 @@ const Markt = () => {
                 <span className="text-xs font-semibold w-12 text-right">{radiusKm} km</span>
               </div>
             </div>
-            <Button variant="ghost" size="sm" onClick={() => setNear(null)} className="shrink-0">
+            <Button variant="ghost" size="sm" onClick={clearAnchor} className="shrink-0">
               <X className="h-4 w-4" />
             </Button>
           </Card>
@@ -207,7 +227,7 @@ const Markt = () => {
                 <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <Input className="pl-9" placeholder="Stadt, PLZ oder Stichwort" value={q} onChange={(e) => setQ(e.target.value)} />
               </div>
-              <Select value={kind} onValueChange={setKind}>
+              <Select value={kind} onValueChange={(v) => setKind(v as "rent" | "sale")}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="rent">Mieten</SelectItem>
@@ -240,21 +260,9 @@ const Markt = () => {
                 {num(displayList.length)} Objekte in der Umgebung ({anchor.kind === "rent" ? "Miete" : "Kauf"})
               </p>
             )}
+            {/* Organische Treffer — KEINE Anzeigen mehr im Grid */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {interleaved.map((entry) => {
-                if (entry.type === "ad") {
-                  return (
-                    <SponsoredSlot
-                      key={entry.key}
-                      placement="market_grid"
-                      zip={adZip}
-                      city={adCity}
-                      kind={adKind}
-                      limit={1}
-                    />
-                  );
-                }
-                const l = entry.data;
+              {displayList.map((l) => {
                 const cover = photoUrl(l.photos?.[0]);
                 return (
                   <div key={l.id} className="relative group">
@@ -303,6 +311,24 @@ const Markt = () => {
                   </div>
                 );
               })}
+            </div>
+
+            {/* Genau EIN, klar gelabelter Hilfe-Hinweis unter den Treffern.
+                Nicht in den organischen Ergebnissen vermischt. */}
+            <div className="pt-2">
+              <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">
+                Hilfe in deiner Nähe
+              </p>
+              <SponsoredSlot
+                placement="market_top"
+                zip={adZip}
+                city={adCity}
+                kind={adKind}
+                limit={1}
+              />
+              <p className="text-[11px] text-muted-foreground mt-2">
+                Anzeigen sind klar gekennzeichnet und beeinflussen nie die Reihenfolge der Wohnungs-Treffer oben.
+              </p>
             </div>
           </>
         )}
