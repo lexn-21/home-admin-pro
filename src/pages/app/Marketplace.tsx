@@ -12,6 +12,7 @@ import {
   Wrench, Search, MapPin, Star, Phone, Mail, ShieldCheck, Filter, Crosshair,
   Calculator, Paintbrush, Zap, Droplets, Hammer, HardHat, Building2, X,
 } from "lucide-react";
+import { SponsoredSlot } from "@/components/market/SponsoredSlot";
 
 // Fix default marker icons
 delete (L.Icon.Default.prototype as any)._getIconUrl;
