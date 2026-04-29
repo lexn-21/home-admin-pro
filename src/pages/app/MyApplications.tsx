@@ -44,10 +44,26 @@ const MyApplications = () => {
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="text-3xl font-bold flex items-center gap-2"><Briefcase className="h-7 w-7 text-primary" /> Meine Bewerbungen</h1>
-        <p className="text-muted-foreground text-sm mt-1">Status, Chats und gespeicherte Inserate.</p>
+      <header className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-3xl font-bold flex items-center gap-2"><Briefcase className="h-7 w-7 text-primary" /> Meine Bewerbungen</h1>
+          <p className="text-muted-foreground text-sm mt-1">Status, Chats und gespeicherte Inserate.</p>
+        </div>
+        <Button variant="outline" size="sm" onClick={load} disabled={loading} className="gap-2">
+          <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} /> Aktualisieren
+        </Button>
       </header>
+
+      {error && (
+        <Card className="p-4 border-destructive/40 bg-destructive/5 flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-sm">Daten konnten nicht geladen werden</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{error}</p>
+          </div>
+          <Button size="sm" variant="outline" onClick={load}>Erneut versuchen</Button>
+        </Card>
+      )}
 
       <section className="space-y-3">
         <h2 className="font-bold">Aktive Bewerbungen</h2>
