@@ -10,6 +10,7 @@ import {
   TrendingUp, BarChart3, Briefcase, Megaphone, UserCircle2, Inbox,
   FileText, Clock,
 } from "lucide-react";
+import { AskCopilot } from "@/components/AskCopilot";
 
 type NavItem = { to: string; label: string; icon: any; end?: boolean; badge?: string };
 type NavGroup = { title: string; items: NavItem[] };
@@ -223,6 +224,8 @@ const AppLayout = () => {
           ))}
         </div>
       </nav>
+
+      <AskCopilot />
     </div>
   );
 };
