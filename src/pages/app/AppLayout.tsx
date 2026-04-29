@@ -84,13 +84,18 @@ const bottomRight: NavItem[] = [
   { to: "/app/vault", label: "Tresor", icon: Lock },
 ];
 
-const QUICK_CREATE = [
-  { to: "/app/properties", icon: Building2, label: "Objekt anlegen", desc: "Wohnung, Haus, MFH" },
-  { to: "/app/listings/new", icon: Megaphone, label: "Inserat erstellen", desc: "Vermieten in 60 Sek." },
-  { to: "/app/payments", icon: Wallet, label: "Zahlung erfassen", desc: "Mieteingang buchen" },
-  { to: "/app/expenses", icon: Receipt, label: "Beleg hochladen", desc: "Steuer-relevant" },
-  { to: "/app/tenants", icon: Users, label: "Mieter hinzufügen", desc: "Mit Vertrag" },
-  { to: "/app/vault", icon: Lock, label: "Dokument sichern", desc: "Verschlüsselt" },
+type QuickAction =
+  | { kind: "link"; to: string; icon: any; label: string; desc: string; highlight?: boolean }
+  | { kind: "action"; id: "scan"; icon: any; label: string; desc: string; highlight?: boolean };
+
+const QUICK_CREATE: QuickAction[] = [
+  { kind: "action", id: "scan", icon: ScanLine, label: "Dokument scannen", desc: "Mit Kamera in den Tresor", highlight: true },
+  { kind: "link", to: "/app/properties", icon: Building2, label: "Objekt anlegen", desc: "Wohnung, Haus, MFH" },
+  { kind: "link", to: "/app/listings/new", icon: Megaphone, label: "Inserat erstellen", desc: "Vermieten in 60 Sek." },
+  { kind: "link", to: "/app/payments", icon: Wallet, label: "Zahlung erfassen", desc: "Mieteingang buchen" },
+  { kind: "link", to: "/app/expenses", icon: Receipt, label: "Beleg hochladen", desc: "Steuer-relevant" },
+  { kind: "link", to: "/app/tenants", icon: Users, label: "Mieter hinzufügen", desc: "Mit Vertrag" },
+  { kind: "link", to: "/app/vault", icon: Lock, label: "Dokument sichern", desc: "Verschlüsselt" },
 ];
 
 const AppLayout = () => {
