@@ -32,7 +32,7 @@ const ListingApplications = () => {
     if (l.data) document.title = `Bewerbungen · ${l.data.title}`;
   };
 
-  const setStatus = async (appId: string, status: string) => {
+  const setStatus = async (appId: string, status: "sent" | "shortlisted" | "rejected" | "accepted" | "withdrawn") => {
     const { error } = await supabase.from("applications").update({ status }).eq("id", appId);
     if (error) return toast.error(error.message);
 
