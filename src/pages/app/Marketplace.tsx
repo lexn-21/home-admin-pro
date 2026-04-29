@@ -459,67 +459,96 @@ const Marketplace = () => {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
                           <div className="min-w-0">
-                            <div className="flex items-center gap-1.5">
-                              <p className="font-semibold truncate">{p.name}</p>
-                              {p.verified && <ShieldCheck className="h-3.5 w-3.5 text-success flex-shrink-0" />}
-                            </div>
-                            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-                              <MapPin className="h-3 w-3" /> {p.zip} {p.city}
-                              <span className="text-primary font-semibold tabular ml-1">
-                                · {p.distance.toFixed(1).replace(".", ",")} km
-                              </span>
-                            </p>
-                          </div>
-                          {p.premium && (
-                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border border-border text-muted-foreground tracking-wider uppercase flex-shrink-0">
-                              Anzeige
-                            </span>
+                        <div className="flex items-center gap-1.5">
+                          <p className="font-semibold truncate">{p.name}</p>
+                          {p.verified ? (
+                            <TooltipProvider delayDuration={150}>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span className="inline-flex items-center"><ShieldCheck className="h-3.5 w-3.5 text-success flex-shrink-0" /></span>
+                                </TooltipTrigger>
+                                <TooltipContent side="top" className="text-xs max-w-[220px]">
+                                  Eintrag bei Handwerks-/Steuerberaterkammer geprüft.
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          ) : (
+                            <TooltipProvider delayDuration={150}>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-muted text-muted-foreground flex-shrink-0">unverifiziert</span>
+                                </TooltipTrigger>
+                                <TooltipContent side="top" className="text-xs max-w-[220px]">
+                                  Noch nicht von uns geprüft. Selbsteintrag des Anbieters.
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
                           )}
                         </div>
-
-                        <div className="flex items-center gap-1 mt-2 text-xs">
-                          <Star className="h-3.5 w-3.5 fill-primary text-primary" />
-                          <span className="font-semibold tabular">
-                            {p.rating.toFixed(1).replace(".", ",")}
+                        <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                          <MapPin className="h-3 w-3" /> {p.zip} {p.city}
+                          <span className="text-primary font-semibold tabular ml-1">
+                            · {p.distance.toFixed(1).replace(".", ",")} km
                           </span>
-                          <span className="text-muted-foreground">
-                            ({new Intl.NumberFormat("de-DE").format(p.reviews)})
-                          </span>
-                        </div>
+                        </p>
+                      </div>
+                      {p.premium && (
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border border-border text-muted-foreground tracking-wider uppercase flex-shrink-0">
+                          Anzeige
+                        </span>
+                      )}
+                    </div>
 
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {p.specialties.map((s) => (
-                            <span key={s} className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-                              {s}
-                            </span>
-                          ))}
-                        </div>
+                    <div className="flex items-center gap-1 mt-2 text-xs">
+                      <Star className="h-3.5 w-3.5 fill-primary text-primary" />
+                      <span className="font-semibold tabular">
+                        {p.rating.toFixed(1).replace(".", ",")}
+                      </span>
+                      <span className="text-muted-foreground">
+                        ({new Intl.NumberFormat("de-DE").format(p.reviews)})
+                      </span>
+                    </div>
 
-                        <div className="flex gap-2 mt-3">
-                          {p.phone && (
-                            <Button asChild size="sm" variant="outline" className="h-8 text-xs">
-                              <a href={`tel:${p.phone.replace(/\s/g, "")}`}>
-                                <Phone className="h-3 w-3 mr-1.5" /> Anrufen
-                              </a>
-                            </Button>
-                          )}
-                          {p.email && (
-                            <Button asChild size="sm" variant="outline" className="h-8 text-xs">
-                              <a href={`mailto:${p.email}`}>
-                                <Mail className="h-3 w-3 mr-1.5" /> E-Mail
-                              </a>
-                            </Button>
-                          )}
-                          <Button asChild size="sm" variant="ghost" className="h-8 text-xs ml-auto">
-                            <a
-                              href={`https://www.openstreetmap.org/directions?from=${origin[0]},${origin[1]}&to=${p.lat},${p.lng}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              Route
-                            </a>
-                          </Button>
-                        </div>
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {p.specialties.map((s) => (
+                        <span key={s} className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {p.phone && (
+                        <Button asChild size="sm" variant="default" className="h-8 text-xs bg-primary text-primary-foreground hover:bg-primary/90">
+                          <a href={`tel:${p.phone.replace(/\s/g, "")}`}>
+                            <Phone className="h-3 w-3 mr-1.5" /> Anrufen
+                          </a>
+                        </Button>
+                      )}
+                      {p.email && (
+                        <Button asChild size="sm" variant="outline" className="h-8 text-xs">
+                          <a href={`mailto:${p.email}`}>
+                            <Mail className="h-3 w-3 mr-1.5" /> E-Mail
+                          </a>
+                        </Button>
+                      )}
+                      {p.website && (
+                        <Button asChild size="sm" variant="outline" className="h-8 text-xs">
+                          <a href={p.website} target="_blank" rel="noopener noreferrer">
+                            <Globe className="h-3 w-3 mr-1.5" /> Website
+                          </a>
+                        </Button>
+                      )}
+                      <Button asChild size="sm" variant="ghost" className="h-8 text-xs ml-auto">
+                        <a
+                          href={`https://www.openstreetmap.org/directions?from=${origin[0]},${origin[1]}&to=${p.lat},${p.lng}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Route
+                        </a>
+                      </Button>
+                    </div>
                       </div>
                     </div>
                   </Card>
