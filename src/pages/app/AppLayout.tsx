@@ -104,6 +104,7 @@ const AppLayout = () => {
   const location = useLocation();
   const [createOpen, setCreateOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [scannerOpen, setScannerOpen] = useState(false);
   const handleSignOut = async () => { await signOut(); navigate("/", { replace: true }); };
 
   // Schließe Drawer bei Routenwechsel
