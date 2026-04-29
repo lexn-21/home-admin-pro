@@ -212,12 +212,13 @@ const Marketplace = () => {
       <Item>
         <div className="flex items-end justify-between gap-4 flex-wrap">
           <div>
-            <p className="text-xs text-primary font-semibold uppercase tracking-wider mb-2">Marktplatz</p>
+            <p className="text-xs text-primary font-semibold uppercase tracking-wider mb-2">Hilfe & Profis</p>
             <h1 className="text-3xl lg:text-4xl font-bold tracking-tight">
-              Handwerker & <span className="text-gradient-gold">Steuerberater</span>
+              Ehrlich gelistete <span className="text-gradient-gold">Profis</span>
             </h1>
-            <p className="text-muted-foreground mt-2 max-w-xl">
-              Geprüfte Profis in deinem Umkreis. Kostenlos für dich als Vermieter.
+            <p className="text-muted-foreground mt-2 max-w-xl text-sm">
+              Strikt nach Kategorie getrennt. Reihenfolge nach Bewertung und Nähe — nicht nach Geld.
+              Anzeigen sind klar gekennzeichnet und maximal eine pro Kategorie.
             </p>
           </div>
           <div className="text-xs text-muted-foreground flex items-center gap-2 px-3 py-1.5 rounded-full glass">
