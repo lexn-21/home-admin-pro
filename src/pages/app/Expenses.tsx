@@ -182,6 +182,7 @@ const Expenses = () => {
         </Card>
       )}
 
+      {items.length === 0 ? (
         <Card className="p-10 text-center glass"><p className="text-sm text-muted-foreground">Noch keine Belege.</p></Card>
       ) : (
         <Card className="glass overflow-hidden">
