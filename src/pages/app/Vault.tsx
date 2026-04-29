@@ -561,12 +561,22 @@ const Vault = () => {
           onClick={() => document.getElementById("vault-file-input")?.click()}
           className={`cursor-pointer rounded-2xl border-2 border-dashed transition-all p-6 text-center ${
             dragOver ? "border-primary bg-primary/5 scale-[1.01]" : "border-border hover:border-primary/50 hover:bg-muted/30"
-          }`}
+          } ${quickSaving ? "opacity-60 pointer-events-none" : ""}`}
         >
-          <Upload className={`h-8 w-8 mx-auto mb-2 ${dragOver ? "text-primary" : "text-muted-foreground"}`} />
-          <p className="text-sm font-medium">Datei hierher ziehen oder klicken</p>
-          <p className="text-xs text-muted-foreground">PDF, Bilder, Dokumente · max. 25 MB · wird vor Upload verschlüsselt</p>
-          <input id="vault-file-input" type="file" hidden onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
+          {quickSaving ? (
+            <>
+              <div className="h-8 w-8 mx-auto mb-2 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+              <p className="text-sm font-medium">Verschlüssele &amp; speichere…</p>
+            </>
+          ) : (
+            <>
+              <Zap className={`h-8 w-8 mx-auto mb-2 ${dragOver ? "text-primary" : "text-muted-foreground"}`} />
+              <p className="text-sm font-medium">Schnell ablegen — auch mehrere Dateien gleichzeitig</p>
+              <p className="text-xs text-muted-foreground">Werden sofort verschlüsselt &amp; gespeichert · max. 25 MB pro Datei</p>
+            </>
+          )}
+          <input id="vault-file-input" type="file" multiple hidden
+            onChange={(e) => e.target.files && e.target.files.length > 0 && handleFiles(e.target.files)} />
         </div>
       </Item>
 
