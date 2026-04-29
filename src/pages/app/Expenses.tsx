@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Receipt, Paperclip, Info } from "lucide-react";
+import { Plus, Receipt, Paperclip, Info, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { eur, date } from "@/lib/format";
 import { z } from "zod";
@@ -85,6 +85,23 @@ const Expenses = () => {
   };
 
   const total = items.reduce((s, e) => s + Number(e.amount), 0);
+
+  // §6(1)1a EStG — Anschaffungsnahe Herstellungskosten Check
+  const warnings = useMemo(() => {
+    const out: { propertyName: string; spent: number; limit: number }[] = [];
+    for (const p of props as any[]) {
+      if (!p.purchase_price || !p.purchase_date) continue;
+      const purchase = new Date(p.purchase_date);
+      const threeYearLimit = new Date(purchase); threeYearLimit.setFullYear(purchase.getFullYear() + 3);
+      const buildingAk = Number(p.purchase_price) * 0.8;
+      const limit = buildingAk * 0.15;
+      const spent = items
+        .filter(i => i.property_id === p.id && new Date(i.spent_on) >= purchase && new Date(i.spent_on) <= threeYearLimit)
+        .reduce((s, i) => s + Number(i.amount), 0);
+      if (spent > limit && limit > 0) out.push({ propertyName: p.name, spent, limit });
+    }
+    return out;
+  }, [items, props]);
 
   return (
     <div className="space-y-6">
