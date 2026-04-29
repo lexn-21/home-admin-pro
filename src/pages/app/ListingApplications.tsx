@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { eur } from "@/lib/format";
 import { toast } from "sonner";
-import { ArrowLeft, Star, X, Check, MessageSquare, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Star, X, Check, MessageSquare, ShieldCheck, Sparkles, Loader2, TrendingUp } from "lucide-react";
 import ChatDialog from "@/components/market/ChatDialog";
 
 const labelStatus: Record<string, string> = {
@@ -19,6 +19,21 @@ const ListingApplications = () => {
   const [listing, setListing] = useState<any>(null);
   const [apps, setApps] = useState<any[]>([]);
   const [chatApp, setChatApp] = useState<any>(null);
+  const [scoring, setScoring] = useState<string | null>(null);
+
+  const aiScore = async (appId: string) => {
+    setScoring(appId);
+    try {
+      const { error } = await supabase.functions.invoke("ai-score-application", { body: { application_id: appId } });
+      if (error) throw error;
+      toast.success("KI-Bewertung erstellt");
+      load();
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setScoring(null);
+    }
+  };
 
   useEffect(() => { if (id) load(); }, [id]);
 
@@ -100,8 +115,34 @@ const ListingApplications = () => {
                     </div>
                     {a.cover_message && <p className="text-sm mt-3 p-3 bg-muted/40 rounded-lg italic">„{a.cover_message}"</p>}
                     {sp.about_me && <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{sp.about_me}</p>}
+
+                    {a.ai_score != null && (
+                      <div className="mt-3 p-3 rounded-lg border border-primary/20 bg-primary/5">
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <Sparkles className="h-3.5 w-3.5 text-primary" />
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-primary">KI-Bewertung</span>
+                          <Badge variant="outline" className="ml-auto text-xs font-bold">
+                            {a.ai_score}/100
+                          </Badge>
+                        </div>
+                        {a.ai_summary && <p className="text-xs">{a.ai_summary}</p>}
+                        {a.ai_strengths?.length > 0 && (
+                          <p className="text-xs text-success mt-1">+ {a.ai_strengths.join(" · ")}</p>
+                        )}
+                        {a.ai_concerns?.length > 0 && (
+                          <p className="text-xs text-warning mt-1">! {a.ai_concerns.join(" · ")}</p>
+                        )}
+                      </div>
+                    )}
                   </div>
                   <div className="flex flex-col gap-1.5 sm:w-40">
+                    {a.ai_score == null && (
+                      <Button size="sm" variant="outline" onClick={() => aiScore(a.id)} disabled={scoring === a.id}
+                        className="border-primary/40 text-primary hover:bg-primary/5">
+                        {scoring === a.id ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : <Sparkles className="h-3 w-3 mr-1" />}
+                        KI-Score
+                      </Button>
+                    )}
                     <Button size="sm" variant="outline" onClick={() => setChatApp(a)}>
                       <MessageSquare className="h-3 w-3 mr-1" /> Chat
                     </Button>
