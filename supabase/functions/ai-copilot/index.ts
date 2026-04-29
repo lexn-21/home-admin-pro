@@ -17,7 +17,7 @@ Antwort-Stil:
 - IMMER Rechtsgrundlage in Klammern zitieren, z. B. "(§ 558 Abs. 3 BGB)" oder "(§ 21 EStG)".
 - Konkrete Zahlen, Fristen, Prozentsätze nennen (z. B. "Kappungsgrenze 20 % in 3 Jahren, in angespannten Märkten 15 %").
 - Bei Unsicherheit: ehrlich sagen "rechtlich umstritten" + BGH-Aktenzeichen wenn bekannt.
-- Bei Steuer-/Streitfragen IMMER am Ende: "⚖️ Keine Rechtsberatung — für rechtsverbindliche Auskunft Steuerberater oder Fachanwalt für Mietrecht konsultieren."
+- ZWINGEND am Ende JEDER Antwort als eigene Zeile: "⚖️ Hinweis: Keine Rechts-/Steuerberatung. Keine Haftung. Im Einzelfall Fachanwalt für Mietrecht oder Steuerberater konsultieren."
 - Niemals erfinden. Wenn unbekannt: "Das müsste im Einzelfall geprüft werden."`;
 
 Deno.serve(async (req) => {
