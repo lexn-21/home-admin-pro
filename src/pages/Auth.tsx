@@ -49,7 +49,7 @@ const Auth = () => {
       return;
     }
     if (result.redirected) return;
-    navigate("/app", { replace: true });
+    navigate(redirect, { replace: true });
   };
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -63,7 +63,7 @@ const Auth = () => {
     setLoading(false);
     if (error) return toast.error(error.message === "Invalid login credentials" ? "E-Mail oder Passwort falsch." : error.message);
     toast.success("Willkommen zurück.");
-    navigate("/app", { replace: true });
+    navigate(redirect, { replace: true });
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
