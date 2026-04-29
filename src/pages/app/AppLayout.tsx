@@ -352,27 +352,27 @@ const AppLayout = () => {
                   </>
                 );
                 const cls = "p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition group text-left";
-                if (q.kind === "action" && q.id === "scan") {
+                if (q.kind === "link") {
                   return (
-                    <button
-                      key="scan"
-                      type="button"
-                      onClick={() => { setCreateOpen(false); setScannerOpen(true); }}
+                    <Link
+                      key={q.to}
+                      to={q.to}
+                      onClick={() => setCreateOpen(false)}
                       className={cls}
                     >
                       {Inner}
-                    </button>
+                    </Link>
                   );
                 }
                 return (
-                  <Link
-                    key={q.to}
-                    to={q.to}
-                    onClick={() => setCreateOpen(false)}
+                  <button
+                    key="scan"
+                    type="button"
+                    onClick={() => { setCreateOpen(false); setScannerOpen(true); }}
                     className={cls}
                   >
                     {Inner}
-                  </Link>
+                  </button>
                 );
               })}
             </div>
