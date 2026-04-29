@@ -187,7 +187,9 @@ const Marketplace = () => {
       })
       .sort(
         (a, b) =>
-          (b.premium ? 1 : 0) - (a.premium ? 1 : 0) ||
+          // Organisch: erst Bewertung (gewichtet mit Reviews), dann Nähe.
+          // KEINE Premium-Bevorzugung mehr.
+          (b.rating * Math.log10(b.reviews + 10)) - (a.rating * Math.log10(a.reviews + 10)) ||
           a.distance - b.distance,
       );
   }, [enriched, cat, query, radiusKm]);
