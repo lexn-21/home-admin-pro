@@ -56,6 +56,83 @@ export type Database = {
         }
         Relationships: []
       }
+      bookings: {
+        Row: {
+          budget_estimate: number | null
+          category: Database["public"]["Enums"]["provider_category"]
+          commission_amount: number | null
+          commission_rate: number | null
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          final_amount: number | null
+          id: string
+          property_id: string | null
+          provider_id: string | null
+          quoted_amount: number | null
+          rating: number | null
+          review: string | null
+          scheduled_at: string | null
+          status: Database["public"]["Enums"]["booking_status"]
+          title: string
+          updated_at: string
+          urgency: string | null
+          user_id: string
+        }
+        Insert: {
+          budget_estimate?: number | null
+          category: Database["public"]["Enums"]["provider_category"]
+          commission_amount?: number | null
+          commission_rate?: number | null
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          final_amount?: number | null
+          id?: string
+          property_id?: string | null
+          provider_id?: string | null
+          quoted_amount?: number | null
+          rating?: number | null
+          review?: string | null
+          scheduled_at?: string | null
+          status?: Database["public"]["Enums"]["booking_status"]
+          title: string
+          updated_at?: string
+          urgency?: string | null
+          user_id: string
+        }
+        Update: {
+          budget_estimate?: number | null
+          category?: Database["public"]["Enums"]["provider_category"]
+          commission_amount?: number | null
+          commission_rate?: number | null
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          final_amount?: number | null
+          id?: string
+          property_id?: string | null
+          provider_id?: string | null
+          quoted_amount?: number | null
+          rating?: number | null
+          review?: string | null
+          scheduled_at?: string | null
+          status?: Database["public"]["Enums"]["booking_status"]
+          title?: string
+          updated_at?: string
+          urgency?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       expenses: {
         Row: {
           amount: number
@@ -115,6 +192,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      market_index: {
+        Row: {
+          avg_purchase_sqm: number
+          avg_rent_sqm: number
+          avg_utilities_sqm: number | null
+          city: string | null
+          id: string
+          sample_size: number | null
+          updated_at: string
+          vacancy_rate: number | null
+          yield_factor: number
+          zip: string
+        }
+        Insert: {
+          avg_purchase_sqm: number
+          avg_rent_sqm: number
+          avg_utilities_sqm?: number | null
+          city?: string | null
+          id?: string
+          sample_size?: number | null
+          updated_at?: string
+          vacancy_rate?: number | null
+          yield_factor: number
+          zip: string
+        }
+        Update: {
+          avg_purchase_sqm?: number
+          avg_rent_sqm?: number
+          avg_utilities_sqm?: number | null
+          city?: string | null
+          id?: string
+          sample_size?: number | null
+          updated_at?: string
+          vacancy_rate?: number | null
+          yield_factor?: number
+          zip?: string
+        }
+        Relationships: []
       }
       payments: {
         Row: {
@@ -233,6 +349,147 @@ export type Database = {
           updated_at?: string
           user_id?: string
           zip?: string | null
+        }
+        Relationships: []
+      }
+      providers: {
+        Row: {
+          category: Database["public"]["Enums"]["provider_category"]
+          city: string | null
+          created_at: string
+          email: string | null
+          hourly_rate: number | null
+          id: string
+          lat: number | null
+          lng: number | null
+          name: string
+          phone: string | null
+          premium: boolean | null
+          rating: number | null
+          response_time_hours: number | null
+          reviews_count: number | null
+          verified: boolean | null
+          website: string | null
+          zip: string | null
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["provider_category"]
+          city?: string | null
+          created_at?: string
+          email?: string | null
+          hourly_rate?: number | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name: string
+          phone?: string | null
+          premium?: boolean | null
+          rating?: number | null
+          response_time_hours?: number | null
+          reviews_count?: number | null
+          verified?: boolean | null
+          website?: string | null
+          zip?: string | null
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["provider_category"]
+          city?: string | null
+          created_at?: string
+          email?: string | null
+          hourly_rate?: number | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name?: string
+          phone?: string | null
+          premium?: boolean | null
+          rating?: number | null
+          response_time_hours?: number | null
+          reviews_count?: number | null
+          verified?: boolean | null
+          website?: string | null
+          zip?: string | null
+        }
+        Relationships: []
+      }
+      tenant_issues: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          reported_at: string
+          resolved_at: string | null
+          severity: Database["public"]["Enums"]["issue_severity"]
+          status: Database["public"]["Enums"]["issue_status"]
+          tenant_id: string
+          title: string
+          unit_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          reported_at?: string
+          resolved_at?: string | null
+          severity?: Database["public"]["Enums"]["issue_severity"]
+          status?: Database["public"]["Enums"]["issue_status"]
+          tenant_id: string
+          title: string
+          unit_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          reported_at?: string
+          resolved_at?: string | null
+          severity?: Database["public"]["Enums"]["issue_severity"]
+          status?: Database["public"]["Enums"]["issue_status"]
+          tenant_id?: string
+          title?: string
+          unit_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tenant_portal_links: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          revoked: boolean
+          tenant_id: string
+          token: string
+          unit_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          revoked?: boolean
+          tenant_id: string
+          token?: string
+          unit_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          revoked?: boolean
+          tenant_id?: string
+          token?: string
+          unit_id?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -425,15 +682,58 @@ export type Database = {
       advisor_get_data: { Args: { _token: string }; Returns: Json }
       advisor_owner_for_token: { Args: { _token: string }; Returns: string }
       advisor_touch_token: { Args: { _token: string }; Returns: string }
+      avm_estimate: {
+        Args: { _annual_rent: number; _living_space: number; _zip: string }
+        Returns: Json
+      }
+      tenant_portal_report_issue: {
+        Args: {
+          _category: string
+          _description: string
+          _severity: Database["public"]["Enums"]["issue_severity"]
+          _title: string
+          _token: string
+        }
+        Returns: string
+      }
+      tenant_portal_resolve: { Args: { _token: string }; Returns: Json }
     }
     Enums: {
+      booking_status:
+        | "requested"
+        | "quoted"
+        | "accepted"
+        | "in_progress"
+        | "completed"
+        | "cancelled"
+        | "disputed"
       expense_category:
         | "immediate"
         | "depreciable"
         | "utilities_passthrough"
         | "financing"
         | "other"
+      issue_severity: "info" | "minor" | "major" | "urgent"
+      issue_status:
+        | "open"
+        | "acknowledged"
+        | "in_progress"
+        | "resolved"
+        | "closed"
       payment_kind: "rent_cold" | "utilities" | "deposit" | "other"
+      provider_category:
+        | "sanitaer"
+        | "elektrik"
+        | "heizung"
+        | "dach"
+        | "maler"
+        | "garten"
+        | "reinigung"
+        | "schluessel"
+        | "schaedling"
+        | "steuerberater"
+        | "jurist"
+        | "energieberater"
       vault_category:
         | "kaufvertrag"
         | "mietvertrag"
@@ -574,6 +874,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      booking_status: [
+        "requested",
+        "quoted",
+        "accepted",
+        "in_progress",
+        "completed",
+        "cancelled",
+        "disputed",
+      ],
       expense_category: [
         "immediate",
         "depreciable",
@@ -581,7 +890,29 @@ export const Constants = {
         "financing",
         "other",
       ],
+      issue_severity: ["info", "minor", "major", "urgent"],
+      issue_status: [
+        "open",
+        "acknowledged",
+        "in_progress",
+        "resolved",
+        "closed",
+      ],
       payment_kind: ["rent_cold", "utilities", "deposit", "other"],
+      provider_category: [
+        "sanitaer",
+        "elektrik",
+        "heizung",
+        "dach",
+        "maler",
+        "garten",
+        "reinigung",
+        "schluessel",
+        "schaedling",
+        "steuerberater",
+        "jurist",
+        "energieberater",
+      ],
       vault_category: [
         "kaufvertrag",
         "mietvertrag",
