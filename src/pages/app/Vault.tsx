@@ -12,6 +12,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { num, date } from "@/lib/format";
+import { pendingIngest } from "@/lib/ingest";
+import { useSearchParams } from "react-router-dom";
 import {
   Lock, ShieldCheck, KeyRound, FileText, Eye, EyeOff,
   Fingerprint, ServerCrash, CheckCircle2, AlertTriangle,
