@@ -488,10 +488,21 @@ const Vault = () => {
               Dein <span className="text-gradient-gold">Eigentums-Archiv</span>
             </h1>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Button variant="outline" onClick={lock}><Lock className="h-4 w-4 mr-2" />Sperren</Button>
+            <input id="vault-camera-input" type="file" accept="image/*" capture="environment" hidden
+              onChange={(e) => e.target.files && handleFiles(e.target.files)} />
+            <Button
+              variant="outline"
+              onClick={() => document.getElementById("vault-camera-input")?.click()}
+              disabled={quickSaving}
+              className="gap-2"
+              title="Mit Kamera scannen — sofort verschlüsselt gespeichert"
+            >
+              <Camera className="h-4 w-4" /> Schnell-Scan
+            </Button>
             <Button onClick={() => setUploadOpen(true)} className="bg-gradient-gold text-primary-foreground shadow-gold">
-              <Upload className="h-4 w-4 mr-2" />Hochladen
+              <Upload className="h-4 w-4 mr-2" />Mit Details
             </Button>
           </div>
         </div>
