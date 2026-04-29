@@ -10,6 +10,7 @@ import { ArrowLeft, Plus, Home } from "lucide-react";
 import { toast } from "sonner";
 import { eur } from "@/lib/format";
 import { z } from "zod";
+import { NeighborhoodInsight } from "@/components/market/NeighborhoodInsight";
 
 const unitSchema = z.object({
   label: z.string().trim().min(1).max(100),
@@ -84,6 +85,14 @@ const PropertyDetail = () => {
           <div><p className="text-xs text-muted-foreground">Sollmiete/Mo</p><p className="font-semibold text-gradient-gold">{eur(monthlyTotal)}</p></div>
         </div>
       </Card>
+
+      <NeighborhoodInsight
+        zip={property.zip}
+        city={property.city}
+        kind="rent"
+        label={property.name}
+        radiusKm={10}
+      />
 
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold">Wohneinheiten</h2>

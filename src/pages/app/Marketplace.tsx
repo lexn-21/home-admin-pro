@@ -12,6 +12,7 @@ import {
   Wrench, Search, MapPin, Star, Phone, Mail, ShieldCheck, Filter, Crosshair,
   Calculator, Paintbrush, Zap, Droplets, Hammer, HardHat, Building2, X,
 } from "lucide-react";
+import { SponsoredSlot } from "@/components/market/SponsoredSlot";
 
 // Fix default marker icons
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -187,7 +188,9 @@ const Marketplace = () => {
       })
       .sort(
         (a, b) =>
-          (b.premium ? 1 : 0) - (a.premium ? 1 : 0) ||
+          // Organisch: erst Bewertung (gewichtet mit Reviews), dann Nähe.
+          // KEINE Premium-Bevorzugung mehr.
+          (b.rating * Math.log10(b.reviews + 10)) - (a.rating * Math.log10(a.reviews + 10)) ||
           a.distance - b.distance,
       );
   }, [enriched, cat, query, radiusKm]);
@@ -210,12 +213,13 @@ const Marketplace = () => {
       <Item>
         <div className="flex items-end justify-between gap-4 flex-wrap">
           <div>
-            <p className="text-xs text-primary font-semibold uppercase tracking-wider mb-2">Marktplatz</p>
+            <p className="text-xs text-primary font-semibold uppercase tracking-wider mb-2">Hilfe & Profis</p>
             <h1 className="text-3xl lg:text-4xl font-bold tracking-tight">
-              Handwerker & <span className="text-gradient-gold">Steuerberater</span>
+              Ehrlich gelistete <span className="text-gradient-gold">Profis</span>
             </h1>
-            <p className="text-muted-foreground mt-2 max-w-xl">
-              Geprüfte Profis in deinem Umkreis. Kostenlos für dich als Vermieter.
+            <p className="text-muted-foreground mt-2 max-w-xl text-sm">
+              Strikt nach Kategorie getrennt. Reihenfolge nach Bewertung und Nähe — nicht nach Geld.
+              Anzeigen sind klar gekennzeichnet und maximal eine pro Kategorie.
             </p>
           </div>
           <div className="text-xs text-muted-foreground flex items-center gap-2 px-3 py-1.5 rounded-full glass">
@@ -358,7 +362,7 @@ const Marketplace = () => {
                 <Marker
                   key={p.id}
                   position={[p.lat, p.lng]}
-                  icon={p.premium ? premiumIcon : new L.Icon.Default()}
+                  icon={new L.Icon.Default()}
                   eventHandlers={{
                     click: () => {
                       const el = document.getElementById(`provider-${p.id}`);
@@ -405,6 +409,15 @@ const Marketplace = () => {
           </div>
         </Item>
 
+        {cat !== "all" && (
+          <Item>
+            <div className="mb-3">
+              <SponsoredSlot placement="marketplace_category" kind={null} limit={1} />
+            </div>
+          </Item>
+        )}
+
+
         {filtered.length === 0 ? (
           <Item>
             <Card className="p-10 glass text-center">
@@ -444,8 +457,8 @@ const Marketplace = () => {
                             </p>
                           </div>
                           {p.premium && (
-                            <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-primary text-primary-foreground tracking-wider uppercase flex-shrink-0">
-                              Premium
+                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border border-border text-muted-foreground tracking-wider uppercase flex-shrink-0">
+                              Anzeige
                             </span>
                           )}
                         </div>
@@ -504,14 +517,14 @@ const Marketplace = () => {
       </div>
 
       <Item>
-        <Card className="p-5 glass text-center">
+        <Card className="p-5 border border-dashed border-border/70 bg-muted/20 text-center">
           <Wrench className="h-8 w-8 text-muted-foreground mx-auto mb-2 opacity-60" />
-          <p className="text-sm font-medium">Bist du Handwerker oder Steuerberater?</p>
-          <p className="text-xs text-muted-foreground mt-1 mb-3">
-            Kostenlos gelistet werden · Bezahlte Premium-Platzierung verfügbar
+          <p className="text-sm font-medium">Bist du Profi?</p>
+          <p className="text-xs text-muted-foreground mt-1 mb-3 max-w-md mx-auto">
+            Eintrag &amp; Verifizierung sind kostenlos. Reihenfolge richtet sich nach Bewertung und Nähe — keine bezahlten Spitzenplätze. Anzeigen sind klar als „Anzeige" gekennzeichnet.
           </p>
           <Button variant="outline" size="sm">
-            Jetzt bewerben
+            Jetzt eintragen
           </Button>
         </Card>
       </Item>
