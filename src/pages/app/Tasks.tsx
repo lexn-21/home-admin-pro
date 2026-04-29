@@ -122,7 +122,8 @@ export default function Tasks() {
       ) : (
         <div className="space-y-6">
           <Section title="Überfällig" icon={AlertOctagon} tone="destructive" tasks={overdue} onToggle={toggle} propMap={propMap} />
-          <Section title="Anstehend" icon={ListChecks} tone="default" tasks={upcoming} onToggle={toggle} propMap={propMap} />
+          <Section title="Bald fällig (30 Tage)" icon={CalendarClock} tone="default" tasks={soon} onToggle={toggle} propMap={propMap} />
+          <Section title="Später" icon={ListChecks} tone="muted" tasks={later} onToggle={toggle} propMap={propMap} />
           <Section title="Erledigt" icon={CheckCircle2} tone="muted" tasks={done} onToggle={toggle} propMap={propMap} />
         </div>
       )}
