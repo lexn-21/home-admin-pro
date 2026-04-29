@@ -333,6 +333,90 @@ export type Database = {
           },
         ]
       }
+      vault_documents: {
+        Row: {
+          category: Database["public"]["Enums"]["vault_category"]
+          created_at: string
+          display_name: string
+          enc_iv: string
+          enc_salt: string
+          id: string
+          mime_type: string | null
+          notes: string | null
+          original_name: string
+          property_id: string | null
+          retention_until: string | null
+          size_bytes: number
+          storage_path: string
+          tenant_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: Database["public"]["Enums"]["vault_category"]
+          created_at?: string
+          display_name: string
+          enc_iv: string
+          enc_salt: string
+          id?: string
+          mime_type?: string | null
+          notes?: string | null
+          original_name: string
+          property_id?: string | null
+          retention_until?: string | null
+          size_bytes?: number
+          storage_path: string
+          tenant_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["vault_category"]
+          created_at?: string
+          display_name?: string
+          enc_iv?: string
+          enc_salt?: string
+          id?: string
+          mime_type?: string | null
+          notes?: string | null
+          original_name?: string
+          property_id?: string | null
+          retention_until?: string | null
+          size_bytes?: number
+          storage_path?: string
+          tenant_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      vault_settings: {
+        Row: {
+          created_at: string
+          pin_salt: string
+          updated_at: string
+          user_id: string
+          verifier_ct: string
+          verifier_iv: string
+        }
+        Insert: {
+          created_at?: string
+          pin_salt: string
+          updated_at?: string
+          user_id: string
+          verifier_ct: string
+          verifier_iv: string
+        }
+        Update: {
+          created_at?: string
+          pin_salt?: string
+          updated_at?: string
+          user_id?: string
+          verifier_ct?: string
+          verifier_iv?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -350,6 +434,19 @@ export type Database = {
         | "financing"
         | "other"
       payment_kind: "rent_cold" | "utilities" | "deposit" | "other"
+      vault_category:
+        | "kaufvertrag"
+        | "mietvertrag"
+        | "nebenkostenabrechnung"
+        | "versicherung"
+        | "steuerbescheid"
+        | "grundbuch"
+        | "energieausweis"
+        | "foto"
+        | "rechnung"
+        | "protokoll"
+        | "korrespondenz"
+        | "sonstiges"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -485,6 +582,20 @@ export const Constants = {
         "other",
       ],
       payment_kind: ["rent_cold", "utilities", "deposit", "other"],
+      vault_category: [
+        "kaufvertrag",
+        "mietvertrag",
+        "nebenkostenabrechnung",
+        "versicherung",
+        "steuerbescheid",
+        "grundbuch",
+        "energieausweis",
+        "foto",
+        "rechnung",
+        "protokoll",
+        "korrespondenz",
+        "sonstiges",
+      ],
     },
   },
 } as const
