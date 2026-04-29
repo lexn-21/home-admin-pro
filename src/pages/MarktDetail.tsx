@@ -172,23 +172,22 @@ const MarktDetail = () => {
                 <ShieldCheck className="h-3 w-3 text-primary" /> Direkt vom Eigentümer · keine Maklerprovision
               </p>
             </Card>
-            <SponsoredSlot
-              placement="listing_sidebar"
-              zip={l.zip}
-              city={l.city}
-              kind={l.kind}
-              contextListingId={l.id}
-              variant="banner"
-              limit={1}
-            />
-            <SponsoredSlot
-              placement="listing_detail"
-              zip={l.zip}
-              city={l.city}
-              kind={l.kind}
-              contextListingId={l.id}
-              limit={2}
-            />
+            <div>
+              <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">
+                Hilfe in deiner Nähe
+              </p>
+              <SponsoredSlot
+                placement="listing_sidebar"
+                zip={l.zip}
+                city={l.city}
+                kind={l.kind}
+                contextListingId={l.id}
+                limit={1}
+              />
+              <p className="text-[10px] text-muted-foreground mt-2">
+                Klar gekennzeichnet, getrennt vom Inserat.
+              </p>
+            </div>
           </aside>
         </div>
       </main>
