@@ -429,7 +429,7 @@ export function DocScanner({ open, onClose, onComplete, suggestedName }: Props) 
                   onClick={snap}
                   disabled={!cameraReady}
                   aria-label="Foto aufnehmen"
-                  className="h-18 w-18 h-[72px] w-[72px] rounded-full bg-white border-4 border-white/30 active:scale-95 transition-transform disabled:opacity-50 flex items-center justify-center"
+                  className="h-[72px] w-[72px] rounded-full bg-white border-4 border-white/30 active:scale-95 transition-transform disabled:opacity-50 flex items-center justify-center"
                 >
                   <div className="h-14 w-14 rounded-full bg-white border-2 border-black/20" />
                 </button>
