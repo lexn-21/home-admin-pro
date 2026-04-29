@@ -51,6 +51,7 @@ type Provider = {
   reviews: number;
   phone?: string;
   email?: string;
+  website?: string;
   verified: boolean;
   premium?: boolean;
   lat: number;
