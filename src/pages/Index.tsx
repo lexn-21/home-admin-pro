@@ -57,14 +57,14 @@ const Index = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button asChild size="lg" className="bg-gradient-gold text-primary-foreground hover:opacity-90 shadow-gold h-12 px-8 text-base">
-                <Link to="/auth">Jetzt kostenlos starten <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                <Link to="/auth">Vermieter werden <ArrowRight className="ml-2 h-4 w-4" /></Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="h-12 px-8 text-base">
-                <a href="#module">Module entdecken</a>
+                <Link to="/markt">Wohnung suchen</Link>
               </Button>
             </div>
             <p className="text-xs text-muted-foreground mt-6">
-              Keine Kreditkarte nötig · Volle Funktionen 14 Tage testen
+              Kostenlos starten · Mieter & Vermieter · Keine Kreditkarte
             </p>
           </div>
 
