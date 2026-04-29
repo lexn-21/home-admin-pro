@@ -506,14 +506,14 @@ const Marketplace = () => {
       </div>
 
       <Item>
-        <Card className="p-5 glass text-center">
+        <Card className="p-5 border border-dashed border-border/70 bg-muted/20 text-center">
           <Wrench className="h-8 w-8 text-muted-foreground mx-auto mb-2 opacity-60" />
-          <p className="text-sm font-medium">Bist du Handwerker oder Steuerberater?</p>
-          <p className="text-xs text-muted-foreground mt-1 mb-3">
-            Kostenlos gelistet werden · Bezahlte Premium-Platzierung verfügbar
+          <p className="text-sm font-medium">Bist du Profi?</p>
+          <p className="text-xs text-muted-foreground mt-1 mb-3 max-w-md mx-auto">
+            Eintrag &amp; Verifizierung sind kostenlos. Reihenfolge richtet sich nach Bewertung und Nähe — keine bezahlten Spitzenplätze. Anzeigen sind klar als „Anzeige" gekennzeichnet.
           </p>
           <Button variant="outline" size="sm">
-            Jetzt bewerben
+            Jetzt eintragen
           </Button>
         </Card>
       </Item>
