@@ -12,7 +12,7 @@ import { eur, date } from "@/lib/format";
 import { z } from "zod";
 
 const schema = z.object({
-  unit_id: z.string().uuid("Einheit wählen"),
+  property_id: z.string().uuid("Objekt wählen"),
   paid_on: z.string().min(1, "Datum fehlt"),
   amount: z.number().min(0.01).max(999999),
   kind: z.enum(["rent_cold","utilities","deposit","other"]),
@@ -25,24 +25,24 @@ const KIND_LABEL: Record<string, string> = {
 
 const Payments = () => {
   const [items, setItems] = useState<any[]>([]);
-  const [units, setUnits] = useState<any[]>([]);
+  const [properties, setProperties] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ unit_id: "", paid_on: new Date().toISOString().slice(0, 10), amount: "", kind: "rent_cold", note: "" });
+  const [form, setForm] = useState({ property_id: "", paid_on: new Date().toISOString().slice(0, 10), amount: "", kind: "rent_cold", note: "" });
 
   useEffect(() => { document.title = "Zahlungen · ImmoNIQ"; load(); }, []);
 
   const load = async () => {
-    const [p, u] = await Promise.all([
-      supabase.from("payments").select("*, units(label, properties(name))").order("paid_on", { ascending: false }),
-      supabase.from("units").select("id, label, properties(name)"),
+    const [p, pr] = await Promise.all([
+      supabase.from("payments").select("*, properties(name)").order("paid_on", { ascending: false }),
+      supabase.from("properties").select("id, name").order("name"),
     ]);
     setItems(p.data ?? []);
-    setUnits(u.data ?? []);
+    setProperties(pr.data ?? []);
   };
 
   const submit = async () => {
     const parsed = schema.safeParse({
-      unit_id: form.unit_id,
+      property_id: form.property_id,
       paid_on: form.paid_on,
       amount: Number(form.amount),
       kind: form.kind as any,
@@ -51,13 +51,15 @@ const Payments = () => {
     if (!parsed.success) return toast.error(parsed.error.issues[0].message);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    const payload: any = { ...parsed.data, user_id: user.id };
+    const { data: unitId, error: uErr } = await supabase.rpc("ensure_default_unit", { _property_id: parsed.data.property_id });
+    if (uErr) return toast.error(uErr.message);
+    const payload: any = { ...parsed.data, user_id: user.id, unit_id: unitId };
     if (!payload.note) delete payload.note;
     const { error } = await supabase.from("payments").insert(payload);
     if (error) return toast.error(error.message);
     toast.success("Zahlung erfasst.");
     setOpen(false);
-    setForm({ unit_id: "", paid_on: new Date().toISOString().slice(0, 10), amount: "", kind: "rent_cold", note: "" });
+    setForm({ property_id: "", paid_on: new Date().toISOString().slice(0, 10), amount: "", kind: "rent_cold", note: "" });
     load();
   };
 
@@ -72,17 +74,17 @@ const Payments = () => {
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-gradient-gold text-primary-foreground shadow-gold" disabled={units.length === 0}>
+            <Button className="bg-gradient-gold text-primary-foreground shadow-gold" disabled={properties.length === 0}>
               <Plus className="h-4 w-4 mr-2" /> Zahlung
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>Zahlung erfassen</DialogTitle></DialogHeader>
             <div className="grid grid-cols-2 gap-3">
-              <div className="col-span-2"><Label>Einheit *</Label>
-                <Select value={form.unit_id} onValueChange={(v) => setForm({ ...form, unit_id: v })}>
+              <div className="col-span-2"><Label>Objekt *</Label>
+                <Select value={form.property_id} onValueChange={(v) => setForm({ ...form, property_id: v })}>
                   <SelectTrigger><SelectValue placeholder="Wählen…" /></SelectTrigger>
-                  <SelectContent>{units.map((u: any) => <SelectItem key={u.id} value={u.id}>{u.properties?.name} — {u.label}</SelectItem>)}</SelectContent>
+                  <SelectContent>{properties.map((p: any) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <div><Label>Datum *</Label><Input type="date" value={form.paid_on} onChange={(e) => setForm({ ...form, paid_on: e.target.value })} /></div>
@@ -123,7 +125,7 @@ const Payments = () => {
             <thead className="bg-muted/50 text-xs">
               <tr>
                 <th className="text-left p-3">Datum</th>
-                <th className="text-left p-3">Einheit</th>
+                <th className="text-left p-3">Objekt</th>
                 <th className="text-left p-3">Art</th>
                 <th className="text-right p-3">Betrag</th>
               </tr>
@@ -132,7 +134,7 @@ const Payments = () => {
               {items.map(p => (
                 <tr key={p.id} className="border-t border-border">
                   <td className="p-3">{date(p.paid_on)}</td>
-                  <td className="p-3">{p.units?.properties?.name} — {p.units?.label}</td>
+                  <td className="p-3">{p.properties?.name ?? "—"}</td>
                   <td className="p-3 text-muted-foreground">{KIND_LABEL[p.kind]}</td>
                   <td className="p-3 text-right font-semibold text-success">+{eur(p.amount)}</td>
                 </tr>
