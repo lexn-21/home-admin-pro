@@ -16,7 +16,7 @@ import {
   Lock, ShieldCheck, KeyRound, FileText, Eye, EyeOff,
   Fingerprint, ServerCrash, CheckCircle2, AlertTriangle,
   Upload, Search, Download, Trash2, Building2, Filter,
-  FileImage, FileType2, Sparkles, Clock,
+  FileImage, FileType2, Sparkles, Clock, Camera, Zap,
 } from "lucide-react";
 import {
   buildVerifier, verifyPin, encryptBytes, decryptBytes, b64, randomBytes, deriveKey,
