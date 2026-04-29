@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import {
-  LayoutDashboard, Building2, Users, Wallet, Receipt, Calculator,
-  LogOut, Settings as SettingsIcon, AlertTriangle, ShieldCheck,
-  Lock, Wrench, Bell, Search, CalendarClock, Scale,
-  TrendingUp, BarChart3, Briefcase, Megaphone, UserCircle2, Inbox,
-  FileText, Clock, Plus, Home, Menu, X, HelpCircle,
+  Building2, Users, Wallet, Receipt, Calculator,
+  LogOut, Settings as SettingsIcon, ShieldCheck,
+  Lock, Wrench, Bell, Search, Scale,
+  TrendingUp, Megaphone, Inbox,
+  FileText, Plus, Home, Menu, X, CalendarCheck, Search as SearchIcon,
 } from "lucide-react";
 import { AskCopilot } from "@/components/AskCopilot";
 import {
@@ -22,62 +22,52 @@ import {
 type NavItem = { to: string; label: string; icon: any; end?: boolean; badge?: string; hint?: string };
 type NavGroup = { title: string; subtitle?: string; items: NavItem[] };
 
-// Psychologisch geordnet: erst was du JETZT tust, dann Geld, dann Wert, dann Schutz, dann Tools
+// 4 klare Bereiche statt 6 — psychologisch sortiert nach „was tust du gerade?"
 const groups: NavGroup[] = [
   {
-    title: "Start",
-    subtitle: "Dein Tag im Überblick",
+    title: "Überblick",
     items: [
-      { to: "/app", label: "Übersicht", icon: Home, end: true, hint: "Cashflow, Termine, KPIs" },
-      { to: "/app/tasks", label: "Heute zu tun", icon: Clock, hint: "Offene Aufgaben" },
-      { to: "/app/deadlines", label: "Fristen", icon: CalendarClock, hint: "Damit nichts verfällt" },
+      { to: "/app", label: "Dashboard", icon: Home, end: true, hint: "Cashflow, KPIs, Termine" },
+      { to: "/app/tasks", label: "Mein Plan", icon: CalendarCheck, badge: "TO-DO", hint: "Alle Aufgaben & Fristen — nichts mehr verpassen" },
     ],
   },
   {
-    title: "Vermieten",
-    subtitle: "Leerstand → Mieter",
+    title: "Vermieten & Verwalten",
+    subtitle: "Vom Inserat bis zur Miete",
     items: [
-      { to: "/app/listings", label: "Inserate", icon: Megaphone, badge: "Markt", hint: "Veröffentlichen" },
+      { to: "/app/properties", label: "Objekte", icon: Building2, hint: "Deine Immobilien" },
+      { to: "/app/tenants", label: "Mieter", icon: Users, hint: "Mit Verträgen" },
+      { to: "/app/listings", label: "Inserate", icon: Megaphone, hint: "Veröffentlichen & Markt" },
       { to: "/app/applications", label: "Bewerbungen", icon: Inbox, hint: "Mit KI-Score" },
-      { to: "/app/profile-seeker", label: "Mieter-Profil", icon: UserCircle2, hint: "Wenn du selbst suchst" },
-    ],
-  },
-  {
-    title: "Verwalten",
-    subtitle: "Deine Immobilien",
-    items: [
-      { to: "/app/properties", label: "Objekte", icon: Building2 },
-      { to: "/app/tenants", label: "Mieter", icon: Users },
       { to: "/app/payments", label: "Einnahmen", icon: Wallet },
-      { to: "/app/expenses", label: "Ausgaben", icon: Receipt },
-      { to: "/app/dunning", label: "Mahnwesen", icon: AlertTriangle },
-      { to: "/app/templates", label: "Vorlagen", icon: FileText },
+      { to: "/app/expenses", label: "Ausgaben", icon: Receipt, hint: "Belege scannen" },
+      { to: "/app/templates", label: "Vorlagen", icon: FileText, hint: "Verträge & Schreiben" },
     ],
   },
   {
-    title: "Wert",
-    subtitle: "Was ist es wert?",
+    title: "Wert & Steuer",
     items: [
       { to: "/app/valuation", label: "Bewertung", icon: TrendingUp, badge: "AVM" },
-      { to: "/app/benchmark", label: "Marktindex", icon: BarChart3 },
-      { to: "/app/calculator", label: "Rechner", icon: Calculator },
+      { to: "/app/calculator", label: "Rechner", icon: Calculator, hint: "AfA, Rendite, Tilgung" },
+      { to: "/app/tax", label: "Steuer-Brücke", icon: Calculator, hint: "Anlage V Export" },
+      { to: "/app/advisor", label: "Steuerberater", icon: ShieldCheck, hint: "Sicher freigeben" },
     ],
   },
   {
-    title: "Schutz",
-    subtitle: "Sicher & rechtssicher",
+    title: "Schutz & Hilfe",
     items: [
-      { to: "/app/vault", label: "Tresor", icon: Lock, badge: "AES-256" },
-      { to: "/app/tax", label: "Steuer-Brücke", icon: Calculator },
-      { to: "/app/advisor", label: "Steuerberater", icon: ShieldCheck },
-      { to: "/app/law", label: "Rechts-Ecke", icon: Scale },
+      { to: "/app/vault", label: "Tresor", icon: Lock, badge: "AES-256", hint: "Verschlüsselte Dokumente" },
+      { to: "/app/law", label: "Rechts-Ecke", icon: Scale, hint: "BGB, WEG, HeizkostenV" },
+      { to: "/app/marketplace", label: "Handwerker", icon: Wrench, hint: "Verifizierte Profis" },
     ],
   },
   {
-    title: "Hilfe holen",
+    title: "Wohnung suchen",
+    subtitle: "Du suchst selbst?",
     items: [
-      { to: "/app/bookings", label: "Aufträge", icon: Briefcase },
-      { to: "/app/marketplace", label: "Handwerker", icon: Wrench },
+      { to: "/markt", label: "Markt durchsuchen", icon: SearchIcon, hint: "Direkt vom Eigentümer" },
+      { to: "/app/profile-seeker", label: "Mein Mieter-Profil", icon: Inbox, hint: "Damit Vermieter dich finden" },
+      { to: "/app/my-applications", label: "Meine Bewerbungen", icon: FileText },
     ],
   },
 ];
@@ -85,10 +75,10 @@ const groups: NavGroup[] = [
 // 4 Tabs + zentraler "+" FAB für Mobile
 const bottomLeft: NavItem[] = [
   { to: "/app", label: "Start", icon: Home, end: true },
-  { to: "/app/properties", label: "Objekte", icon: Building2 },
+  { to: "/app/tasks", label: "Plan", icon: CalendarCheck },
 ];
 const bottomRight: NavItem[] = [
-  { to: "/app/payments", label: "Geld", icon: Wallet },
+  { to: "/app/properties", label: "Objekte", icon: Building2 },
   { to: "/app/vault", label: "Tresor", icon: Lock },
 ];
 

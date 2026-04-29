@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ExternalLink, Plus, AlertOctagon, ListChecks, CheckCircle2 } from "lucide-react";
+import { ExternalLink, Plus, AlertOctagon, ListChecks, CheckCircle2, CalendarClock } from "lucide-react";
 import { toast } from "sonner";
 
 interface Task {
@@ -72,8 +72,10 @@ export default function Tasks() {
   };
 
   const today = new Date().toISOString().slice(0, 10);
+  const in30 = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
   const overdue = tasks.filter(t => !t.done && t.due_date && t.due_date < today);
-  const upcoming = tasks.filter(t => !t.done && (!t.due_date || t.due_date >= today));
+  const soon = tasks.filter(t => !t.done && t.due_date && t.due_date >= today && t.due_date <= in30);
+  const later = tasks.filter(t => !t.done && (!t.due_date || t.due_date > in30));
   const done = tasks.filter(t => t.done);
 
   const propMap = Object.fromEntries(properties.map(p => [p.id, p.name]));
@@ -82,8 +84,8 @@ export default function Tasks() {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight">Fristen & Aufgaben</h1>
-          <p className="text-muted-foreground mt-1">Alle gesetzlichen Fristen automatisch im Blick.</p>
+          <h1 className="text-3xl font-semibold tracking-tight">Mein Plan</h1>
+          <p className="text-muted-foreground mt-1">Alle Aufgaben & gesetzlichen Fristen — sortiert nach Dringlichkeit. Du verpasst nichts.</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
@@ -120,7 +122,8 @@ export default function Tasks() {
       ) : (
         <div className="space-y-6">
           <Section title="Überfällig" icon={AlertOctagon} tone="destructive" tasks={overdue} onToggle={toggle} propMap={propMap} />
-          <Section title="Anstehend" icon={ListChecks} tone="default" tasks={upcoming} onToggle={toggle} propMap={propMap} />
+          <Section title="Bald fällig (30 Tage)" icon={CalendarClock} tone="default" tasks={soon} onToggle={toggle} propMap={propMap} />
+          <Section title="Später" icon={ListChecks} tone="muted" tasks={later} onToggle={toggle} propMap={propMap} />
           <Section title="Erledigt" icon={CheckCircle2} tone="muted" tasks={done} onToggle={toggle} propMap={propMap} />
         </div>
       )}
