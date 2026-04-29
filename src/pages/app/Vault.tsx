@@ -182,10 +182,58 @@ const Vault = () => {
     setUploadOpen(true);
   };
 
+  // Schnell-Scan: Datei direkt verschlüsseln & speichern, ohne Dialog
+  const [quickSaving, setQuickSaving] = useState(false);
+  const quickSaveFile = async (f: File) => {
+    if (f.size > 25 * 1024 * 1024) return toast.error("Datei zu groß (max. 25 MB)");
+    if (!keyRef.current) return toast.error("Tresor ist gesperrt");
+    setQuickSaving(true);
+    const t = toast.loading("Verschlüssele & speichere…");
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Nicht angemeldet");
+      const buf = await f.arrayBuffer();
+      const salt = b64.enc(randomBytes(16));
+      const { iv, ct } = await encryptBytes(keyRef.current, buf);
+      const path = `${user.id}/${crypto.randomUUID()}.bin`;
+      const { error: upErr } = await supabase.storage
+        .from("vault").upload(path, new Blob([ct]), { contentType: "application/octet-stream" });
+      if (upErr) throw upErr;
+      const niceName = f.name.replace(/\.[^.]+$/, "") || `Scan ${new Date().toLocaleString("de-DE")}`;
+      const isImage = (f.type || "").startsWith("image/");
+      const { error: dbErr } = await supabase.from("vault_documents").insert({
+        user_id: user.id,
+        property_id: filterProp !== "all" ? filterProp : null,
+        category: (isImage ? "foto" : "sonstiges") as any,
+        display_name: niceName,
+        original_name: f.name,
+        mime_type: f.type || "application/octet-stream",
+        size_bytes: f.size,
+        storage_path: path,
+        enc_iv: iv,
+        enc_salt: salt,
+        notes: null,
+        retention_until: null,
+      });
+      if (dbErr) throw dbErr;
+      toast.success("Im Tresor gespeichert", { id: t });
+      loadData();
+    } catch (e: any) {
+      toast.error(e.message ?? "Speichern fehlgeschlagen", { id: t });
+    } finally {
+      setQuickSaving(false);
+    }
+  };
+
+  const handleFiles = async (files: FileList | File[]) => {
+    const arr = Array.from(files);
+    for (const f of arr) await quickSaveFile(f);
+  };
+
   const onDrop = (e: React.DragEvent) => {
     e.preventDefault(); setDragOver(false);
-    const f = e.dataTransfer.files?.[0];
-    if (f) handleFile(f);
+    const fs = e.dataTransfer.files;
+    if (fs && fs.length > 0) handleFiles(fs);
   };
 
   const submitUpload = async () => {
