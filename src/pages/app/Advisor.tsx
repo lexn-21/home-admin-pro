@@ -152,6 +152,42 @@ const Advisor = () => {
           })}
         </div>
       )}
+
+      {directory.length > 0 && (
+        <div className="space-y-3 pt-4 border-t border-border/60">
+          <div>
+            <h2 className="text-xl font-bold">Andere Steuerberater in deiner Nähe</h2>
+            <p className="text-sm text-muted-foreground mt-1">Geprüftes Verzeichnis · sortiert nach Partner-Status.</p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-3">
+            {directory.map((d) => (
+              <Card key={d.id} className="p-4 glass">
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <div className="min-w-0">
+                    <p className="font-semibold truncate">{d.name}</p>
+                    {d.firm && <p className="text-sm text-muted-foreground truncate">{d.firm}</p>}
+                  </div>
+                  {d.partner_status === "partner" && (
+                    <Badge className="bg-gradient-gold text-primary-foreground border-0">Partner</Badge>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">{[d.zip, d.city].filter(Boolean).join(" ")}</p>
+                {d.immobilien_focus && (
+                  <Badge variant="outline" className="mt-2 text-[10px]">Immobilien-Schwerpunkt</Badge>
+                )}
+                <div className="flex flex-wrap gap-3 mt-3 text-xs">
+                  {d.email && <a href={`mailto:${d.email}`} className="text-primary hover:underline flex items-center gap-1"><Mail className="h-3 w-3" />E-Mail</a>}
+                  {d.website && <a href={d.website} target="_blank" rel="noreferrer" className="text-primary hover:underline">Website ↗</a>}
+                  {d.phone && <span className="text-muted-foreground">{d.phone}</span>}
+                </div>
+              </Card>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground text-center pt-2">
+            Du bist Steuerberater? Werde Partner: <a href="mailto:leonboomgaarden@gmail.com" className="text-primary hover:underline">leonboomgaarden@gmail.com</a>
+          </p>
+        </div>
+      )}
     </div>
   );
 };
