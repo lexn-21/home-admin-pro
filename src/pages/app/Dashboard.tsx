@@ -13,9 +13,10 @@ import {
   BarChart3, Briefcase, Megaphone,
 } from "lucide-react";
 
-const KPI = ({ label, value, hint, trend, icon: Icon, tone = "default" }: {
+const KPI = ({ label, value, hint, trend, icon: Icon, tone = "default", progress }: {
   label: string; value: string; hint?: string; trend?: "up" | "down" | null;
   icon: React.ElementType; tone?: "default" | "success" | "warning";
+  progress?: number;
 }) => (
   <Item variant="scale">
     <Card className="p-5 glass hover:shadow-elevated transition-shadow h-full">
@@ -40,6 +41,18 @@ const KPI = ({ label, value, hint, trend, icon: Icon, tone = "default" }: {
           }`} />
         </div>
       </div>
+      {typeof progress === "number" && (
+        <div className="mt-3 h-1.5 w-full bg-muted rounded-full overflow-hidden">
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${Math.max(0, Math.min(100, progress))}%` }}
+            transition={{ duration: 0.9, ease: "easeOut" }}
+            className={`h-full rounded-full ${
+              tone === "success" ? "bg-success" : tone === "warning" ? "bg-warning" : "bg-primary"
+            }`}
+          />
+        </div>
+      )}
     </Card>
   </Item>
 );
@@ -215,12 +228,14 @@ const Dashboard = () => {
               value={eur(ytdIncome)}
               hint={`${num(payments.filter(p => p.paid_on >= yearStart).length)} Buchungen`}
               trend="up" tone="success" icon={Wallet}
+              progress={monthlyTarget > 0 ? Math.min(100, (ytdIncome / (monthlyTarget * (new Date().getMonth() + 1))) * 100) : undefined}
             />
             <KPI
               label="Ausgaben YTD"
               value={eur(ytdExpense)}
               hint={`${num(expenses.filter(e => e.spent_on >= yearStart).length)} Belege`}
               icon={Receipt}
+              progress={ytdIncome > 0 ? Math.min(100, (ytdExpense / ytdIncome) * 100) : undefined}
             />
             <KPI
               label="Cashflow YTD"
@@ -228,14 +243,71 @@ const Dashboard = () => {
               hint={cashflow >= 0 ? "Positiv" : "Negativ"}
               tone={cashflow >= 0 ? "success" : "warning"}
               icon={TrendingUp}
+              progress={ytdIncome > 0 ? Math.max(0, Math.min(100, (cashflow / ytdIncome) * 100)) : undefined}
             />
             <KPI
               label="Vermietungsquote"
               value={pct(occRate, 0)}
               hint={`${num(occupied)} / ${num(units.length)} Einheiten`}
               icon={Building2}
+              progress={occRate}
             />
           </div>
+
+          {/* Visueller 12-Monats-Verlauf */}
+          <Item>
+            <Card className="p-6 glass">
+              <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+                <div>
+                  <h2 className="font-bold text-lg">Letzte 12 Monate</h2>
+                  <p className="text-xs text-muted-foreground mt-0.5">Einnahmen vs. Ausgaben — auf einen Blick</p>
+                </div>
+                <div className="flex items-center gap-3 text-xs">
+                  <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-success" /> Einnahmen</span>
+                  <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-destructive/70" /> Ausgaben</span>
+                </div>
+              </div>
+              {(() => {
+                const months: { label: string; income: number; expense: number }[] = [];
+                const now = new Date();
+                for (let i = 11; i >= 0; i--) {
+                  const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                  const next = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
+                  const startISO = d.toISOString().slice(0, 10);
+                  const endISO = next.toISOString().slice(0, 10);
+                  const inc = payments.filter(p => p.paid_on >= startISO && p.paid_on < endISO).reduce((s, p) => s + Number(p.amount), 0);
+                  const exp = expenses.filter(e => e.spent_on >= startISO && e.spent_on < endISO).reduce((s, e) => s + Number(e.amount), 0);
+                  months.push({ label: d.toLocaleDateString("de-DE", { month: "short" }), income: inc, expense: exp });
+                }
+                const max = Math.max(1, ...months.map(m => Math.max(m.income, m.expense)));
+                return (
+                  <div className="flex items-end gap-1.5 h-32">
+                    {months.map((m, i) => (
+                      <div key={i} className="flex-1 flex flex-col items-center gap-1 group">
+                        <div className="w-full flex items-end gap-0.5 h-24">
+                          <motion.div
+                            initial={{ height: 0 }}
+                            animate={{ height: `${(m.income / max) * 100}%` }}
+                            transition={{ duration: 0.6, delay: i * 0.04 }}
+                            className="flex-1 bg-success rounded-t-sm min-h-[2px]"
+                            title={`${m.label}: +${eur(m.income)}`}
+                          />
+                          <motion.div
+                            initial={{ height: 0 }}
+                            animate={{ height: `${(m.expense / max) * 100}%` }}
+                            transition={{ duration: 0.6, delay: i * 0.04 + 0.1 }}
+                            className="flex-1 bg-destructive/70 rounded-t-sm min-h-[2px]"
+                            title={`${m.label}: −${eur(m.expense)}`}
+                          />
+                        </div>
+                        <span className="text-[9px] text-muted-foreground tabular">{m.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+            </Card>
+          </Item>
 
           <Item>
             <Card className="p-6 glass relative overflow-hidden">

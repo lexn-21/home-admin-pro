@@ -20,6 +20,7 @@ const Valuation = () => {
   const [monthlyRent, setMonthlyRent] = useState<number>(950);
   const [result, setResult] = useState<AvmResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.from("properties").select("id,name,zip,city").then(async ({ data }) => {
@@ -33,9 +34,15 @@ const Valuation = () => {
   const calc = async () => {
     if (!zip || zip.length < 4) return;
     setLoading(true);
-    const r = await estimateValue(zip, livingSpace, annualRent);
-    setResult(r);
-    setLoading(false);
+    setError(null);
+    try {
+      const r = await estimateValue(zip, livingSpace, annualRent);
+      setResult(r);
+    } catch (e: any) {
+      setError(e.message || "Bewertung fehlgeschlagen.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { if (zip) calc(); /* eslint-disable-next-line */ }, [zip]);
@@ -97,7 +104,20 @@ const Valuation = () => {
           </Item>
 
           <Item variant="scale">
-            {result ? (
+            {loading ? (
+              <Card className="p-8 h-full flex flex-col items-center justify-center border-dashed gap-3 min-h-[280px]">
+                <div className="h-10 w-10 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                <p className="text-sm text-muted-foreground">Berechne Sachwert &amp; Ertragswert …</p>
+                <p className="text-xs text-muted-foreground/70">Marktdaten für PLZ {zip} werden abgerufen</p>
+              </Card>
+            ) : error ? (
+              <Card className="p-8 h-full flex flex-col items-center justify-center border-destructive/40 bg-destructive/5 gap-3 min-h-[280px] text-center">
+                <Info className="h-8 w-8 text-destructive" />
+                <p className="font-semibold">Bewertung nicht möglich</p>
+                <p className="text-sm text-muted-foreground max-w-xs">{error}</p>
+                <Button onClick={calc} variant="outline" size="sm">Erneut versuchen</Button>
+              </Card>
+            ) : result ? (
               <Card className="relative overflow-hidden p-8 border-primary/20" style={{ background: "var(--gradient-card, hsl(var(--card)))" }}>
                 <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
                 <div className="relative space-y-6">

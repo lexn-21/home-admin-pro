@@ -16,7 +16,7 @@ import {
   Lock, ShieldCheck, KeyRound, FileText, Eye, EyeOff,
   Fingerprint, ServerCrash, CheckCircle2, AlertTriangle,
   Upload, Search, Download, Trash2, Building2, Filter,
-  FileImage, FileType2, Sparkles, Clock,
+  FileImage, FileType2, Sparkles, Clock, Camera, Zap,
 } from "lucide-react";
 import {
   buildVerifier, verifyPin, encryptBytes, decryptBytes, b64, randomBytes, deriveKey,
@@ -182,10 +182,58 @@ const Vault = () => {
     setUploadOpen(true);
   };
 
+  // Schnell-Scan: Datei direkt verschlüsseln & speichern, ohne Dialog
+  const [quickSaving, setQuickSaving] = useState(false);
+  const quickSaveFile = async (f: File) => {
+    if (f.size > 25 * 1024 * 1024) return toast.error("Datei zu groß (max. 25 MB)");
+    if (!keyRef.current) return toast.error("Tresor ist gesperrt");
+    setQuickSaving(true);
+    const t = toast.loading("Verschlüssele & speichere…");
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Nicht angemeldet");
+      const buf = await f.arrayBuffer();
+      const salt = b64.enc(randomBytes(16));
+      const { iv, ct } = await encryptBytes(keyRef.current, buf);
+      const path = `${user.id}/${crypto.randomUUID()}.bin`;
+      const { error: upErr } = await supabase.storage
+        .from("vault").upload(path, new Blob([ct]), { contentType: "application/octet-stream" });
+      if (upErr) throw upErr;
+      const niceName = f.name.replace(/\.[^.]+$/, "") || `Scan ${new Date().toLocaleString("de-DE")}`;
+      const isImage = (f.type || "").startsWith("image/");
+      const { error: dbErr } = await supabase.from("vault_documents").insert({
+        user_id: user.id,
+        property_id: filterProp !== "all" ? filterProp : null,
+        category: (isImage ? "foto" : "sonstiges") as any,
+        display_name: niceName,
+        original_name: f.name,
+        mime_type: f.type || "application/octet-stream",
+        size_bytes: f.size,
+        storage_path: path,
+        enc_iv: iv,
+        enc_salt: salt,
+        notes: null,
+        retention_until: null,
+      });
+      if (dbErr) throw dbErr;
+      toast.success("Im Tresor gespeichert", { id: t });
+      loadData();
+    } catch (e: any) {
+      toast.error(e.message ?? "Speichern fehlgeschlagen", { id: t });
+    } finally {
+      setQuickSaving(false);
+    }
+  };
+
+  const handleFiles = async (files: FileList | File[]) => {
+    const arr = Array.from(files);
+    for (const f of arr) await quickSaveFile(f);
+  };
+
   const onDrop = (e: React.DragEvent) => {
     e.preventDefault(); setDragOver(false);
-    const f = e.dataTransfer.files?.[0];
-    if (f) handleFile(f);
+    const fs = e.dataTransfer.files;
+    if (fs && fs.length > 0) handleFiles(fs);
   };
 
   const submitUpload = async () => {
@@ -440,10 +488,21 @@ const Vault = () => {
               Dein <span className="text-gradient-gold">Eigentums-Archiv</span>
             </h1>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Button variant="outline" onClick={lock}><Lock className="h-4 w-4 mr-2" />Sperren</Button>
+            <input id="vault-camera-input" type="file" accept="image/*" capture="environment" hidden
+              onChange={(e) => e.target.files && handleFiles(e.target.files)} />
+            <Button
+              variant="outline"
+              onClick={() => document.getElementById("vault-camera-input")?.click()}
+              disabled={quickSaving}
+              className="gap-2"
+              title="Mit Kamera scannen — sofort verschlüsselt gespeichert"
+            >
+              <Camera className="h-4 w-4" /> Schnell-Scan
+            </Button>
             <Button onClick={() => setUploadOpen(true)} className="bg-gradient-gold text-primary-foreground shadow-gold">
-              <Upload className="h-4 w-4 mr-2" />Hochladen
+              <Upload className="h-4 w-4 mr-2" />Mit Details
             </Button>
           </div>
         </div>
@@ -502,12 +561,22 @@ const Vault = () => {
           onClick={() => document.getElementById("vault-file-input")?.click()}
           className={`cursor-pointer rounded-2xl border-2 border-dashed transition-all p-6 text-center ${
             dragOver ? "border-primary bg-primary/5 scale-[1.01]" : "border-border hover:border-primary/50 hover:bg-muted/30"
-          }`}
+          } ${quickSaving ? "opacity-60 pointer-events-none" : ""}`}
         >
-          <Upload className={`h-8 w-8 mx-auto mb-2 ${dragOver ? "text-primary" : "text-muted-foreground"}`} />
-          <p className="text-sm font-medium">Datei hierher ziehen oder klicken</p>
-          <p className="text-xs text-muted-foreground">PDF, Bilder, Dokumente · max. 25 MB · wird vor Upload verschlüsselt</p>
-          <input id="vault-file-input" type="file" hidden onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
+          {quickSaving ? (
+            <>
+              <div className="h-8 w-8 mx-auto mb-2 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+              <p className="text-sm font-medium">Verschlüssele &amp; speichere…</p>
+            </>
+          ) : (
+            <>
+              <Zap className={`h-8 w-8 mx-auto mb-2 ${dragOver ? "text-primary" : "text-muted-foreground"}`} />
+              <p className="text-sm font-medium">Schnell ablegen — auch mehrere Dateien gleichzeitig</p>
+              <p className="text-xs text-muted-foreground">Werden sofort verschlüsselt &amp; gespeichert · max. 25 MB pro Datei</p>
+            </>
+          )}
+          <input id="vault-file-input" type="file" multiple hidden
+            onChange={(e) => e.target.files && e.target.files.length > 0 && handleFiles(e.target.files)} />
         </div>
       </Item>
 

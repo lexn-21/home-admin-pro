@@ -4,9 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Briefcase, MessageSquare, Heart } from "lucide-react";
+import { Briefcase, MessageSquare, Heart, Loader2, AlertCircle, RefreshCw } from "lucide-react";
 import { eur } from "@/lib/format";
 import ChatDialog from "@/components/market/ChatDialog";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const labelStatus: Record<string, string> = {
   sent: "Gesendet", shortlisted: "Favorit beim Eigentümer", rejected: "Abgelehnt",
@@ -17,25 +18,60 @@ const MyApplications = () => {
   const [apps, setApps] = useState<any[]>([]);
   const [saved, setSaved] = useState<any[]>([]);
   const [chatApp, setChatApp] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => { document.title = "Meine Bewerbungen · ImmoNIQ"; load(); }, []);
   const load = async () => {
-    const { data: a } = await supabase.from("applications").select("*, listings(*)").order("created_at", { ascending: false });
-    setApps(a ?? []);
-    const { data: s } = await supabase.from("listing_saves").select("*, listings(*)");
-    setSaved(s ?? []);
+    setLoading(true); setError(null);
+    try {
+      // Parallel + 10s Timeout, sonst hängt die Seite ewig
+      const timeout = <T,>(p: Promise<T>, ms = 10000) =>
+        Promise.race([p, new Promise<T>((_, rej) => setTimeout(() => rej(new Error("Zeitüberschreitung")), ms))]);
+      const [aRes, sRes] = await Promise.all([
+        timeout(Promise.resolve(supabase.from("applications").select("*, listings(*)").order("created_at", { ascending: false }))),
+        timeout(Promise.resolve(supabase.from("listing_saves").select("*, listings(*)"))),
+      ]);
+      if ((aRes as any).error) throw (aRes as any).error;
+      setApps((aRes as any).data ?? []);
+      setSaved((sRes as any).data ?? []);
+    } catch (e: any) {
+      setError(e.message || "Konnte nicht laden.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="text-3xl font-bold flex items-center gap-2"><Briefcase className="h-7 w-7 text-primary" /> Meine Bewerbungen</h1>
-        <p className="text-muted-foreground text-sm mt-1">Status, Chats und gespeicherte Inserate.</p>
+      <header className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-3xl font-bold flex items-center gap-2"><Briefcase className="h-7 w-7 text-primary" /> Meine Bewerbungen</h1>
+          <p className="text-muted-foreground text-sm mt-1">Status, Chats und gespeicherte Inserate.</p>
+        </div>
+        <Button variant="outline" size="sm" onClick={load} disabled={loading} className="gap-2">
+          <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} /> Aktualisieren
+        </Button>
       </header>
+
+      {error && (
+        <Card className="p-4 border-destructive/40 bg-destructive/5 flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-sm">Daten konnten nicht geladen werden</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{error}</p>
+          </div>
+          <Button size="sm" variant="outline" onClick={load}>Erneut versuchen</Button>
+        </Card>
+      )}
 
       <section className="space-y-3">
         <h2 className="font-bold">Aktive Bewerbungen</h2>
-        {apps.length === 0 ? (
+        {loading ? (
+          <div className="space-y-2">
+            {[0, 1, 2].map((i) => <Skeleton key={i} className="h-20 w-full rounded-xl" />)}
+          </div>
+        ) : apps.length === 0 ? (
           <Card className="p-8 glass text-center text-sm text-muted-foreground">
             Noch keine Bewerbungen. <Link to="/markt" className="text-primary underline">Im Markt stöbern</Link>.
           </Card>
