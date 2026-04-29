@@ -29,8 +29,8 @@ const MyApplications = () => {
       const timeout = <T,>(p: Promise<T>, ms = 10000) =>
         Promise.race([p, new Promise<T>((_, rej) => setTimeout(() => rej(new Error("Zeitüberschreitung")), ms))]);
       const [aRes, sRes] = await Promise.all([
-        timeout(supabase.from("applications").select("*, listings(*)").order("created_at", { ascending: false })),
-        timeout(supabase.from("listing_saves").select("*, listings(*)")),
+        timeout(Promise.resolve(supabase.from("applications").select("*, listings(*)").order("created_at", { ascending: false }))),
+        timeout(Promise.resolve(supabase.from("listing_saves").select("*, listings(*)"))),
       ]);
       if ((aRes as any).error) throw (aRes as any).error;
       setApps((aRes as any).data ?? []);
