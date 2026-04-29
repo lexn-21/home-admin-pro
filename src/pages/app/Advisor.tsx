@@ -12,14 +12,19 @@ import { date } from "@/lib/format";
 
 const Advisor = () => {
   const [items, setItems] = useState<any[]>([]);
+  const [directory, setDirectory] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ advisor_name: "", advisor_email: "" });
 
   useEffect(() => { document.title = "Steuerberater · ImmoNIQ"; load(); }, []);
 
   const load = async () => {
-    const { data } = await supabase.from("advisor_links").select("*").order("created_at", { ascending: false });
-    setItems(data ?? []);
+    const [links, dir] = await Promise.all([
+      supabase.from("advisor_links").select("*").order("created_at", { ascending: false }),
+      supabase.from("advisor_directory").select("*").order("partner_status", { ascending: true }).limit(5),
+    ]);
+    setItems(links.data ?? []);
+    setDirectory(dir.data ?? []);
   };
 
   const submit = async () => {
