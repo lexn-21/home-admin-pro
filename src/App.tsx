@@ -22,6 +22,10 @@ import Marketplace from "./pages/app/Marketplace";
 import Deadlines from "./pages/app/Deadlines";
 import LawCorner from "./pages/app/LawCorner";
 import AdvisorView from "./pages/AdvisorView";
+import TenantPortal from "./pages/TenantPortal";
+import Valuation from "./pages/app/Valuation";
+import Benchmark from "./pages/app/Benchmark";
+import Bookings from "./pages/app/Bookings";
 import AppLayout from "./pages/app/AppLayout";
 import NotFound from "./pages/NotFound";
 
@@ -37,6 +41,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/advisor/:token" element={<AdvisorView />} />
+          <Route path="/mieter/:token" element={<TenantPortal />} />
           <Route
             path="/app/onboarding"
             element={
@@ -63,6 +68,9 @@ const App = () => (
             <Route path="tax" element={<TaxBridge />} />
             <Route path="advisor" element={<Advisor />} />
             <Route path="vault" element={<Vault />} />
+            <Route path="valuation" element={<Valuation />} />
+            <Route path="benchmark" element={<Benchmark />} />
+            <Route path="bookings" element={<Bookings />} />
             <Route path="marketplace" element={<Marketplace />} />
             <Route path="deadlines" element={<Deadlines />} />
             <Route path="law" element={<LawCorner />} />

@@ -7,6 +7,7 @@ import {
   LayoutDashboard, Building2, Users, Wallet, Receipt, Calculator,
   LogOut, Settings as SettingsIcon, AlertTriangle, ShieldCheck,
   Lock, Wrench, Bell, Search, CalendarClock, Scale,
+  TrendingUp, BarChart3, Briefcase,
 } from "lucide-react";
 
 type NavItem = { to: string; label: string; icon: any; end?: boolean; badge?: string };
@@ -31,6 +32,13 @@ const groups: NavGroup[] = [
     ],
   },
   {
+    title: "Wert & Markt",
+    items: [
+      { to: "/app/valuation", label: "Bewertung", icon: TrendingUp, badge: "AVM" },
+      { to: "/app/benchmark", label: "Marktindex", icon: BarChart3 },
+    ],
+  },
+  {
     title: "Finanzen & Steuer",
     items: [
       { to: "/app/tax", label: "Steuer-Brücke", icon: Calculator },
@@ -41,6 +49,7 @@ const groups: NavGroup[] = [
     title: "Werkzeuge",
     items: [
       { to: "/app/vault", label: "Tresor", icon: Lock, badge: "Zero-Knowledge" },
+      { to: "/app/bookings", label: "Aufträge", icon: Briefcase, badge: "neu" },
       { to: "/app/marketplace", label: "Marktplatz", icon: Wrench },
       { to: "/app/law", label: "Rechts-Ecke", icon: Scale },
     ],
