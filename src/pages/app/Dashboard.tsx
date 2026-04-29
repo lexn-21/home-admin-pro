@@ -248,18 +248,30 @@ const Dashboard = () => {
           </div>
         </Item>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <QuickAction to="/app/vault" icon={Lock} badge="Neu"
+          <QuickAction to="/app/valuation" icon={TrendingUp} badge="AVM"
+            label="Live-Bewertung"
+            desc="Was ist mein Objekt heute wert?" />
+          <QuickAction to="/app/benchmark" icon={BarChart3}
+            label="Marktindex"
+            desc="Vergleich gegen anonyme Marktdaten." />
+          <QuickAction to="/app/bookings" icon={Briefcase} badge="10 % Take"
+            label="Handwerker buchen"
+            desc="Festpreis-Angebote in 24 h." />
+          <QuickAction to="/app/vault" icon={Lock}
             label="Dokumenten-Tresor"
-            desc="Verschlüsselt. Nur du siehst Inhalte." />
+            desc="Zero-Knowledge verschlüsselt." />
           <QuickAction to="/app/deadlines" icon={CalendarClock}
             label="Fristen"
-            desc="NK-Abrechnung, Mieterhöhung, §147 AO." />
+            desc="NK-Abrechnung, § 147 AO." />
           <QuickAction to="/app/marketplace" icon={Wrench}
-            label="Handwerker finden"
-            desc="Geprüfte Profis in deiner Region." />
+            label="Marktplatz"
+            desc="Profis in deiner Region." />
           <QuickAction to="/app/law" icon={Scale}
             label="Rechts-Ecke"
-            desc="§ BGB, § EStG — original verlinkt." />
+            desc="BGB, EStG — original verlinkt." />
+          <QuickAction to="/app/advisor" icon={ShieldCheck}
+            label="Steuerberater-Link"
+            desc="Sicherer Read-only-Zugang." />
         </div>
       </div>
 
