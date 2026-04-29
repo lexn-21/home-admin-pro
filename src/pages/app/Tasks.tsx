@@ -72,8 +72,10 @@ export default function Tasks() {
   };
 
   const today = new Date().toISOString().slice(0, 10);
+  const in30 = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
   const overdue = tasks.filter(t => !t.done && t.due_date && t.due_date < today);
-  const upcoming = tasks.filter(t => !t.done && (!t.due_date || t.due_date >= today));
+  const soon = tasks.filter(t => !t.done && t.due_date && t.due_date >= today && t.due_date <= in30);
+  const later = tasks.filter(t => !t.done && (!t.due_date || t.due_date > in30));
   const done = tasks.filter(t => t.done);
 
   const propMap = Object.fromEntries(properties.map(p => [p.id, p.name]));
@@ -82,8 +84,8 @@ export default function Tasks() {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight">Fristen & Aufgaben</h1>
-          <p className="text-muted-foreground mt-1">Alle gesetzlichen Fristen automatisch im Blick.</p>
+          <h1 className="text-3xl font-semibold tracking-tight">Mein Plan</h1>
+          <p className="text-muted-foreground mt-1">Alle Aufgaben & gesetzlichen Fristen — sortiert nach Dringlichkeit. Du verpasst nichts.</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
