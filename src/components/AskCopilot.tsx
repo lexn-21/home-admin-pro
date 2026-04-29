@@ -84,7 +84,8 @@ export const AskCopilot = () => {
     <>
       <motion.button
         onClick={() => setOpen(true)}
-        className="fixed bottom-24 right-4 sm:bottom-6 sm:right-6 z-40 h-14 w-14 rounded-full bg-gradient-gold shadow-gold flex items-center justify-center text-primary-foreground"
+        style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 5.5rem)" }}
+        className="fixed right-4 sm:!bottom-6 sm:right-6 z-30 h-14 w-14 rounded-full bg-gradient-gold shadow-gold flex items-center justify-center text-primary-foreground"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         aria-label="Co-Pilot öffnen"
