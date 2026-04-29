@@ -106,6 +106,12 @@ export type Database = {
       }
       applications: {
         Row: {
+          ai_concerns: string[] | null
+          ai_score: number | null
+          ai_scored_at: string | null
+          ai_strengths: string[] | null
+          ai_summary: string | null
+          bonitaet_check_id: string | null
           cover_message: string | null
           created_at: string
           id: string
@@ -118,6 +124,12 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          ai_concerns?: string[] | null
+          ai_score?: number | null
+          ai_scored_at?: string | null
+          ai_strengths?: string[] | null
+          ai_summary?: string | null
+          bonitaet_check_id?: string | null
           cover_message?: string | null
           created_at?: string
           id?: string
@@ -130,6 +142,12 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          ai_concerns?: string[] | null
+          ai_score?: number | null
+          ai_scored_at?: string | null
+          ai_strengths?: string[] | null
+          ai_summary?: string | null
+          bonitaet_check_id?: string | null
           cover_message?: string | null
           created_at?: string
           id?: string
@@ -150,6 +168,57 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      bonitaets_checks: {
+        Row: {
+          application_id: string | null
+          completed_at: string | null
+          created_at: string
+          id: string
+          owner_user_id: string | null
+          paid_amount: number | null
+          provider: string
+          rating: string | null
+          report_path: string | null
+          requested_at: string
+          score: number | null
+          seeker_user_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          application_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          owner_user_id?: string | null
+          paid_amount?: number | null
+          provider?: string
+          rating?: string | null
+          report_path?: string | null
+          requested_at?: string
+          score?: number | null
+          seeker_user_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          application_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          owner_user_id?: string | null
+          paid_amount?: number | null
+          provider?: string
+          rating?: string | null
+          report_path?: string | null
+          requested_at?: string
+          score?: number | null
+          seeker_user_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       bookings: {
         Row: {
@@ -441,6 +510,9 @@ export type Database = {
       }
       listings: {
         Row: {
+          ai_description: string | null
+          ai_generated_at: string | null
+          ai_suggested_rent: number | null
           applications_count: number
           available_from: string | null
           city: string | null
@@ -471,6 +543,9 @@ export type Database = {
           zip: string | null
         }
         Insert: {
+          ai_description?: string | null
+          ai_generated_at?: string | null
+          ai_suggested_rent?: number | null
           applications_count?: number
           available_from?: string | null
           city?: string | null
@@ -501,6 +576,9 @@ export type Database = {
           zip?: string | null
         }
         Update: {
+          ai_description?: string | null
+          ai_generated_at?: string | null
+          ai_suggested_rent?: number | null
           applications_count?: number
           available_from?: string | null
           city?: string | null
