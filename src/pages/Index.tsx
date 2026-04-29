@@ -266,6 +266,12 @@ const Index = () => {
       <footer className="border-t border-border py-12">
         <div className="container flex flex-col md:flex-row items-center justify-between gap-4">
           <Logo />
+          <nav className="flex gap-5 text-xs text-muted-foreground">
+            <Link to="/impressum" className="hover:text-foreground">Impressum</Link>
+            <Link to="/datenschutz" className="hover:text-foreground">Datenschutz</Link>
+            <Link to="/agb" className="hover:text-foreground">AGB</Link>
+            <a href="mailto:leonboomgaarden@gmail.com" className="hover:text-foreground">Kontakt</a>
+          </nav>
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} ImmoNIQ · Made in Ennigerloh, NRW · DSGVO-konform
           </p>
