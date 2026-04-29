@@ -40,15 +40,15 @@ export async function deriveKey(pin: string, saltB64: string): Promise<CryptoKey
   );
 }
 
-export async function encryptBytes(key: CryptoKey, data: ArrayBuffer) {
+export async function encryptBytes(key: CryptoKey, data: BufferSource) {
   const iv = randomBytes(12);
-  const ct = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, data);
+  const ct = await crypto.subtle.encrypt({ name: "AES-GCM", iv: iv as BufferSource }, key, data);
   return { iv: b64.enc(iv), ct };
 }
 
-export async function decryptBytes(key: CryptoKey, ivB64: string, ct: ArrayBuffer) {
+export async function decryptBytes(key: CryptoKey, ivB64: string, ct: BufferSource) {
   const iv = b64.dec(ivB64);
-  return crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, ct);
+  return crypto.subtle.decrypt({ name: "AES-GCM", iv: iv as BufferSource }, key, ct);
 }
 
 // PIN setup: produce salt + verifier ciphertext
@@ -68,7 +68,7 @@ export async function verifyPin(
 ): Promise<CryptoKey | null> {
   try {
     const key = await deriveKey(pin, saltB64);
-    const plain = await decryptBytes(key, verIvB64, b64.dec(verCtB64));
+    const plain = await decryptBytes(key, verIvB64, b64.dec(verCtB64) as BufferSource);
     if (dec.decode(plain) === VERIFIER_PLAINTEXT) return key;
     return null;
   } catch {
