@@ -126,23 +126,41 @@ const Index = () => {
       {/* HERO */}
       <section className="relative">
         <div className="absolute inset-0 bg-hero-glow pointer-events-none" />
-        <div className="container relative pt-16 pb-20 md:pt-24 md:pb-28">
+        <div className="container relative pt-12 pb-16 md:pt-20 md:pb-24">
           <div className="max-w-3xl mx-auto text-center animate-fade-in-up">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass text-xs font-medium text-muted-foreground mb-8">
-              <Sparkles className="h-3 w-3 text-primary" />
-              All-in-One für deine Immobilie · Made in Germany · DSGVO
+              <Shield className="h-3 w-3 text-primary" />
+              Made in Germany · DSGVO · Verschlüsselt · Kostenlos für Privatnutzer
             </div>
-            <h1 className="text-[2.25rem] leading-[1.1] sm:text-5xl md:text-7xl font-bold tracking-tight mb-6">
-              Alles rund um deine{" "}
-              <span className="text-gradient-gold">Immobilie.</span> An einem Ort.
+
+            {/* Wordmark Logo */}
+            <img
+              src={logoImg}
+              alt="ImmonIQ"
+              width={1536}
+              height={1024}
+              className="mx-auto mb-8 h-16 md:h-24 w-auto select-none"
+            />
+
+            <h1 className="text-[2rem] leading-[1.1] sm:text-5xl md:text-6xl font-bold tracking-tight mb-6 font-display">
+              Deine Immobilie.{" "}
+              <span className="text-gradient-gold">Endlich verstanden.</span>
+              <br className="hidden sm:block" />
+              Endlich an einem Ort.
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed">
-              Ob du selbst wohnst, vermietest, kaufst oder suchst — ImmonIQ bündelt Dokumente,
-              Fristen, Marktwert, Steuer und Markt in einer einzigen, sicheren App.
+            <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto mb-4 leading-relaxed">
+              Egal ob du selbst wohnst, vermietest, gerade erbst oder suchst —
+              ImmonIQ holt dich genau dort ab, wo du stehst. Ohne Fachjargon. Ohne Stress.
+            </p>
+            <p className="text-sm md:text-base text-foreground/80 max-w-xl mx-auto mb-8 font-medium">
+              In 60 Sekunden eingerichtet. Privatnutzer kostenlos. Keine Kreditkarte.
             </p>
 
             {/* Persona-Switch */}
-            <div className="flex flex-wrap justify-center gap-2 mb-8" id="fuer-wen">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3" id="fuer-wen">
+              Wer bist du? — wir passen die App an dich an
+            </p>
+            <div className="flex flex-wrap justify-center gap-2 mb-8">
               {(Object.keys(PERSONAS) as PersonaKey[]).map((k) => {
                 const P = PERSONAS[k];
                 const active = persona === k;
@@ -152,8 +170,8 @@ const Index = () => {
                     onClick={() => setPersona(k)}
                     className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
                       active
-                        ? "bg-primary text-primary-foreground shadow-gold"
-                        : "glass text-muted-foreground hover:text-foreground"
+                        ? "bg-primary text-primary-foreground shadow-gold scale-[1.02]"
+                        : "glass text-muted-foreground hover:text-foreground hover:scale-[1.02]"
                     }`}
                   >
                     <P.icon className="h-4 w-4" />
@@ -164,8 +182,8 @@ const Index = () => {
             </div>
 
             {/* Persona-spezifischer Block */}
-            <div key={persona} className="glass rounded-3xl p-6 md:p-8 text-left animate-fade-in-up">
-              <h2 className="text-2xl md:text-3xl font-bold mb-2">{p.headline}</h2>
+            <div key={persona} className="glass rounded-3xl p-6 md:p-8 text-left animate-fade-in-up shadow-elevated">
+              <h2 className="text-2xl md:text-3xl font-bold mb-2 font-display">{p.headline}</h2>
               <p className="text-muted-foreground mb-6">{p.sub}</p>
               <div className="grid sm:grid-cols-3 gap-3 mb-6">
                 {p.bullets.map((b) => (
@@ -188,9 +206,26 @@ const Index = () => {
                 )}
               </div>
             </div>
-            <p className="text-xs text-muted-foreground mt-6">
-              Kostenloser Plan für private Nutzer · Keine Kreditkarte · Wechsel jederzeit
-            </p>
+
+            {/* Trust-Strip — direkt unterm Hero, beruhigt sofort */}
+            <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-3 text-left">
+              {[
+                { icon: Lock, label: "Ende-zu-Ende verschlüsselt", sub: "Nur du hast den Schlüssel" },
+                { icon: MapPin, label: "Server in Deutschland", sub: "DSGVO, BDSG, ISO-konform" },
+                { icon: Clock, label: "60 Sekunden Setup", sub: "Ohne Excel-Import-Marathon" },
+                { icon: HeartHandshake, label: "Echter Support", sub: "Aus Ennigerloh, kein Bot" },
+              ].map((t) => (
+                <div key={t.label} className="glass rounded-xl p-3 flex items-start gap-2.5">
+                  <div className="h-8 w-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
+                    <t.icon className="h-4 w-4 text-primary" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold leading-tight">{t.label}</p>
+                    <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">{t.sub}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
