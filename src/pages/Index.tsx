@@ -9,6 +9,7 @@ import {
   HeartHandshake, Clock, MapPin, Star,
 } from "lucide-react";
 import logoImg from "@/assets/immoniq-logo.png";
+import QuickStartFlow from "@/components/QuickStartFlow";
 
 type PersonaKey = "owner" | "landlord" | "buyer" | "tenant" | "family";
 
@@ -109,6 +110,7 @@ const Index = () => {
           <Logo />
           <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
             <a href="#fuer-wen" className="hover:text-foreground transition">Für wen</a>
+            <a href="#start" className="hover:text-foreground transition">60-Sek-Start</a>
             <a href="#module" className="hover:text-foreground transition">Module</a>
             <a href="#warum" className="hover:text-foreground transition">Warum</a>
             <a href="#preise" className="hover:text-foreground transition">Preise</a>
@@ -229,6 +231,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* 60-Sekunden-Start-Flow */}
+      <QuickStartFlow />
 
       {/* WAS DRIN IST — universelle Module */}
       <section id="module" className="py-24 bg-muted/30 border-y border-border">
