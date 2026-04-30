@@ -166,10 +166,12 @@ const Vault = () => {
       if (error) throw error;
       const key = await deriveKey(setupForm.pin, v.pin_salt);
       keyRef.current = key;
+      lastPinRef.current = setupForm.pin;
       setUnlocked(true);
       setHasPin(true);
       await loadData();
       toast.success("Tresor erstellt & geöffnet");
+      if (bioAvailable) setTimeout(() => setEnrollPromptOpen(true), 600);
     } catch (e: any) {
       toast.error(e.message ?? "Fehler beim Anlegen");
     } finally {
