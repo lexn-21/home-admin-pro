@@ -23,6 +23,12 @@ import {
 import {
   buildVerifier, verifyPin, encryptBytes, decryptBytes, b64, randomBytes, deriveKey,
 } from "@/lib/vaultCrypto";
+import {
+  platformAuthenticatorAvailable, hasBiometricSetup,
+  enrollBiometric, unlockWithBiometric, clearBiometric,
+} from "@/lib/vaultBiometric";
+import { VaultUnlockAnimation } from "@/components/VaultUnlockAnimation";
+import { AnimatePresence as AP } from "framer-motion";
 
 type VaultDoc = {
   id: string;
