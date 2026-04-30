@@ -110,6 +110,7 @@ const Index = () => {
           <Logo />
           <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
             <a href="#fuer-wen" className="hover:text-foreground transition">Für wen</a>
+            <a href="#start" className="hover:text-foreground transition">60-Sek-Start</a>
             <a href="#module" className="hover:text-foreground transition">Module</a>
             <a href="#warum" className="hover:text-foreground transition">Warum</a>
             <a href="#preise" className="hover:text-foreground transition">Preise</a>
