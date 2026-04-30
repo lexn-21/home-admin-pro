@@ -6,9 +6,11 @@ import {
   Building2, Calculator, Shield, FileText, TrendingUp, Receipt,
   CheckCircle2, ArrowRight, Sparkles, Lock, Zap, Users,
   Home, Search, KeyRound, Wrench, Bell, FolderLock, Wallet,
+  HeartHandshake, Clock, MapPin, Star,
 } from "lucide-react";
+import logoImg from "@/assets/immoniq-logo.png";
 
-type PersonaKey = "owner" | "landlord" | "buyer" | "tenant";
+type PersonaKey = "owner" | "landlord" | "buyer" | "tenant" | "family";
 
 const PERSONAS: Record<PersonaKey, {
   label: string;
@@ -22,54 +24,67 @@ const PERSONAS: Record<PersonaKey, {
   owner: {
     label: "Ich wohne selbst",
     icon: Home,
-    headline: "Alles zu deiner Wohnung — sicher an einem Ort.",
-    sub: "Kaufvertrag, Grundbuch, Versicherungen, Handwerker-Rechnungen, Energieausweis. Verschlüsselt im Tresor. Fristen werden für dich überwacht.",
+    headline: "Endlich alles zu deinem Zuhause — an einem sicheren Ort.",
+    sub: "Kaufvertrag, Grundbuch, Versicherung, Handwerker-Rechnungen, Energieausweis. Verschlüsselt im Tresor. Wir erinnern dich rechtzeitig an alles, was zählt — du musst nichts mehr im Kopf haben.",
     bullets: [
-      { icon: FolderLock, text: "Verschlüsselter Dokumenten-Tresor" },
-      { icon: Bell, text: "Erinnerungen für Versicherung, Wartung, Steuer" },
-      { icon: TrendingUp, text: "Aktueller Marktwert deiner Immobilie" },
+      { icon: FolderLock, text: "Tresor mit deiner PIN — niemand sonst kommt rein" },
+      { icon: Bell, text: "Versicherung, Wartung, Steuer — wir melden uns" },
+      { icon: TrendingUp, text: "Was ist deine Wohnung heute wert? Auf Knopfdruck." },
     ],
-    primary: { label: "Kostenlos starten", to: "/auth" },
+    primary: { label: "Kostenlos starten — in 60 Sekunden", to: "/auth" },
     secondary: { label: "Marktwert ansehen", to: "/markt" },
   },
   landlord: {
     label: "Ich vermiete",
     icon: Building2,
-    headline: "Schluss mit dem Vermieter-Papierkrieg.",
-    sub: "Mieten, Nebenkosten, Belege, Anlage V — in 30 Minuten pro Quartal statt 15 Stunden im Jahr. Ohne Steuerberater-Honorar.",
+    headline: "Schluss mit Excel, Schuhkarton und Quartals-Stress.",
+    sub: "Mieten, Nebenkosten, Belege, Anlage V — 30 Minuten pro Quartal statt 15 Stunden im Jahr. Ohne Steuerberater-Honorar. Und du inserierst direkt — ohne Maklerprovision.",
     bullets: [
-      { icon: Wallet, text: "Mietkonto & Mahnwesen automatisch" },
+      { icon: Wallet, text: "Mietkonto & Mahnwesen — vollautomatisch" },
       { icon: Calculator, text: "DATEV-CSV für deinen Steuerberater" },
-      { icon: Users, text: "Inserieren ohne Maklerprovision" },
+      { icon: Users, text: "Inserieren ohne Provision (Bestellerprinzip)" },
     ],
-    primary: { label: "Vermieter werden", to: "/auth" },
+    primary: { label: "Vermieter werden — 14 Tage gratis", to: "/auth" },
     secondary: { label: "Inserate ansehen", to: "/markt" },
   },
   buyer: {
     label: "Ich kaufe / verkaufe",
     icon: KeyRound,
-    headline: "Klar entscheiden. Fair handeln.",
-    sub: "Echte Marktwerte aus dem Mietspiegel + Vergleichsobjekten. Inserate direkt von Eigentümer zu Eigentümer — ohne Maklerprovision.",
+    headline: "Klar entscheiden. Fair handeln. Ohne Provision.",
+    sub: "Echte Marktwerte aus Mietspiegel und Vergleichsobjekten. Inserate direkt zwischen Eigentümern. Du siehst, was andere übersehen — Rendite, Förderungen, Risiken.",
     bullets: [
-      { icon: TrendingUp, text: "Marktwert-Analyse für jede PLZ" },
+      { icon: TrendingUp, text: "Marktwert für jede deutsche PLZ" },
       { icon: Search, text: "Privater Markt mit Umkreissuche" },
-      { icon: Calculator, text: "Finanzierungs- & Renditerechner" },
+      { icon: Calculator, text: "Finanzierung & Rendite in einem Klick" },
     ],
-    primary: { label: "Marktwert prüfen", to: "/auth" },
+    primary: { label: "Marktwert prüfen — gratis", to: "/auth" },
     secondary: { label: "Markt entdecken", to: "/markt" },
   },
   tenant: {
     label: "Ich miete / suche",
     icon: Search,
-    headline: "Wohnung finden — direkt vom Eigentümer.",
-    sub: "Keine Maklerprovision nach Bestellerprinzip. Eigenes Mieter-Profil, das du einmal pflegst und bei jeder Bewerbung sicher teilst.",
+    headline: "Wohnung finden — direkt vom Eigentümer. Ohne Makler.",
+    sub: "Keine Maklerprovision (Bestellerprinzip). Einmal Mieter-Profil pflegen, dann mit einem Klick bewerben. Deine Daten bleiben bei dir — du entscheidest, wer was sieht.",
     bullets: [
-      { icon: Search, text: "Markt mit Umkreissuche & Filter" },
-      { icon: Shield, text: "Mieter-Profil sicher & DSGVO-konform" },
-      { icon: FolderLock, text: "Mietvertrag, Nebenkosten, SCHUFA im Tresor" },
+      { icon: Search, text: "Markt mit Umkreis & smarten Filtern" },
+      { icon: Shield, text: "Mieter-Profil DSGVO-sicher — du kontrollierst alles" },
+      { icon: FolderLock, text: "Mietvertrag, NK, SCHUFA — verschlüsselt im Tresor" },
     ],
-    primary: { label: "Wohnung suchen", to: "/markt" },
+    primary: { label: "Wohnung suchen — kostenlos", to: "/markt" },
     secondary: { label: "Mieter-Profil anlegen", to: "/auth" },
+  },
+  family: {
+    label: "Erbschaft / Familie",
+    icon: HeartHandshake,
+    headline: "Ein Haus geerbt? Wir nehmen dich an die Hand.",
+    sub: "Was muss wann zum Finanzamt? Welche Fristen laufen? Was ist das Haus wirklich wert — und lohnt sich Halten oder Verkaufen? ImmonIQ ordnet es Schritt für Schritt — verständlich, ohne Fachjargon.",
+    bullets: [
+      { icon: Clock, text: "Fristen: Erbschein, Grundbuch, Steuer — automatisch" },
+      { icon: TrendingUp, text: "Realer Marktwert für die Erbschaftsteuer" },
+      { icon: FileText, text: "Vorlagen: Mitteilung ans Finanzamt, Versicherung, Verwalter" },
+    ],
+    primary: { label: "Schritt für Schritt starten", to: "/auth" },
+    secondary: { label: "Marktwert prüfen", to: "/markt" },
   },
 };
 
