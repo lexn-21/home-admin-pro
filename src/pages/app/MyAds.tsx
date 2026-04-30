@@ -15,7 +15,8 @@ import {
 import {
   Megaphone, Plus, Eye, MousePointerClick, Calendar, AlertCircle,
   CheckCircle2, Clock, XCircle, CreditCard, Target, Users, TrendingUp,
-  Sparkles, ExternalLink, Trash2, HelpCircle,
+  Sparkles, ExternalLink, Trash2, HelpCircle, Calculator, ShieldCheck,
+  Zap, Wrench, Building2, Banknote, Lightbulb, ArrowRight, Quote,
 } from "lucide-react";
 import { toast } from "sonner";
 
