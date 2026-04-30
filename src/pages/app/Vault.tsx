@@ -610,6 +610,17 @@ const Vault = () => {
           </div>
           <div className="flex gap-2 flex-wrap">
             <Button variant="outline" onClick={lock}><Lock className="h-4 w-4 mr-2" />Sperren</Button>
+            {bioAvailable && (
+              bioEnrolled ? (
+                <Button variant="outline" onClick={disableBio} className="gap-2" title="Biometrie für diesen Tresor entfernen">
+                  <Fingerprint className="h-4 w-4 text-success" /> Biometrie aktiv
+                </Button>
+              ) : (
+                <Button variant="outline" onClick={() => setEnrollPromptOpen(true)} className="gap-2">
+                  <Fingerprint className="h-4 w-4" /> Biometrie aktivieren
+                </Button>
+              )
+            )}
             <input id="vault-camera-input" type="file" accept="image/*" capture="environment" hidden
               onChange={(e) => e.target.files && handleFiles(e.target.files)} />
             <Button
