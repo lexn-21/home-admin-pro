@@ -39,6 +39,7 @@ import Templates from "./pages/app/Templates";
 import Impressum from "./pages/Impressum";
 import Datenschutz from "./pages/Datenschutz";
 import AGB from "./pages/AGB";
+import Widerruf from "./pages/Widerruf";
 import AppLayout from "./pages/app/AppLayout";
 import Pricing from "./pages/Pricing";
 import CheckoutReturn from "./pages/CheckoutReturn";
@@ -62,6 +63,7 @@ const App = () => (
           <Route path="/impressum" element={<Impressum />} />
           <Route path="/datenschutz" element={<Datenschutz />} />
           <Route path="/agb" element={<AGB />} />
+          <Route path="/widerruf" element={<Widerruf />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/checkout/return" element={<CheckoutReturn />} />
           <Route
