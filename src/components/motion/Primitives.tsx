@@ -1,5 +1,5 @@
 import { motion, Variants } from "framer-motion";
-import { PropsWithChildren, HTMLAttributes } from "react";
+import { forwardRef, HTMLAttributes, PropsWithChildren } from "react";
 
 const spring = { type: "spring" as const, stiffness: 300, damping: 30, mass: 0.8 };
 
@@ -26,52 +26,69 @@ export const itemScale: Variants = {
 
 type DivProps = HTMLAttributes<HTMLDivElement>;
 
-export const Page = ({ children, className, ...rest }: PropsWithChildren<DivProps>) => (
-  <motion.div
-    variants={pageVariants}
-    initial="initial"
-    animate="enter"
-    exit="exit"
-    className={className}
-    {...(rest as any)}
-  >
-    {children}
-  </motion.div>
+export const Page = forwardRef<HTMLDivElement, PropsWithChildren<DivProps>>(
+  ({ children, className, ...rest }, ref) => (
+    <motion.div
+      ref={ref}
+      variants={pageVariants}
+      initial="initial"
+      animate="enter"
+      exit="exit"
+      className={className}
+      {...(rest as any)}
+    >
+      {children}
+    </motion.div>
+  )
 );
+Page.displayName = "Page";
 
-export const Stagger = ({ children, className, ...rest }: PropsWithChildren<DivProps>) => (
-  <motion.div
-    variants={staggerChildren}
-    initial="initial"
-    animate="enter"
-    className={className}
-    {...(rest as any)}
-  >
-    {children}
-  </motion.div>
+export const Stagger = forwardRef<HTMLDivElement, PropsWithChildren<DivProps>>(
+  ({ children, className, ...rest }, ref) => (
+    <motion.div
+      ref={ref}
+      variants={staggerChildren}
+      initial="initial"
+      animate="enter"
+      className={className}
+      {...(rest as any)}
+    >
+      {children}
+    </motion.div>
+  )
 );
+Stagger.displayName = "Stagger";
 
-export const Item = ({ children, className, variant = "up", ...rest }: PropsWithChildren<DivProps & { variant?: "up" | "scale" }>) => (
+export const Item = forwardRef<
+  HTMLDivElement,
+  PropsWithChildren<DivProps & { variant?: "up" | "scale" }>
+>(({ children, className, variant = "up", ...rest }, ref) => (
   <motion.div
+    ref={ref}
     variants={variant === "up" ? itemUp : itemScale}
     className={className}
     {...(rest as any)}
   >
     {children}
   </motion.div>
-);
+));
+Item.displayName = "Item";
 
-export const Tappable = ({ children, className, ...rest }: PropsWithChildren<HTMLAttributes<HTMLDivElement>>) => (
-  <motion.div
-    whileHover={{ y: -2 }}
-    whileTap={{ scale: 0.985 }}
-    transition={spring}
-    className={className}
-    {...(rest as any)}
-  >
-    {children}
-  </motion.div>
+export const Tappable = forwardRef<HTMLDivElement, PropsWithChildren<DivProps>>(
+  ({ children, className, ...rest }, ref) => (
+    <motion.div
+      ref={ref}
+      whileHover={{ y: -2 }}
+      whileTap={{ scale: 0.985 }}
+      transition={spring}
+      className={className}
+      {...(rest as any)}
+    >
+      {children}
+    </motion.div>
+  )
 );
+Tappable.displayName = "Tappable";
 
 export const Counter = ({ value, className, prefix = "", suffix = "" }: { value: number; className?: string; prefix?: string; suffix?: string }) => (
   <motion.span
