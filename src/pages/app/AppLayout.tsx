@@ -152,36 +152,38 @@ const AppLayout = () => {
                   {g.items.map((n) => (
                     <Tooltip key={n.to}>
                       <TooltipTrigger asChild>
-                        <NavLink
-                          to={n.to}
-                          end={n.end}
-                          className={({ isActive }) =>
-                            `group relative flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
-                              isActive
-                                ? "bg-primary/10 text-primary shadow-sm"
-                                : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
-                            }`
-                          }
-                        >
-                          {({ isActive }) => (
-                            <>
-                              <n.icon className={`h-[18px] w-[18px] transition-transform ${isActive ? "scale-110" : "group-hover:scale-105"}`} />
-                              <span className="flex-1">{n.label}</span>
-                              {n.badge && (
-                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-primary/15 text-primary tracking-wide">
-                                  {n.badge}
-                                </span>
-                              )}
-                              {isActive && (
-                                <motion.div
-                                  layoutId="active-nav-pill"
-                                  className="absolute left-0 w-1 h-6 bg-primary rounded-r-full"
-                                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                                />
-                              )}
-                            </>
-                          )}
-                        </NavLink>
+                        <span className="block">
+                          <NavLink
+                            to={n.to}
+                            end={n.end}
+                            className={({ isActive }) =>
+                              `group relative flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
+                                isActive
+                                  ? "bg-primary/10 text-primary shadow-sm"
+                                  : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+                              }`
+                            }
+                          >
+                            {({ isActive }) => (
+                              <>
+                                <n.icon className={`h-[18px] w-[18px] transition-transform ${isActive ? "scale-110" : "group-hover:scale-105"}`} />
+                                <span className="flex-1">{n.label}</span>
+                                {n.badge && (
+                                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-primary/15 text-primary tracking-wide">
+                                    {n.badge}
+                                  </span>
+                                )}
+                                {isActive && (
+                                  <motion.div
+                                    layoutId="active-nav-pill"
+                                    className="absolute left-0 w-1 h-6 bg-primary rounded-r-full"
+                                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                                  />
+                                )}
+                              </>
+                            )}
+                          </NavLink>
+                        </span>
                       </TooltipTrigger>
                       {n.hint && <TooltipContent side="right">{n.hint}</TooltipContent>}
                     </Tooltip>
