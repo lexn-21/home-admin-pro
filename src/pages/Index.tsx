@@ -39,7 +39,7 @@ const PERSONAS: Record<PersonaKey, {
     tertiary: { label: "Tresor-Demo öffnen", sub: "So sicher liegen deine Dokumente", to: "/auth", icon: FolderLock },
   },
   landlord: {
-    label: "Ich vermiete",
+    label: "Verwalten +",
     icon: Building2,
     headline: "Schluss mit Excel, Schuhkarton und Quartals-Stress.",
     sub: "Mieten, Nebenkosten, Belege, Anlage V — 30 Minuten pro Quartal statt 15 Stunden im Jahr. Ohne Steuerberater-Honorar. Und du inserierst direkt — ohne Maklerprovision.",
