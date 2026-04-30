@@ -162,6 +162,11 @@ const MarktDetail = () => {
               </Card>
             )}
 
+            <LegalSnippet
+              title={l.kind === "rent" ? "Mietrecht — was du wissen solltest" : "Kaufrecht — was du wissen solltest"}
+              keys={l.kind === "rent" ? ["bgb_535", "bgb_551", "bgb_556", "betrkv", "geg_80"] : ["geg_80", "estg_21", "estg_7b"]}
+            />
+
             {l.energy_class && (
               <Card className="p-6 glass">
                 <h2 className="font-bold mb-2">Energieausweis</h2>
