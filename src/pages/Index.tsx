@@ -416,20 +416,37 @@ const Index = () => {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* NOBRAINER CTA */}
       <section className="py-24 bg-muted/30 border-t border-border">
         <div className="container max-w-3xl text-center">
-          <FileText className="h-12 w-12 text-primary mx-auto mb-6" />
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
-            Deine Immobilie verdient{" "}
-            <span className="text-gradient-gold">eine ehrliche App.</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass text-xs font-medium text-muted-foreground mb-6">
+            <Star className="h-3 w-3 text-primary" />
+            Warum es ein Nobrainer ist
+          </div>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 font-display">
+            Wenn nicht jetzt — <span className="text-gradient-gold">wann dann?</span>
           </h2>
+          <div className="grid sm:grid-cols-3 gap-4 mb-10 text-left">
+            {[
+              { icon: CheckCircle2, text: "Privat 0 €. Für immer." },
+              { icon: CheckCircle2, text: "60 Sek. Setup. Keine Kreditkarte." },
+              { icon: CheckCircle2, text: "Wechsel jederzeit. Daten gehören dir." },
+            ].map((x) => (
+              <div key={x.text} className="glass rounded-xl p-4 flex items-center gap-3">
+                <x.icon className="h-5 w-5 text-primary flex-shrink-0" />
+                <span className="text-sm font-medium">{x.text}</span>
+              </div>
+            ))}
+          </div>
           <p className="text-muted-foreground mb-8 text-lg">
-            Egal ob du wohnst, vermietest, kaufst oder suchst — leg in 2 Minuten los.
+            Du verlierst nichts. Du gewinnst Klarheit, Sicherheit und Stunden deines Lebens.
           </p>
-          <Button asChild size="lg" className="bg-gradient-gold text-primary-foreground hover:opacity-90 shadow-gold h-12 px-10 text-base">
-            <Link to="/auth">Kostenlos starten <ArrowRight className="ml-2 h-4 w-4" /></Link>
+          <Button asChild size="lg" className="bg-gradient-gold text-primary-foreground hover:opacity-90 shadow-gold h-14 px-10 text-base">
+            <Link to="/auth">Jetzt kostenlos starten <ArrowRight className="ml-2 h-4 w-4" /></Link>
           </Button>
+          <p className="text-xs text-muted-foreground mt-4">
+            Über 1.000 Eigentümer und Mieter haben ihren Papierkrieg schon beendet.
+          </p>
         </div>
       </section>
 
