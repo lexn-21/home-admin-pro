@@ -36,7 +36,7 @@ const PropertyDetail = () => {
     ]);
     setProperty(p.data);
     setUnits(u.data ?? []);
-    if (p.data) document.title = `${p.data.name} · ImmoNIQ`;
+    if (p.data) document.title = `${p.data.name} · ImmonIQ`;
   };
 
   const addUnit = async () => {

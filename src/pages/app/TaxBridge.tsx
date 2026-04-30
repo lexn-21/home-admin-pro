@@ -20,7 +20,7 @@ const TaxBridge = () => {
   const [properties, setProperties] = useState<any[]>([]);
 
   useEffect(() => {
-    document.title = "Steuer-Brücke · ImmoNIQ";
+    document.title = "Steuer-Brücke · ImmonIQ";
     (async () => {
       const [p, e, pr] = await Promise.all([
         supabase.from("payments").select("*"),
@@ -70,7 +70,7 @@ const TaxBridge = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `ImmoNIQ_Steuerexport_${year}.csv`;
+    a.download = `ImmonIQ_Steuerexport_${year}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success("Steuer-Export heruntergeladen.");

@@ -27,7 +27,7 @@ const AdvisorView = () => {
   const [year, setYear] = useState(String(currentYear));
 
   useEffect(() => {
-    document.title = "Steuerberater-Ansicht · ImmoNIQ";
+    document.title = "Steuerberater-Ansicht · ImmonIQ";
     if (!token) { setError("Ungültiger Link"); setLoading(false); return; }
     (async () => {
       const { data: payload, error: e1 } = await supabase.rpc("advisor_get_data", { _token: token });
@@ -75,7 +75,7 @@ const AdvisorView = () => {
     const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url; a.download = `ImmoNIQ_Steuerexport_${year}.csv`; a.click();
+    a.href = url; a.download = `ImmonIQ_Steuerexport_${year}.csv`; a.click();
     URL.revokeObjectURL(url);
     toast.success("CSV heruntergeladen.");
   };
@@ -252,7 +252,7 @@ const AdvisorView = () => {
         </section>
 
         <footer className="text-center text-xs text-muted-foreground pt-8 pb-4 border-t border-border">
-          Read-only-Zugang via ImmoNIQ · Daten Stand {date(new Date().toISOString())}
+          Read-only-Zugang via ImmonIQ · Daten Stand {date(new Date().toISOString())}
         </footer>
       </main>
     </div>

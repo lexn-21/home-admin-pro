@@ -32,7 +32,7 @@ const Onboarding = () => {
   const [prop, setProp] = useState({ name: "", street: "", zip: "", city: "" });
   const [unit, setUnit] = useState({ label: "WE 01", rent_cold: "", utilities: "" });
 
-  useEffect(() => { document.title = "Onboarding · ImmoNIQ"; }, []);
+  useEffect(() => { document.title = "Onboarding · ImmonIQ"; }, []);
 
   const next = () => setStep((s) => Math.min(s + 1, STEPS.length - 1));
 
@@ -95,7 +95,7 @@ const Onboarding = () => {
             <div className="h-16 w-16 mx-auto rounded-2xl bg-gradient-gold flex items-center justify-center shadow-gold mb-6">
               <Sparkles className="h-8 w-8 text-primary-foreground" />
             </div>
-            <h1 className="text-3xl font-bold mb-3">Willkommen bei ImmoNIQ</h1>
+            <h1 className="text-3xl font-bold mb-3">Willkommen bei ImmonIQ</h1>
             <p className="text-muted-foreground mb-8 leading-relaxed">
               In zwei Minuten richten wir dein Cockpit ein. Wir legen dein erstes Objekt
               und deine erste Wohneinheit an — danach bist du startklar.

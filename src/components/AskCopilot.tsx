@@ -91,12 +91,12 @@ export const AskCopilot = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4, type: "spring" }}
-        aria-label="ImmoNIQ-Assistent öffnen"
+        aria-label="ImmonIQ-Assistent öffnen"
       >
         <span className="h-8 w-8 rounded-full bg-black/15 flex items-center justify-center">
           <Sparkles className="h-4 w-4" />
         </span>
-        <span className="hidden sm:inline">Frag ImmoNIQ</span>
+        <span className="hidden sm:inline">Frag ImmonIQ</span>
         <span className="sm:hidden">Hilfe</span>
       </motion.button>
 
@@ -119,7 +119,7 @@ export const AskCopilot = () => {
                     <Sparkles className="h-4 w-4 text-primary-foreground" />
                   </div>
                   <div>
-                    <p className="font-bold text-sm">Ask ImmoNIQ</p>
+                    <p className="font-bold text-sm">Ask ImmonIQ</p>
                     <p className="text-[10px] text-muted-foreground">Dein KI-Vermieter-Co-Pilot</p>
                   </div>
                 </div>

@@ -21,7 +21,7 @@ const MyApplications = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => { document.title = "Meine Bewerbungen · ImmoNIQ"; load(); }, []);
+  useEffect(() => { document.title = "Meine Bewerbungen · ImmonIQ"; load(); }, []);
   const load = async () => {
     setLoading(true); setError(null);
     try {

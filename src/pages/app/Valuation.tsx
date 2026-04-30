@@ -60,7 +60,7 @@ const Valuation = () => {
           </div>
           <h1 className="font-display text-4xl font-bold tracking-tight">Was ist Ihre Immobilie heute wert?</h1>
           <p className="text-muted-foreground mt-2 max-w-2xl">
-            Sofort-Bewertung nach Sachwert- und Ertragswertverfahren auf Basis von ImmoNIQ-Marktdaten pro PLZ.
+            Sofort-Bewertung nach Sachwert- und Ertragswertverfahren auf Basis von ImmonIQ-Marktdaten pro PLZ.
             Aktualisiert monatlich, anonymisiert aus über 5.000 Objekten.
           </p>
         </Item>
@@ -161,7 +161,7 @@ const Valuation = () => {
                     <Info className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
                     <p>
                       Indikative Bewertung nach <strong>ImmoWertV § 17/§ 27</strong>. Ersetzt kein Verkehrswertgutachten.
-                      Datengrundlage: anonymisierter ImmoNIQ-Marktindex.
+                      Datengrundlage: anonymisierter ImmonIQ-Marktindex.
                     </p>
                   </div>
                 </div>

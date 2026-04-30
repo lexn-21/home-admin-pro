@@ -37,7 +37,7 @@ const SeekerProfile = () => {
   const [form, setForm] = useState<any>(empty);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { document.title = "Bewerber-Profil · ImmoNIQ"; load(); }, []);
+  useEffect(() => { document.title = "Bewerber-Profil · ImmonIQ"; load(); }, []);
 
   const load = async () => {
     const { data: { user } } = await supabase.auth.getUser();

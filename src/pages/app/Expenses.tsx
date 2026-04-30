@@ -36,7 +36,7 @@ const Expenses = () => {
   const [file, setFile] = useState<File | null>(null);
   const [form, setForm] = useState({ property_id: "", spent_on: new Date().toISOString().slice(0, 10), amount: "", vendor: "", description: "", category: "immediate" });
 
-  useEffect(() => { document.title = "Belege · ImmoNIQ"; load(); }, []);
+  useEffect(() => { document.title = "Belege · ImmonIQ"; load(); }, []);
 
   const load = async () => {
     const [e, p] = await Promise.all([

@@ -127,7 +127,7 @@ export default function Pricing() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-2xl max-h-[92vh] overflow-y-auto p-0">
           <DialogHeader className="p-6 pb-2">
-            <DialogTitle>ImmoNIQ Pro abonnieren</DialogTitle>
+            <DialogTitle>ImmonIQ Pro abonnieren</DialogTitle>
           </DialogHeader>
           <div className="px-2 pb-4">
             {open && user && (

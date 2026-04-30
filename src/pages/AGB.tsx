@@ -9,7 +9,7 @@ export default function AGB() {
 
         <section className="space-y-2 text-sm">
           <h2 className="text-lg font-semibold">§ 1 Geltungsbereich</h2>
-          <p>Diese AGB gelten für die Nutzung von ImmoNIQ (Anbieter: Leon Boomgaarden / ENTERVENTUS).</p>
+          <p>Diese AGB gelten für die Nutzung von ImmonIQ (Anbieter: Leon Boomgaarden / ENTERVENTUS).</p>
         </section>
 
         <section className="space-y-2 text-sm">
@@ -25,7 +25,7 @@ export default function AGB() {
         <section className="space-y-2 text-sm">
           <h2 className="text-lg font-semibold">§ 4 Leistungsumfang</h2>
           <p>
-            ImmoNIQ ist ein Werkzeug zur Selbstverwaltung. Wir <strong>geben keine Steuer- oder Rechtsberatung</strong>.
+            ImmonIQ ist ein Werkzeug zur Selbstverwaltung. Wir <strong>geben keine Steuer- oder Rechtsberatung</strong>.
             Generierte Reports sind Arbeitshilfen — die rechtliche/steuerliche Bewertung erfolgt
             durch einen qualifizierten Berater.
           </p>

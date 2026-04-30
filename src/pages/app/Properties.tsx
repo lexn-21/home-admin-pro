@@ -35,7 +35,7 @@ const Properties = () => {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<any>(empty);
 
-  useEffect(() => { document.title = "Objekte · ImmoNIQ"; load(); }, []);
+  useEffect(() => { document.title = "Objekte · ImmonIQ"; load(); }, []);
 
   const load = async () => {
     const { data } = await supabase.from("properties").select("*").order("created_at", { ascending: false });

@@ -29,7 +29,7 @@ const Payments = () => {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ property_id: "", paid_on: new Date().toISOString().slice(0, 10), amount: "", kind: "rent_cold", note: "" });
 
-  useEffect(() => { document.title = "Zahlungen · ImmoNIQ"; load(); }, []);
+  useEffect(() => { document.title = "Zahlungen · ImmonIQ"; load(); }, []);
 
   const load = async () => {
     const [p, pr] = await Promise.all([

@@ -16,7 +16,7 @@ const Advisor = () => {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ advisor_name: "", advisor_email: "" });
 
-  useEffect(() => { document.title = "Steuerberater · ImmoNIQ"; load(); }, []);
+  useEffect(() => { document.title = "Steuerberater · ImmonIQ"; load(); }, []);
 
   const load = async () => {
     const [links, dir] = await Promise.all([

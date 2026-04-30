@@ -83,7 +83,7 @@ const catBadge: Record<Deadline["category"], { label: string; cls: string }> = {
 };
 
 const Deadlines = () => {
-  useEffect(() => { document.title = "Fristen · ImmoNIQ"; }, []);
+  useEffect(() => { document.title = "Fristen · ImmonIQ"; }, []);
   const now = new Date();
   const items = useMemo(() => {
     return buildDeadlines().map((d) => ({

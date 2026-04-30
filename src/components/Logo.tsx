@@ -4,8 +4,8 @@ export const Logo = ({ className = "" }: { className?: string }) => (
       <span className="text-primary-foreground font-bold text-sm">i</span>
       <div className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-primary-glow" />
     </div>
-    <span className="text-lg font-bold tracking-tight">
-      Immo<span className="text-gradient-gold">NIQ</span>
+    <span className="text-lg font-bold tracking-tight font-display">
+      <span className="text-foreground">Immon</span><span className="text-gradient-gold">IQ</span>
     </span>
   </div>
 );

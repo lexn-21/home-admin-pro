@@ -67,7 +67,7 @@ const Markt = () => {
   const hasAnchor = !!anchorId || !!anchorZip;
 
   useEffect(() => {
-    document.title = "Markt — Wohnungen direkt vom Eigentümer · ImmoNIQ";
+    document.title = "Markt — Wohnungen direkt vom Eigentümer · ImmonIQ";
     (async () => {
       const [{ data }, { data: u }] = await Promise.all([
         supabase.from("listings").select("*").eq("status", "published").order("published_at", { ascending: false }).limit(500),

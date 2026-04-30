@@ -34,7 +34,7 @@ const ListingEditor = () => {
   });
 
   useEffect(() => {
-    document.title = editing ? "Inserat bearbeiten · ImmoNIQ" : "Neues Inserat · ImmoNIQ";
+    document.title = editing ? "Inserat bearbeiten · ImmonIQ" : "Neues Inserat · ImmonIQ";
     (async () => {
       const [p, u] = await Promise.all([
         supabase.from("properties").select("*").order("name"),

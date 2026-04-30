@@ -27,7 +27,7 @@ const Tenants = () => {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ property_id: "", full_name: "", email: "", phone: "", lease_start: "", lease_end: "", deposit: "" });
 
-  useEffect(() => { document.title = "Mieter · ImmoNIQ"; load(); }, []);
+  useEffect(() => { document.title = "Mieter · ImmonIQ"; load(); }, []);
 
   const load = async () => {
     const [t, p] = await Promise.all([

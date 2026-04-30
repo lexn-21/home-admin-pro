@@ -106,7 +106,7 @@ const Bookings = () => {
               <h1 className="font-display text-4xl font-bold tracking-tight">Handwerker buchen</h1>
               <p className="text-muted-foreground mt-2 max-w-xl">
                 Geprüfte Dienstleister, transparente Preise, Festpreis-Angebote in 24 h.
-                Bezahlung über ImmoNIQ-Treuhand — sicher für Sie und den Profi.
+                Bezahlung über ImmonIQ-Treuhand — sicher für Sie und den Profi.
               </p>
             </div>
             <Dialog open={open} onOpenChange={setOpen}>

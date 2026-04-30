@@ -1,4 +1,4 @@
-// ImmoNIQ Service Worker — Offline-Cache für Dashboard & Tresor
+// ImmonIQ Service Worker — Offline-Cache für Dashboard & Tresor
 // Strategie: Network-First für HTML/API, Cache-First für statische Assets
 const VERSION = "immoniq-v1";
 const STATIC_CACHE = `static-${VERSION}`;
