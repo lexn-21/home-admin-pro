@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Cookie, X } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -21,7 +21,7 @@ export function getConsent(): Consent | null {
   }
 }
 
-export default function CookieBanner() {
+const CookieBanner = forwardRef<HTMLDivElement>((_, ref) => {
   const [open, setOpen] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [analytics, setAnalytics] = useState(false);
@@ -41,7 +41,7 @@ export default function CookieBanner() {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-[100] p-3 sm:p-4 animate-in slide-in-from-bottom-4">
+    <div ref={ref} className="fixed inset-x-0 bottom-0 z-[100] p-3 sm:p-4 animate-in slide-in-from-bottom-4">
       <div className="mx-auto max-w-3xl rounded-2xl border bg-background/95 backdrop-blur shadow-2xl p-5">
         <div className="flex items-start gap-3">
           <div className="rounded-full bg-primary/10 p-2 shrink-0">
@@ -131,4 +131,6 @@ export default function CookieBanner() {
       </div>
     </div>
   );
-}
+});
+CookieBanner.displayName = "CookieBanner";
+export default CookieBanner;
