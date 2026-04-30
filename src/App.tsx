@@ -47,6 +47,7 @@ import AppLayout from "./pages/app/AppLayout";
 import Pricing from "./pages/Pricing";
 import CheckoutReturn from "./pages/CheckoutReturn";
 import NotFound from "./pages/NotFound";
+import Unsubscribe from "./pages/Unsubscribe";
 import CookieBanner from "./components/CookieBanner";
 
 const queryClient = new QueryClient();
@@ -71,6 +72,7 @@ const App = () => (
           <Route path="/widerruf" element={<Widerruf />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/checkout/return" element={<CheckoutReturn />} />
+          <Route path="/unsubscribe" element={<Unsubscribe />} />
           <Route
             path="/app/onboarding"
             element={
