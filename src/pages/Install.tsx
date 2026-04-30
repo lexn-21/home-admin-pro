@@ -119,8 +119,8 @@ const Install = () => {
         </Card>
 
         <p className="text-center text-xs text-muted-foreground">
-          Für eine native iOS/Android-App im Apple App Store / Google Play kontaktiere uns —
-          das ist mit Capacitor möglich, erfordert aber Developer-Konten.
+          Native iOS/Android-Apps (App Store / Google Play) und eine eigenständige Desktop-App (.exe / .dmg) sind möglich —
+          Code dafür ist im Repo unter <code className="px-1.5 py-0.5 bg-muted rounded text-[11px]">electron/</code> vorbereitet. Kontaktiere uns für die fertige Distribution.
         </p>
       </div>
     </main>
