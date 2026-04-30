@@ -23,16 +23,18 @@ const Valuation = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.from("properties").select("id,name,zip,city").then(async ({ data }) => {
+    supabase.from("properties").select("id,name,zip,city").then(({ data }) => {
       setProps(data ?? []);
-      if (data?.[0]?.zip) setZip(data[0].zip);
     });
   }, []);
 
   const annualRent = useMemo(() => monthlyRent * 12, [monthlyRent]);
 
   const calc = async () => {
-    if (!zip || zip.length < 4) return;
+    if (!zip || zip.length < 4) {
+      setError("Bitte gültige PLZ eingeben (mind. 4 Ziffern).");
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -44,8 +46,6 @@ const Valuation = () => {
       setLoading(false);
     }
   };
-
-  useEffect(() => { if (zip) calc(); /* eslint-disable-next-line */ }, [zip]);
 
   const grossYield = result && result.value_blended ? (annualRent / result.value_blended) * 100 : 0;
 
