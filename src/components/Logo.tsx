@@ -1,11 +1,24 @@
-export const Logo = ({ className = "" }: { className?: string }) => (
-  <div className={`flex items-center gap-2 ${className}`}>
-    <div className="relative h-8 w-8 rounded-xl bg-gradient-gold flex items-center justify-center shadow-gold">
-      <span className="text-primary-foreground font-bold text-sm">i</span>
-      <div className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-primary-glow" />
+import { Link } from "react-router-dom";
+
+export const Logo = ({
+  className = "",
+  to = "/app",
+}: {
+  className?: string;
+  /** Ziel für Klick aufs Icon — default: Dashboard */
+  to?: string;
+}) => (
+  <Link to={to} className={`flex items-center gap-2.5 group ${className}`} aria-label="ImmonIQ — zum Dashboard">
+    {/* Icon: schwarz gefüllt, IQ in Gold */}
+    <div className="relative h-9 w-9 rounded-xl bg-black border border-primary/40 flex items-center justify-center shadow-gold transition-transform group-hover:scale-105">
+      <span className="text-gradient-gold font-bold text-[13px] tracking-tight font-display leading-none">
+        IQ
+      </span>
     </div>
+    {/* Wordmark */}
     <span className="text-lg font-bold tracking-tight font-display">
-      <span className="text-foreground">Immon</span><span className="text-gradient-gold">IQ</span>
+      <span className="text-foreground">Immon</span>
+      <span className="text-gradient-gold">IQ</span>
     </span>
-  </div>
+  </Link>
 );
