@@ -57,23 +57,23 @@ export const SponsoredSlot = ({
     ads.forEach((ad) => {
       if (tracked.current.has(ad.id)) return;
       tracked.current.add(ad.id);
-      supabase.from("ad_events").insert({
-        ad_id: ad.id,
-        event_type: "impression",
-        context_listing_id: contextListingId ?? null,
-        context_zip: zip ?? null,
-        context_city: city ?? null,
+      supabase.rpc("ad_track_event", {
+        _ad_id: ad.id,
+        _event_type: "impression",
+        _zip: zip ?? null,
+        _city: city ?? null,
+        _listing_id: contextListingId ?? null,
       });
     });
   }, [ads, contextListingId, zip, city]);
 
   const handleClick = (ad: Ad) => {
-    supabase.from("ad_events").insert({
-      ad_id: ad.id,
-      event_type: "click",
-      context_listing_id: contextListingId ?? null,
-      context_zip: zip ?? null,
-      context_city: city ?? null,
+    supabase.rpc("ad_track_event", {
+      _ad_id: ad.id,
+      _event_type: "click",
+      _zip: zip ?? null,
+      _city: city ?? null,
+      _listing_id: contextListingId ?? null,
     });
   };
 
