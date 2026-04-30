@@ -62,6 +62,7 @@ const groups: NavGroup[] = [
       { to: "/app/vault", label: "Tresor", icon: Lock, badge: "AES-256", hint: "Verschlüsselte Dokumente" },
       { to: "/app/law", label: "Rechts-Ecke", icon: Scale, hint: "BGB, WEG, HeizkostenV" },
       { to: "/app/marketplace", label: "Handwerker", icon: Wrench, hint: "Verifizierte Profis" },
+      { to: "/app/ads", label: "Werbeplätze", icon: Megaphone, badge: "AD", hint: "Eigene Werbung schalten" },
     ],
   },
   {

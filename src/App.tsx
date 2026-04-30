@@ -36,6 +36,8 @@ import MyApplications from "./pages/app/MyApplications";
 import Calculator from "./pages/app/Calculator";
 import Tasks from "./pages/app/Tasks";
 import Templates from "./pages/app/Templates";
+import MyAds from "./pages/app/MyAds";
+import AdminAds from "./pages/app/AdminAds";
 import Impressum from "./pages/Impressum";
 import Datenschutz from "./pages/Datenschutz";
 import AGB from "./pages/AGB";
@@ -107,6 +109,8 @@ const App = () => (
             <Route path="templates" element={<Templates />} />
             <Route path="deadlines" element={<Deadlines />} />
             <Route path="law" element={<LawCorner />} />
+            <Route path="ads" element={<MyAds />} />
+            <Route path="admin/ads" element={<AdminAds />} />
             <Route path="settings" element={<Settings />} />
           </Route>
           <Route path="*" element={<NotFound />} />
