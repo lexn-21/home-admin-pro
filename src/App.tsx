@@ -50,6 +50,7 @@ import NotFound from "./pages/NotFound";
 import Unsubscribe from "./pages/Unsubscribe";
 import Install from "./pages/Install";
 import CookieBanner from "./components/CookieBanner";
+import { OfflineIndicator } from "./components/OfflineIndicator";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <OfflineIndicator />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
