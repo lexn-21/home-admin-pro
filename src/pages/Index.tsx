@@ -6,11 +6,11 @@ import {
   Building2, Calculator, Shield, FileText, TrendingUp, Receipt,
   CheckCircle2, ArrowRight, Sparkles, Lock, Zap, Users,
   Home, Search, KeyRound, Wrench, Bell, FolderLock, Wallet,
-  HeartHandshake, Clock, MapPin, Star,
+  HeartHandshake, Clock, MapPin, Star, UserPlus,
 } from "lucide-react";
 import QuickStartFlow from "@/components/QuickStartFlow";
 
-type PersonaKey = "owner" | "landlord" | "buyer" | "tenant" | "family";
+type PersonaKey = "owner" | "landlord" | "advisor" | "buyer" | "tenant" | "family";
 
 type CTA = { label: string; sub?: string; to: string; icon?: any };
 
