@@ -122,6 +122,9 @@ const Settings = () => {
         </Button>
       </Card>
 
+      <NotificationSettings />
+
+
       <Card className="p-6 glass">
         <div className="flex items-center gap-3 mb-3">
           <Shield className="h-5 w-5 text-primary" />
