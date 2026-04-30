@@ -223,10 +223,14 @@ const Index = () => {
               </div>
 
               {/* Persona-CTA-Grid: 3 starke Buttons mit Sub-Labels */}
+              {(() => {
+                const withAs = (to: string) =>
+                  to.startsWith("/auth") ? `${to}${to.includes("?") ? "&" : "?"}as=${persona}` : to;
+                return (
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {/* Primary — Gold, dominant */}
                 <Link
-                  to={p.primary.to}
+                  to={withAs(p.primary.to)}
                   className="group relative overflow-hidden rounded-2xl bg-gradient-gold p-4 text-left shadow-gold transition-all hover:scale-[1.02] hover:shadow-[0_0_40px_-5px_hsl(var(--primary)/0.5)] sm:col-span-2 lg:col-span-1"
                 >
                   <div className="flex items-center gap-3">
@@ -248,7 +252,7 @@ const Index = () => {
                 {/* Secondary */}
                 {p.secondary && (
                   <Link
-                    to={p.secondary.to}
+                    to={withAs(p.secondary.to)}
                     className="group rounded-2xl glass border border-primary/20 p-4 text-left transition-all hover:scale-[1.02] hover:border-primary/40"
                   >
                     <div className="flex items-center gap-3">
@@ -271,7 +275,7 @@ const Index = () => {
                 {/* Tertiary */}
                 {p.tertiary && (
                   <Link
-                    to={p.tertiary.to}
+                    to={withAs(p.tertiary.to)}
                     className="group rounded-2xl border border-border bg-background/50 p-4 text-left transition-all hover:scale-[1.02] hover:border-primary/30 hover:bg-primary/5"
                   >
                     <div className="flex items-center gap-3">
@@ -291,6 +295,8 @@ const Index = () => {
                   </Link>
                 )}
               </div>
+                );
+              })()}
             </div>
 
             {/* Trust-Strip — direkt unterm Hero, beruhigt sofort */}
