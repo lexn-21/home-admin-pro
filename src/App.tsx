@@ -74,6 +74,7 @@ const App = () => (
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/checkout/return" element={<CheckoutReturn />} />
           <Route path="/unsubscribe" element={<Unsubscribe />} />
+          <Route path="/install" element={<Install />} />
           <Route
             path="/app/onboarding"
             element={
