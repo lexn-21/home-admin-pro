@@ -1,4 +1,4 @@
-// Zero-Knowledge Crypto für ImmoNIQ-Tresor
+// Zero-Knowledge Crypto für ImmonIQ-Tresor
 // AES-GCM 256 mit Schlüssel abgeleitet via PBKDF2-SHA256 (250.000 Iterationen) aus PIN.
 // Der PIN verlässt niemals das Gerät. Der Server speichert nur einen Verifier-Ciphertext.
 

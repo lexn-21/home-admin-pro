@@ -12,7 +12,7 @@ const Listings = () => {
   const [items, setItems] = useState<any[]>([]);
   const nav = useNavigate();
 
-  useEffect(() => { document.title = "Inserate · ImmoNIQ"; load(); }, []);
+  useEffect(() => { document.title = "Inserate · ImmonIQ"; load(); }, []);
   const load = async () => {
     const { data } = await supabase.from("listings").select("*").order("created_at", { ascending: false });
     setItems(data ?? []);

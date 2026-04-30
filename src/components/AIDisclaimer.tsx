@@ -16,7 +16,7 @@ export function AIDisclaimer({ compact = false }: { compact?: boolean }) {
         <p className="font-medium text-foreground">KI-Hinweis</p>
         <p>
           Diese Inhalte werden automatisch erzeugt und können Fehler enthalten. Bitte vor dem Versand
-          oder einer rechtlichen Verwendung selbst prüfen. ImmoNIQ ist <strong>keine Rechts- oder Steuerberatung</strong>.
+          oder einer rechtlichen Verwendung selbst prüfen. ImmonIQ ist <strong>keine Rechts- oder Steuerberatung</strong>.
         </p>
       </div>
     </div>

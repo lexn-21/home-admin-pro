@@ -51,7 +51,7 @@ export default function CookieBanner() {
             <h2 className="font-bold text-base mb-1">Wir respektieren deine Privatsphäre 🍪</h2>
             <p className="text-sm text-muted-foreground mb-3">
               Wir nutzen technisch notwendige Cookies, damit die App funktioniert. Mit deiner
-              Erlaubnis verwenden wir auch Cookies für Analyse & Marketing — dadurch wird ImmoNIQ
+              Erlaubnis verwenden wir auch Cookies für Analyse & Marketing — dadurch wird ImmonIQ
               besser. Mehr Infos in der{" "}
               <Link to="/datenschutz" className="underline">
                 Datenschutzerklärung

@@ -71,7 +71,7 @@ const Benchmark = () => {
       <Stagger className="space-y-6">
         <Item>
           <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/15 text-primary mb-2">
-            <BarChart3 className="h-3 w-3" /> ImmoNIQ Index · Anonymisiert
+            <BarChart3 className="h-3 w-3" /> ImmonIQ Index · Anonymisiert
           </span>
           <h1 className="font-display text-4xl font-bold tracking-tight">Marktvergleich</h1>
           <p className="text-muted-foreground mt-2 max-w-2xl">

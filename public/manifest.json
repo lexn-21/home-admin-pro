@@ -1,6 +1,6 @@
 {
-  "name": "ImmoNIQ — Vermieter-OS",
-  "short_name": "ImmoNIQ",
+  "name": "ImmonIQ — Vermieter-OS",
+  "short_name": "ImmonIQ",
   "description": "Verwaltung, Steuer & Belege für Privatvermieter. DSGVO-konform.",
   "start_url": "/app",
   "scope": "/",

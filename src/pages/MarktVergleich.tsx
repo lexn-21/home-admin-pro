@@ -32,7 +32,7 @@ export default function MarktVergleich() {
   const [items, setItems] = useState<any[]>([]);
 
   useEffect(() => {
-    document.title = "Vergleich · ImmoNIQ";
+    document.title = "Vergleich · ImmonIQ";
     if (!ids.length) return;
     (async () => {
       const { data } = await supabase.from("listings").select("*").in("id", ids);

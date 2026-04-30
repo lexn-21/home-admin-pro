@@ -40,7 +40,7 @@ const Install = () => {
             <Download className="h-3 w-3" /> App-Installation
           </span>
           <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight">
-            ImmoNIQ als App installieren
+            ImmonIQ als App installieren
           </h1>
           <p className="text-muted-foreground max-w-xl mx-auto">
             Auf dem Homescreen wie eine echte App — funktioniert offline, lädt sofort, ohne App Store.
@@ -100,7 +100,7 @@ const Install = () => {
             <ol className="space-y-3 text-sm">
               <li className="flex gap-3"><span className="font-mono text-primary">1.</span> Chrome, Edge oder Brave öffnen</li>
               <li className="flex gap-3"><span className="font-mono text-primary">2.</span> Rechts in der Adressleiste auf das <Download className="inline h-4 w-4 mx-1" /> <strong>Installieren-Symbol</strong> klicken</li>
-              <li className="flex gap-3"><span className="font-mono text-primary">3.</span> ImmoNIQ läuft als eigenständiges Fenster — wie eine native Desktop-App</li>
+              <li className="flex gap-3"><span className="font-mono text-primary">3.</span> ImmonIQ läuft als eigenständiges Fenster — wie eine native Desktop-App</li>
             </ol>
           </Card>
         </div>

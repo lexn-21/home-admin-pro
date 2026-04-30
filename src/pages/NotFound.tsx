@@ -8,7 +8,7 @@ const NotFound = () => {
 
   useEffect(() => {
     console.error("404:", location.pathname);
-    document.title = "404 — Seite nicht gefunden | ImmoNIQ";
+    document.title = "404 — Seite nicht gefunden | ImmonIQ";
   }, [location.pathname]);
 
   return (

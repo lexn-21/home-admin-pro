@@ -74,7 +74,7 @@ export async function enrollBiometric(pin: string, userId: string, userEmail: st
   const cred = (await navigator.credentials.create({
     publicKey: {
       challenge,
-      rp: { name: "ImmoNIQ Tresor", id: window.location.hostname },
+      rp: { name: "ImmonIQ Tresor", id: window.location.hostname },
       user: {
         id: userIdBytes,
         name: userEmail,

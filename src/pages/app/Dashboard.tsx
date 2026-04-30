@@ -95,7 +95,7 @@ const Dashboard = () => {
   const [appsIn, setAppsIn] = useState<number>(0);
   const [appsOut, setAppsOut] = useState<number>(0);
 
-  useEffect(() => { document.title = "Übersicht · ImmoNIQ"; }, []);
+  useEffect(() => { document.title = "Übersicht · ImmonIQ"; }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -209,7 +209,7 @@ const Dashboard = () => {
               <div className="h-16 w-16 rounded-2xl bg-gradient-gold mx-auto mb-5 flex items-center justify-center shadow-gold">
                 <Building2 className="h-8 w-8 text-primary-foreground" />
               </div>
-              <h2 className="text-2xl lg:text-3xl font-bold mb-3">Willkommen bei ImmoNIQ</h2>
+              <h2 className="text-2xl lg:text-3xl font-bold mb-3">Willkommen bei ImmonIQ</h2>
               <p className="text-muted-foreground mb-7 max-w-md mx-auto leading-relaxed">
                 Leg dein erstes Objekt an — danach Wohneinheiten und Mieter. Du siehst
                 Cashflow & Vermietungsquote in Echtzeit.

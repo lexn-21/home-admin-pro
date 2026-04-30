@@ -28,7 +28,7 @@ const MarktDetail = () => {
     (async () => {
       const { data } = await supabase.from("listings").select("*").eq("id", id).maybeSingle();
       setL(data);
-      if (data) document.title = `${data.title} · ImmoNIQ`;
+      if (data) document.title = `${data.title} · ImmonIQ`;
       await supabase.rpc("listing_inc_view", { _listing_id: id });
 
       const { data: { user } } = await supabase.auth.getUser();

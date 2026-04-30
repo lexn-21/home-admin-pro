@@ -289,7 +289,7 @@ export default function MyAds() {
                 <p className="text-[11px] text-muted-foreground">/ Monat · Bindung</p>
               </Card>
               <Card className="p-4 bg-primary/10 border-primary shadow-gold">
-                <p className="text-xs text-primary font-semibold">ImmoNIQ</p>
+                <p className="text-xs text-primary font-semibold">ImmonIQ</p>
                 <p className="text-2xl font-bold text-primary">49 €</p>
                 <p className="text-[11px] text-muted-foreground">/ Woche · keine Bindung</p>
               </Card>
@@ -318,7 +318,7 @@ export default function MyAds() {
 
       {/* Use-Case Templates */}
       <div>
-        <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-3">Wer wirbt erfolgreich auf ImmoNIQ?</p>
+        <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-3">Wer wirbt erfolgreich auf ImmonIQ?</p>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {[
             { Icon: Building2, role: "Makler", outcome: "1 Mandat = 8.000 €+ Provision", angle: "PLZ-genaue Eigentümer-Ansprache" },

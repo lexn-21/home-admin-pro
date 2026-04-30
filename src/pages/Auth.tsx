@@ -32,7 +32,7 @@ const Auth = () => {
   const redirect = new URLSearchParams(window.location.search).get("redirect") || "/app";
 
   useEffect(() => {
-    document.title = "Anmelden · ImmoNIQ";
+    document.title = "Anmelden · ImmonIQ";
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) navigate(redirect, { replace: true });
     });
@@ -90,7 +90,7 @@ const Auth = () => {
         return toast.error("Dieses Passwort wurde in Datenlecks gefunden. Bitte ein neues wählen.");
       return toast.error(error.message);
     }
-    toast.success("Konto erstellt. Willkommen bei ImmoNIQ.");
+    toast.success("Konto erstellt. Willkommen bei ImmonIQ.");
     navigate("/app/onboarding", { replace: true });
   };
 

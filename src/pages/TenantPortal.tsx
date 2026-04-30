@@ -197,7 +197,7 @@ const TenantPortal = () => {
         </Card>
 
         <p className="text-xs text-center text-muted-foreground py-4">
-          Sicher · DSGVO · End-to-End verschlüsselt · ImmoNIQ
+          Sicher · DSGVO · End-to-End verschlüsselt · ImmonIQ
         </p>
       </main>
     </div>

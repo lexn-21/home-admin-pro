@@ -127,7 +127,7 @@ export const generateDunningHTML = (b: TenantBalance, landlordName: string, land
 <p>Wir bitten Sie, den offenen Betrag bis spätestens <strong>${fmtDate(deadline)}</strong> auf das Ihnen bekannte Konto zu überweisen.</p>
 <p>${cfg.closing}</p>
 <p>Mit freundlichen Grüßen<br><br>${landlordName}</p>
-<div class="footer">Erstellt mit ImmoNIQ · Diese Mahnung wurde maschinell erstellt und ist auch ohne Unterschrift gültig.</div>
+<div class="footer">Erstellt mit ImmonIQ · Diese Mahnung wurde maschinell erstellt und ist auch ohne Unterschrift gültig.</div>
 </body></html>`;
 };
 

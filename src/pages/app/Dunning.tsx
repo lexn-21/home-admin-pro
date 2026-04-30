@@ -25,7 +25,7 @@ const Dunning = () => {
   const [landlordName, setLandlordName] = useState("Vermieter");
 
   useEffect(() => {
-    document.title = "Mahnwesen · ImmoNIQ";
+    document.title = "Mahnwesen · ImmonIQ";
     (async () => {
       const [t, u, p, pay, prof] = await Promise.all([
         supabase.from("tenants").select("*"),

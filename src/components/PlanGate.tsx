@@ -30,7 +30,7 @@ export const PlanGate = ({ children, feature = "Diese Funktion", description }: 
           <Sparkles className="h-4 w-4 text-primary" /> Pro-Funktion
         </h3>
         <p className="text-sm text-muted-foreground mt-1 max-w-sm mx-auto">
-          {description ?? `${feature} ist Teil von ImmoNIQ Pro.`}
+          {description ?? `${feature} ist Teil von ImmonIQ Pro.`}
         </p>
       </div>
       <Button asChild>

@@ -45,7 +45,7 @@ const LawCorner = () => {
   const [query, setQuery] = useState("");
   const [topic, setTopic] = useState<string>("all");
 
-  useEffect(() => { document.title = "Rechts-Ecke · ImmoNIQ"; }, []);
+  useEffect(() => { document.title = "Rechts-Ecke · ImmonIQ"; }, []);
 
   const filtered = LAWS.filter((l) => {
     if (topic !== "all" && l.topic !== topic) return false;
@@ -129,7 +129,7 @@ const LawCorner = () => {
       <Item>
         <Card className="p-5 glass">
           <p className="text-xs text-muted-foreground leading-relaxed">
-            <strong>Haftungsausschluss:</strong> ImmoNIQ ersetzt keine Rechtsberatung. Die hier
+            <strong>Haftungsausschluss:</strong> ImmonIQ ersetzt keine Rechtsberatung. Die hier
             aufgeführten Gesetzestexte dienen der Orientierung. Für verbindliche Auskünfte wende
             dich an einen Rechtsanwalt oder Steuerberater. Quellen: gesetze-im-internet.de (Bundesministerium der Justiz).
           </p>

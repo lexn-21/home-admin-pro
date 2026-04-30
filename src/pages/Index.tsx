@@ -77,7 +77,7 @@ const Index = () => {
   const [persona, setPersona] = useState<PersonaKey>("owner");
 
   useEffect(() => {
-    document.title = "ImmoNIQ — Alles rund um deine Immobilie. An einem Ort.";
+    document.title = "ImmonIQ — Alles rund um deine Immobilie. An einem Ort.";
     const meta = document.querySelector('meta[name="description"]') || (() => {
       const m = document.createElement("meta"); m.setAttribute("name", "description"); document.head.appendChild(m); return m;
     })();
@@ -122,7 +122,7 @@ const Index = () => {
               <span className="text-gradient-gold">Immobilie.</span> An einem Ort.
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed">
-              Ob du selbst wohnst, vermietest, kaufst oder suchst — ImmoNIQ bündelt Dokumente,
+              Ob du selbst wohnst, vermietest, kaufst oder suchst — ImmonIQ bündelt Dokumente,
               Fristen, Marktwert, Steuer und Markt in einer einzigen, sicheren App.
             </p>
 
@@ -195,7 +195,7 @@ const Index = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               { icon: FolderLock, title: "Dokumenten-Tresor", desc: "Kaufvertrag, Grundbuch, Versicherung, Energieausweis — verschlüsselt mit deiner PIN. Niemand außer dir kann es öffnen." },
-              { icon: Bell, title: "Fristen & Plan", desc: "Nebenkosten, Wartung, Versicherung, Steuer. ImmoNIQ erinnert dich rechtzeitig — mit Paragraph dazu." },
+              { icon: Bell, title: "Fristen & Plan", desc: "Nebenkosten, Wartung, Versicherung, Steuer. ImmonIQ erinnert dich rechtzeitig — mit Paragraph dazu." },
               { icon: TrendingUp, title: "Marktwert & Mietspiegel", desc: "Aktueller Wert deiner Immobilie und Vergleichsmieten für jede PLZ. Jederzeit auf Knopfdruck." },
               { icon: Building2, title: "Vermieter-Cockpit", desc: "Mieten, Nebenkosten, Mahnwesen, Anlage V. Optional, wenn du vermietest." },
               { icon: Search, title: "Privater Markt", desc: "Inserieren oder suchen — direkt zwischen Eigentümern und Mietern. Keine Maklerprovision nach Bestellerprinzip." },
@@ -223,7 +223,7 @@ const Index = () => {
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Egal ob Eigenheim, vermietete Wohnung oder Kaufabsicht — die Unterlagen, Fristen und Zahlen
-              sind verstreut. ImmoNIQ ist der eine Ort, an dem alles zusammenkommt — sicher, ehrlich, deutsch.
+              sind verstreut. ImmonIQ ist der eine Ort, an dem alles zusammenkommt — sicher, ehrlich, deutsch.
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
@@ -245,7 +245,7 @@ const Index = () => {
       <section id="warum" className="py-24 bg-muted/30 border-y border-border">
         <div className="container max-w-5xl">
           <div className="text-center mb-16">
-            <p className="text-sm text-primary font-semibold uppercase tracking-wider mb-4">Warum ImmoNIQ</p>
+            <p className="text-sm text-primary font-semibold uppercase tracking-wider mb-4">Warum ImmonIQ</p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold">
               Andere verwalten. <span className="text-gradient-gold">Wir denken mit.</span>
             </h2>
@@ -395,7 +395,7 @@ const Index = () => {
             <a href="mailto:leonboomgaarden@gmail.com" className="hover:text-foreground">Kontakt</a>
           </nav>
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} ImmoNIQ · Made in Ennigerloh, NRW · DSGVO-konform
+            © {new Date().getFullYear()} ImmonIQ · Made in Ennigerloh, NRW · DSGVO-konform
           </p>
         </div>
       </footer>

@@ -125,7 +125,7 @@ const Marketplace = () => {
   const [geoLoading, setGeoLoading] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { document.title = "Marktplatz · ImmoNIQ"; }, []);
+  useEffect(() => { document.title = "Marktplatz · ImmonIQ"; }, []);
 
   const useMyLocation = () => {
     if (!navigator.geolocation) return toast.error("Geolocation wird nicht unterstützt.");

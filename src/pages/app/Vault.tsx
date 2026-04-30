@@ -107,7 +107,7 @@ const Vault = () => {
   const [dragOver, setDragOver] = useState(false);
 
   useEffect(() => {
-    document.title = "Tresor · ImmoNIQ";
+    document.title = "Tresor · ImmonIQ";
     loadSettings();
     setBioEnrolled(hasBiometricSetup());
     platformAuthenticatorAvailable().then(setBioAvailable);
@@ -777,7 +777,7 @@ const Vault = () => {
             <ShieldCheck className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
             <p className="text-xs text-muted-foreground leading-relaxed">
               Aufbewahrung nach <strong>§ 147 AO</strong> (10 Jahre für Steuerunterlagen) und
-              <strong> § 14b UStG</strong> (Rechnungen). ImmoNIQ kann deine Inhalte nicht lesen —
+              <strong> § 14b UStG</strong> (Rechnungen). ImmonIQ kann deine Inhalte nicht lesen —
               nur du mit deinem PIN.
             </p>
           </div>

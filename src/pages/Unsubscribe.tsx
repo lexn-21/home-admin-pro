@@ -16,7 +16,7 @@ export default function Unsubscribe() {
   const [state, setState] = useState<State>("loading");
 
   useEffect(() => {
-    document.title = "Abmelden · ImmoNIQ";
+    document.title = "Abmelden · ImmonIQ";
     if (!token) { setState("invalid"); return; }
     (async () => {
       try {
@@ -64,7 +64,7 @@ export default function Unsubscribe() {
           <>
             <h1 className="text-2xl font-bold">Abmelden bestätigen</h1>
             <p className="text-sm text-muted-foreground">
-              Du erhältst dann keine E-Mails von ImmoNIQ mehr (außer rechtlich notwendige).
+              Du erhältst dann keine E-Mails von ImmonIQ mehr (außer rechtlich notwendige).
             </p>
             <Button onClick={confirm} className="w-full bg-gradient-gold text-primary-foreground shadow-gold">
               Jetzt abmelden
