@@ -6,9 +6,11 @@ import {
   Building2, Calculator, Shield, FileText, TrendingUp, Receipt,
   CheckCircle2, ArrowRight, Sparkles, Lock, Zap, Users,
   Home, Search, KeyRound, Wrench, Bell, FolderLock, Wallet,
+  HeartHandshake, Clock, MapPin, Star,
 } from "lucide-react";
+import logoImg from "@/assets/immoniq-logo.png";
 
-type PersonaKey = "owner" | "landlord" | "buyer" | "tenant";
+type PersonaKey = "owner" | "landlord" | "buyer" | "tenant" | "family";
 
 const PERSONAS: Record<PersonaKey, {
   label: string;
@@ -22,54 +24,67 @@ const PERSONAS: Record<PersonaKey, {
   owner: {
     label: "Ich wohne selbst",
     icon: Home,
-    headline: "Alles zu deiner Wohnung — sicher an einem Ort.",
-    sub: "Kaufvertrag, Grundbuch, Versicherungen, Handwerker-Rechnungen, Energieausweis. Verschlüsselt im Tresor. Fristen werden für dich überwacht.",
+    headline: "Endlich alles zu deinem Zuhause — an einem sicheren Ort.",
+    sub: "Kaufvertrag, Grundbuch, Versicherung, Handwerker-Rechnungen, Energieausweis. Verschlüsselt im Tresor. Wir erinnern dich rechtzeitig an alles, was zählt — du musst nichts mehr im Kopf haben.",
     bullets: [
-      { icon: FolderLock, text: "Verschlüsselter Dokumenten-Tresor" },
-      { icon: Bell, text: "Erinnerungen für Versicherung, Wartung, Steuer" },
-      { icon: TrendingUp, text: "Aktueller Marktwert deiner Immobilie" },
+      { icon: FolderLock, text: "Tresor mit deiner PIN — niemand sonst kommt rein" },
+      { icon: Bell, text: "Versicherung, Wartung, Steuer — wir melden uns" },
+      { icon: TrendingUp, text: "Was ist deine Wohnung heute wert? Auf Knopfdruck." },
     ],
-    primary: { label: "Kostenlos starten", to: "/auth" },
+    primary: { label: "Kostenlos starten — in 60 Sekunden", to: "/auth" },
     secondary: { label: "Marktwert ansehen", to: "/markt" },
   },
   landlord: {
     label: "Ich vermiete",
     icon: Building2,
-    headline: "Schluss mit dem Vermieter-Papierkrieg.",
-    sub: "Mieten, Nebenkosten, Belege, Anlage V — in 30 Minuten pro Quartal statt 15 Stunden im Jahr. Ohne Steuerberater-Honorar.",
+    headline: "Schluss mit Excel, Schuhkarton und Quartals-Stress.",
+    sub: "Mieten, Nebenkosten, Belege, Anlage V — 30 Minuten pro Quartal statt 15 Stunden im Jahr. Ohne Steuerberater-Honorar. Und du inserierst direkt — ohne Maklerprovision.",
     bullets: [
-      { icon: Wallet, text: "Mietkonto & Mahnwesen automatisch" },
+      { icon: Wallet, text: "Mietkonto & Mahnwesen — vollautomatisch" },
       { icon: Calculator, text: "DATEV-CSV für deinen Steuerberater" },
-      { icon: Users, text: "Inserieren ohne Maklerprovision" },
+      { icon: Users, text: "Inserieren ohne Provision (Bestellerprinzip)" },
     ],
-    primary: { label: "Vermieter werden", to: "/auth" },
+    primary: { label: "Vermieter werden — 14 Tage gratis", to: "/auth" },
     secondary: { label: "Inserate ansehen", to: "/markt" },
   },
   buyer: {
     label: "Ich kaufe / verkaufe",
     icon: KeyRound,
-    headline: "Klar entscheiden. Fair handeln.",
-    sub: "Echte Marktwerte aus dem Mietspiegel + Vergleichsobjekten. Inserate direkt von Eigentümer zu Eigentümer — ohne Maklerprovision.",
+    headline: "Klar entscheiden. Fair handeln. Ohne Provision.",
+    sub: "Echte Marktwerte aus Mietspiegel und Vergleichsobjekten. Inserate direkt zwischen Eigentümern. Du siehst, was andere übersehen — Rendite, Förderungen, Risiken.",
     bullets: [
-      { icon: TrendingUp, text: "Marktwert-Analyse für jede PLZ" },
+      { icon: TrendingUp, text: "Marktwert für jede deutsche PLZ" },
       { icon: Search, text: "Privater Markt mit Umkreissuche" },
-      { icon: Calculator, text: "Finanzierungs- & Renditerechner" },
+      { icon: Calculator, text: "Finanzierung & Rendite in einem Klick" },
     ],
-    primary: { label: "Marktwert prüfen", to: "/auth" },
+    primary: { label: "Marktwert prüfen — gratis", to: "/auth" },
     secondary: { label: "Markt entdecken", to: "/markt" },
   },
   tenant: {
     label: "Ich miete / suche",
     icon: Search,
-    headline: "Wohnung finden — direkt vom Eigentümer.",
-    sub: "Keine Maklerprovision nach Bestellerprinzip. Eigenes Mieter-Profil, das du einmal pflegst und bei jeder Bewerbung sicher teilst.",
+    headline: "Wohnung finden — direkt vom Eigentümer. Ohne Makler.",
+    sub: "Keine Maklerprovision (Bestellerprinzip). Einmal Mieter-Profil pflegen, dann mit einem Klick bewerben. Deine Daten bleiben bei dir — du entscheidest, wer was sieht.",
     bullets: [
-      { icon: Search, text: "Markt mit Umkreissuche & Filter" },
-      { icon: Shield, text: "Mieter-Profil sicher & DSGVO-konform" },
-      { icon: FolderLock, text: "Mietvertrag, Nebenkosten, SCHUFA im Tresor" },
+      { icon: Search, text: "Markt mit Umkreis & smarten Filtern" },
+      { icon: Shield, text: "Mieter-Profil DSGVO-sicher — du kontrollierst alles" },
+      { icon: FolderLock, text: "Mietvertrag, NK, SCHUFA — verschlüsselt im Tresor" },
     ],
-    primary: { label: "Wohnung suchen", to: "/markt" },
+    primary: { label: "Wohnung suchen — kostenlos", to: "/markt" },
     secondary: { label: "Mieter-Profil anlegen", to: "/auth" },
+  },
+  family: {
+    label: "Erbschaft / Familie",
+    icon: HeartHandshake,
+    headline: "Ein Haus geerbt? Wir nehmen dich an die Hand.",
+    sub: "Was muss wann zum Finanzamt? Welche Fristen laufen? Was ist das Haus wirklich wert — und lohnt sich Halten oder Verkaufen? ImmonIQ ordnet es Schritt für Schritt — verständlich, ohne Fachjargon.",
+    bullets: [
+      { icon: Clock, text: "Fristen: Erbschein, Grundbuch, Steuer — automatisch" },
+      { icon: TrendingUp, text: "Realer Marktwert für die Erbschaftsteuer" },
+      { icon: FileText, text: "Vorlagen: Mitteilung ans Finanzamt, Versicherung, Verwalter" },
+    ],
+    primary: { label: "Schritt für Schritt starten", to: "/auth" },
+    secondary: { label: "Marktwert prüfen", to: "/markt" },
   },
 };
 
@@ -77,11 +92,11 @@ const Index = () => {
   const [persona, setPersona] = useState<PersonaKey>("owner");
 
   useEffect(() => {
-    document.title = "ImmonIQ — Alles rund um deine Immobilie. An einem Ort.";
+    document.title = "ImmonIQ — Deine Immobilie. Endlich verstanden. An einem Ort.";
     const meta = document.querySelector('meta[name="description"]') || (() => {
       const m = document.createElement("meta"); m.setAttribute("name", "description"); document.head.appendChild(m); return m;
     })();
-    meta.setAttribute("content", "Die All-in-One App für alles rund um deine Immobilie: Tresor, Fristen, Marktwert, Mieten, Suchen — für Eigennutzer, Vermieter, Käufer und Mieter. Made in Germany.");
+    meta.setAttribute("content", "Die deutsche All-in-One App für jede Lebenslage rund um Immobilien: Tresor, Fristen, Marktwert, Mieten, Suchen, Erben. Verschlüsselt, DSGVO, kostenlos für Privatnutzer.");
   }, []);
 
   const p = PERSONAS[persona];
@@ -111,23 +126,41 @@ const Index = () => {
       {/* HERO */}
       <section className="relative">
         <div className="absolute inset-0 bg-hero-glow pointer-events-none" />
-        <div className="container relative pt-16 pb-20 md:pt-24 md:pb-28">
+        <div className="container relative pt-12 pb-16 md:pt-20 md:pb-24">
           <div className="max-w-3xl mx-auto text-center animate-fade-in-up">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass text-xs font-medium text-muted-foreground mb-8">
-              <Sparkles className="h-3 w-3 text-primary" />
-              All-in-One für deine Immobilie · Made in Germany · DSGVO
+              <Shield className="h-3 w-3 text-primary" />
+              Made in Germany · DSGVO · Verschlüsselt · Kostenlos für Privatnutzer
             </div>
-            <h1 className="text-[2.25rem] leading-[1.1] sm:text-5xl md:text-7xl font-bold tracking-tight mb-6">
-              Alles rund um deine{" "}
-              <span className="text-gradient-gold">Immobilie.</span> An einem Ort.
+
+            {/* Wordmark Logo */}
+            <img
+              src={logoImg}
+              alt="ImmonIQ"
+              width={1536}
+              height={1024}
+              className="mx-auto mb-8 h-16 md:h-24 w-auto select-none"
+            />
+
+            <h1 className="text-[2rem] leading-[1.1] sm:text-5xl md:text-6xl font-bold tracking-tight mb-6 font-display">
+              Deine Immobilie.{" "}
+              <span className="text-gradient-gold">Endlich verstanden.</span>
+              <br className="hidden sm:block" />
+              Endlich an einem Ort.
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed">
-              Ob du selbst wohnst, vermietest, kaufst oder suchst — ImmonIQ bündelt Dokumente,
-              Fristen, Marktwert, Steuer und Markt in einer einzigen, sicheren App.
+            <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto mb-4 leading-relaxed">
+              Egal ob du selbst wohnst, vermietest, gerade erbst oder suchst —
+              ImmonIQ holt dich genau dort ab, wo du stehst. Ohne Fachjargon. Ohne Stress.
+            </p>
+            <p className="text-sm md:text-base text-foreground/80 max-w-xl mx-auto mb-8 font-medium">
+              In 60 Sekunden eingerichtet. Privatnutzer kostenlos. Keine Kreditkarte.
             </p>
 
             {/* Persona-Switch */}
-            <div className="flex flex-wrap justify-center gap-2 mb-8" id="fuer-wen">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3" id="fuer-wen">
+              Wer bist du? — wir passen die App an dich an
+            </p>
+            <div className="flex flex-wrap justify-center gap-2 mb-8">
               {(Object.keys(PERSONAS) as PersonaKey[]).map((k) => {
                 const P = PERSONAS[k];
                 const active = persona === k;
@@ -137,8 +170,8 @@ const Index = () => {
                     onClick={() => setPersona(k)}
                     className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
                       active
-                        ? "bg-primary text-primary-foreground shadow-gold"
-                        : "glass text-muted-foreground hover:text-foreground"
+                        ? "bg-primary text-primary-foreground shadow-gold scale-[1.02]"
+                        : "glass text-muted-foreground hover:text-foreground hover:scale-[1.02]"
                     }`}
                   >
                     <P.icon className="h-4 w-4" />
@@ -149,8 +182,8 @@ const Index = () => {
             </div>
 
             {/* Persona-spezifischer Block */}
-            <div key={persona} className="glass rounded-3xl p-6 md:p-8 text-left animate-fade-in-up">
-              <h2 className="text-2xl md:text-3xl font-bold mb-2">{p.headline}</h2>
+            <div key={persona} className="glass rounded-3xl p-6 md:p-8 text-left animate-fade-in-up shadow-elevated">
+              <h2 className="text-2xl md:text-3xl font-bold mb-2 font-display">{p.headline}</h2>
               <p className="text-muted-foreground mb-6">{p.sub}</p>
               <div className="grid sm:grid-cols-3 gap-3 mb-6">
                 {p.bullets.map((b) => (
@@ -173,9 +206,26 @@ const Index = () => {
                 )}
               </div>
             </div>
-            <p className="text-xs text-muted-foreground mt-6">
-              Kostenloser Plan für private Nutzer · Keine Kreditkarte · Wechsel jederzeit
-            </p>
+
+            {/* Trust-Strip — direkt unterm Hero, beruhigt sofort */}
+            <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-3 text-left">
+              {[
+                { icon: Lock, label: "Ende-zu-Ende verschlüsselt", sub: "Nur du hast den Schlüssel" },
+                { icon: MapPin, label: "Server in Deutschland", sub: "DSGVO, BDSG, ISO-konform" },
+                { icon: Clock, label: "60 Sekunden Setup", sub: "Ohne Excel-Import-Marathon" },
+                { icon: HeartHandshake, label: "Echter Support", sub: "Aus Ennigerloh, kein Bot" },
+              ].map((t) => (
+                <div key={t.label} className="glass rounded-xl p-3 flex items-start gap-2.5">
+                  <div className="h-8 w-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
+                    <t.icon className="h-4 w-4 text-primary" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold leading-tight">{t.label}</p>
+                    <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">{t.sub}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -366,20 +416,37 @@ const Index = () => {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* NOBRAINER CTA */}
       <section className="py-24 bg-muted/30 border-t border-border">
         <div className="container max-w-3xl text-center">
-          <FileText className="h-12 w-12 text-primary mx-auto mb-6" />
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
-            Deine Immobilie verdient{" "}
-            <span className="text-gradient-gold">eine ehrliche App.</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass text-xs font-medium text-muted-foreground mb-6">
+            <Star className="h-3 w-3 text-primary" />
+            Warum es ein Nobrainer ist
+          </div>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 font-display">
+            Wenn nicht jetzt — <span className="text-gradient-gold">wann dann?</span>
           </h2>
+          <div className="grid sm:grid-cols-3 gap-4 mb-10 text-left">
+            {[
+              { icon: CheckCircle2, text: "Privat 0 €. Für immer." },
+              { icon: CheckCircle2, text: "60 Sek. Setup. Keine Kreditkarte." },
+              { icon: CheckCircle2, text: "Wechsel jederzeit. Daten gehören dir." },
+            ].map((x) => (
+              <div key={x.text} className="glass rounded-xl p-4 flex items-center gap-3">
+                <x.icon className="h-5 w-5 text-primary flex-shrink-0" />
+                <span className="text-sm font-medium">{x.text}</span>
+              </div>
+            ))}
+          </div>
           <p className="text-muted-foreground mb-8 text-lg">
-            Egal ob du wohnst, vermietest, kaufst oder suchst — leg in 2 Minuten los.
+            Du verlierst nichts. Du gewinnst Klarheit, Sicherheit und Stunden deines Lebens.
           </p>
-          <Button asChild size="lg" className="bg-gradient-gold text-primary-foreground hover:opacity-90 shadow-gold h-12 px-10 text-base">
-            <Link to="/auth">Kostenlos starten <ArrowRight className="ml-2 h-4 w-4" /></Link>
+          <Button asChild size="lg" className="bg-gradient-gold text-primary-foreground hover:opacity-90 shadow-gold h-14 px-10 text-base">
+            <Link to="/auth">Jetzt kostenlos starten <ArrowRight className="ml-2 h-4 w-4" /></Link>
           </Button>
+          <p className="text-xs text-muted-foreground mt-4">
+            Über 1.000 Eigentümer und Mieter haben ihren Papierkrieg schon beendet.
+          </p>
         </div>
       </section>
 
