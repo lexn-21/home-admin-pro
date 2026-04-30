@@ -428,15 +428,6 @@ const Dashboard = () => {
           <QuickAction to="/app/listings" icon={Megaphone} badge="USP"
             label="Inserate"
             desc="Vermieten/verkaufen — direkt." />
-          <QuickAction to="/app/valuation" icon={TrendingUp} badge="AVM"
-            label="Live-Bewertung"
-            desc="Was ist mein Objekt heute wert?" />
-          <QuickAction to="/app/benchmark" icon={BarChart3}
-            label="Marktindex"
-            desc="Vergleich gegen anonyme Marktdaten." />
-          <QuickAction to="/app/bookings" icon={Briefcase} badge="10 % Take"
-            label="Handwerker buchen"
-            desc="Festpreis-Angebote in 24 h." />
           <QuickAction to="/app/vault" icon={Lock}
             label="Dokumenten-Tresor"
             desc="Zero-Knowledge verschlüsselt." />
@@ -446,12 +437,21 @@ const Dashboard = () => {
           <QuickAction to="/app/marketplace" icon={Wrench}
             label="Marktplatz"
             desc="Profis in deiner Region." />
+          <QuickAction to="/app/bookings" icon={Briefcase} badge="10 % Take"
+            label="Handwerker buchen"
+            desc="Festpreis-Angebote in 24 h." />
           <QuickAction to="/app/law" icon={Scale}
             label="Rechts-Ecke"
             desc="BGB, EStG — original verlinkt." />
           <QuickAction to="/app/advisor" icon={ShieldCheck}
             label="Steuerberater-Link"
             desc="Sicherer Read-only-Zugang." />
+          <QuickAction to="/app/benchmark" icon={BarChart3}
+            label="Marktindex"
+            desc="Vergleich gegen anonyme Marktdaten." />
+          <QuickAction to="/app/valuation" icon={TrendingUp} badge="AVM"
+            label="Bewertung"
+            desc="Was ist mein Objekt wert?" />
         </div>
       </div>
 
