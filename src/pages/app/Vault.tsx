@@ -82,6 +82,14 @@ const Vault = () => {
   const [shake, setShake] = useState(false);
   const keyRef = useRef<CryptoKey | null>(null);
 
+  // Biometrie + Animation
+  const [bioAvailable, setBioAvailable] = useState(false);
+  const [bioEnrolled, setBioEnrolled] = useState(false);
+  const [bioBusy, setBioBusy] = useState(false);
+  const [showUnlockAnim, setShowUnlockAnim] = useState(false);
+  const [enrollPromptOpen, setEnrollPromptOpen] = useState(false);
+  const lastPinRef = useRef<string>("");
+
   // Data
   const [docs, setDocs] = useState<VaultDoc[]>([]);
   const [properties, setProperties] = useState<Property[]>([]);
