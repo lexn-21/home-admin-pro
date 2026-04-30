@@ -562,6 +562,19 @@ const Vault = () => {
                   <Button type="submit" disabled={unlocking} size="lg" className="w-full bg-gradient-gold text-black hover:opacity-90 shadow-gold font-bold h-12">
                     {unlocking ? "Entsperren…" : "Tresor öffnen"}
                   </Button>
+                  {bioAvailable && bioEnrolled && (
+                    <Button
+                      type="button"
+                      onClick={unlockBio}
+                      disabled={bioBusy}
+                      variant="outline"
+                      size="lg"
+                      className="w-full mt-3 h-12 bg-white/5 border-white/20 text-white hover:bg-white/10 hover:text-white gap-2"
+                    >
+                      <Fingerprint className="h-5 w-5" />
+                      {bioBusy ? "Warte auf Freigabe…" : "Mit Biometrie öffnen"}
+                    </Button>
+                  )}
                   <p className="text-[11px] text-white/40 mt-6 flex items-center justify-center gap-1.5">
                     <ShieldCheck className="h-3 w-3" /> Dein PIN verlässt niemals dein Gerät
                   </p>
@@ -570,6 +583,11 @@ const Vault = () => {
             </Card>
           </motion.div>
         </Item>
+
+        {/* Animation Overlay */}
+        <AP>
+          {showUnlockAnim && <VaultUnlockAnimation key="unlock-anim" onComplete={() => {}} />}
+        </AP>
       </Stagger>
     );
   }
