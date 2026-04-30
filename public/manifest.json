@@ -1,0 +1,32 @@
+{
+  "name": "ImmoNIQ — Vermieter-OS",
+  "short_name": "ImmoNIQ",
+  "description": "Verwaltung, Steuer & Belege für Privatvermieter. DSGVO-konform.",
+  "start_url": "/app",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "lang": "de",
+  "categories": ["business", "finance", "productivity"],
+  "icons": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    { "name": "Dashboard", "url": "/app", "icons": [{ "src": "/icon-512.png", "sizes": "192x192" }] },
+    { "name": "Tresor", "url": "/app/vault", "icons": [{ "src": "/icon-512.png", "sizes": "192x192" }] },
+    { "name": "Markt", "url": "/markt", "icons": [{ "src": "/icon-512.png", "sizes": "192x192" }] }
+  ]
+}

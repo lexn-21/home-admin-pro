@@ -25,7 +25,7 @@ import {
 type NavItem = { to: string; label: string; icon: any; end?: boolean; badge?: string; hint?: string };
 type NavGroup = { title: string; subtitle?: string; items: NavItem[] };
 
-// 5 Bereiche — Markt & Netzwerk jetzt prominent oben
+// Reihenfolge nach Nutzungs-Frequenz: Verwalten (täglich) → Vermieten → Tresor → Tools
 const groups: NavGroup[] = [
   {
     title: "Überblick",
@@ -35,7 +35,18 @@ const groups: NavGroup[] = [
     ],
   },
   {
-    title: "Markt & Netzwerk",
+    title: "Verwalten",
+    subtitle: "Dein Tagesgeschäft",
+    items: [
+      { to: "/app/properties", label: "Objekte", icon: Building2, hint: "Deine Immobilien" },
+      { to: "/app/tenants", label: "Mieter", icon: Users, hint: "Mit Verträgen" },
+      { to: "/app/payments", label: "Einnahmen", icon: Wallet },
+      { to: "/app/expenses", label: "Ausgaben", icon: Receipt, hint: "Belege scannen" },
+      { to: "/app/templates", label: "Vorlagen", icon: FileText, hint: "Verträge & Schreiben" },
+    ],
+  },
+  {
+    title: "Vermieten & Markt",
     subtitle: "Finden · Anbieten · Werben",
     items: [
       { to: "/markt", label: "Markt durchsuchen", icon: SearchIcon, badge: "LIVE", hint: "Inserate von Eigentümern — mit Umkreissuche" },
@@ -46,29 +57,21 @@ const groups: NavGroup[] = [
     ],
   },
   {
-    title: "Vermieten & Verwalten",
+    title: "Tresor & Recht",
+    subtitle: "Dokumente sicher · Gesetze parat",
     items: [
-      { to: "/app/properties", label: "Objekte", icon: Building2, hint: "Deine Immobilien" },
-      { to: "/app/tenants", label: "Mieter", icon: Users, hint: "Mit Verträgen" },
-      { to: "/app/payments", label: "Einnahmen", icon: Wallet },
-      { to: "/app/expenses", label: "Ausgaben", icon: Receipt, hint: "Belege scannen" },
-      { to: "/app/templates", label: "Vorlagen", icon: FileText, hint: "Verträge & Schreiben" },
-    ],
-  },
-  {
-    title: "Wert & Steuer",
-    items: [
-      { to: "/app/valuation", label: "Bewertung", icon: TrendingUp, badge: "AVM" },
-      { to: "/app/calculator", label: "Rechner", icon: Calculator, hint: "AfA, Rendite, Tilgung" },
-      { to: "/app/tax", label: "Steuer-Brücke", icon: Calculator, hint: "Anlage V Export" },
+      { to: "/app/vault", label: "Tresor", icon: Lock, badge: "AES-256", hint: "Verschlüsselte Dokumente" },
+      { to: "/app/law", label: "Rechts-Ecke", icon: Scale, hint: "BGB, WEG, HeizkostenV" },
       { to: "/app/advisor", label: "Steuerberater", icon: ShieldCheck, hint: "Sicher freigeben" },
     ],
   },
   {
-    title: "Schutz & Suche",
+    title: "Tools",
+    subtitle: "Selten gebraucht — aber nützlich",
     items: [
-      { to: "/app/vault", label: "Tresor", icon: Lock, badge: "AES-256", hint: "Verschlüsselte Dokumente" },
-      { to: "/app/law", label: "Rechts-Ecke", icon: Scale, hint: "BGB, WEG, HeizkostenV" },
+      { to: "/app/valuation", label: "Bewertung", icon: TrendingUp, badge: "AVM", hint: "Was ist deine Immobilie wert?" },
+      { to: "/app/calculator", label: "Rechner", icon: Calculator, hint: "AfA, Rendite, Tilgung" },
+      { to: "/app/tax", label: "Steuer-Brücke", icon: Calculator, hint: "Anlage V Export" },
       { to: "/app/profile-seeker", label: "Mein Mieter-Profil", icon: Inbox, hint: "Du suchst selbst?" },
       { to: "/app/my-applications", label: "Meine Bewerbungen", icon: FileText },
     ],
