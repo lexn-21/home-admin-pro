@@ -14,6 +14,7 @@ import {
 import { AskCopilot } from "@/components/AskCopilot";
 import { DocScanner } from "@/components/DocScanner";
 import { pendingIngest } from "@/lib/ingest";
+import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from "@/components/ui/tooltip";
