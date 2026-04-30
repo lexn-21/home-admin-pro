@@ -1694,6 +1694,10 @@ export type Database = {
         Args: { _seeker: string; _viewer: string }
         Returns: boolean
       }
+      check_user_quota: {
+        Args: { _resource: string; _user_id: string }
+        Returns: undefined
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean

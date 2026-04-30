@@ -8,6 +8,7 @@ import { eur } from "@/lib/format";
 import { toast } from "sonner";
 import { ArrowLeft, Star, X, Check, MessageSquare, ShieldCheck, Sparkles, Loader2, TrendingUp } from "lucide-react";
 import ChatDialog from "@/components/market/ChatDialog";
+import LegalSnippet from "@/components/LegalSnippet";
 
 const labelStatus: Record<string, string> = {
   sent: "Neu", shortlisted: "Favorit", rejected: "Abgelehnt", accepted: "Angenommen", withdrawn: "Zurückgezogen",
@@ -86,6 +87,12 @@ const ListingApplications = () => {
         <h1 className="text-3xl font-bold">{listing.title}</h1>
         <p className="text-muted-foreground text-sm mt-1">{apps.length} Bewerbungen</p>
       </header>
+
+      <LegalSnippet
+        title="Wichtig: Diskriminierungsverbot"
+        keys={["agg_19", "bgb_535", "bgb_551"]}
+      />
+
 
       {apps.length === 0 ? (
         <Card className="p-10 glass text-center text-muted-foreground">Noch keine Bewerbungen.</Card>
