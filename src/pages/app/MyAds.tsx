@@ -137,163 +137,222 @@ export default function MyAds() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-            <Megaphone className="h-7 w-7 text-primary" /> Werben auf ImmoNIQ
-          </h1>
-          <p className="text-muted-foreground mt-1 max-w-2xl">
-            Erreiche zielgenau Eigentümer, Mieter und Käufer in deiner Region. Keine Mindestlaufzeit.
-          </p>
-        </div>
-        <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-          <DialogTrigger asChild>
-            <Button size="lg" className="gap-2 bg-gradient-gold text-primary-foreground shadow-gold">
-              <Plus className="h-4 w-4" /> Neue Anzeige
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Anzeige erstellen — in 3 Schritten</DialogTitle>
-              <DialogDescription>
-                1. Anzeige beschreiben → 2. Wir prüfen (max. 24h) → 3. Du buchst & gehst live.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              {/* Schritt 1 */}
-              <div className="rounded-lg border p-4 space-y-3 bg-muted/30">
-                <p className="text-xs font-bold uppercase tracking-wider text-primary">Schritt 1 — Was bewirbst du?</p>
-                <div>
-                  <Label>Überschrift *</Label>
-                  <Input value={form.title} onChange={e => setForm({...form, title: e.target.value})} placeholder='z.B. "Kostenlose Marktwert-Analyse für Berlin"' maxLength={80} />
-                  <p className="text-xs text-muted-foreground mt-1">{form.title.length}/80 — kurz & klickstark</p>
-                </div>
-                <div>
-                  <Label>Untertitel (optional)</Label>
-                  <Input value={form.subtitle} onChange={e => setForm({...form, subtitle: e.target.value})} placeholder="z.B. Erfahrener Makler · 200+ verkaufte Objekte" maxLength={120} />
-                </div>
-                <div>
-                  <Label>Dein Firmenname / Anbieter</Label>
-                  <Input value={form.sponsor_name} onChange={e => setForm({...form, sponsor_name: e.target.value})} placeholder='z.B. "Mustermann Immobilien GmbH"' maxLength={60} />
-                </div>
-                <div>
-                  <Label>Link bei Klick * <span className="text-muted-foreground">(deine Website)</span></Label>
-                  <Input value={form.click_url} onChange={e => setForm({...form, click_url: e.target.value})} placeholder="https://deine-website.de" />
-                </div>
-                <div>
-                  <Label>Button-Text</Label>
-                  <Input value={form.cta_label} onChange={e => setForm({...form, cta_label: e.target.value})} maxLength={30} placeholder="z.B. Termin buchen" />
-                </div>
-              </div>
+      {/* HERO — psychological no-brainer */}
+      <Card className="overflow-hidden border-primary/30 bg-gradient-to-br from-primary/5 via-background to-primary/10">
+        <div className="p-6 md:p-8 grid md:grid-cols-2 gap-6 items-center">
+          <div>
+            <Badge className="mb-3 bg-emerald-600 text-white border-0 gap-1">
+              <Sparkles className="h-3 w-3" /> Erste Woche 50 % günstiger — nur <strong className="ml-1">24,50 €</strong>
+            </Badge>
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight leading-tight">
+              <span className="text-primary">1 Mieter.</span> 6.000 € Jahresmiete.<br />
+              Dein Werbeplatz: <span className="text-primary">49 €/Woche.</span>
+            </h1>
+            <p className="text-muted-foreground mt-3 text-sm md:text-base">
+              Du sprichst direkt Eigentümer, Mieter und Käufer an — ohne Streuverluste.
+              Keine Mindestlaufzeit. Pausieren jederzeit. Wenn unter 500 Views: <strong className="text-foreground">Geld zurück.</strong>
+            </p>
+            <div className="flex gap-2 mt-5 flex-wrap">
+              <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+                <DialogTrigger asChild>
+                  <Button size="lg" className="gap-2 bg-gradient-gold text-primary-foreground shadow-gold">
+                    <Plus className="h-4 w-4" /> Anzeige in 2 Min. erstellen
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Anzeige erstellen — in 3 Schritten</DialogTitle>
+                    <DialogDescription>
+                      1. Anzeige beschreiben → 2. Wir prüfen (max. 24h) → 3. Du buchst & gehst live.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    {/* Schritt 1 */}
+                    <div className="rounded-lg border p-4 space-y-3 bg-muted/30">
+                      <p className="text-xs font-bold uppercase tracking-wider text-primary">Schritt 1 — Was bewirbst du?</p>
+                      <div>
+                        <Label>Überschrift *</Label>
+                        <Input value={form.title} onChange={e => setForm({...form, title: e.target.value})} placeholder='z.B. "Kostenlose Marktwert-Analyse für Berlin"' maxLength={80} />
+                        <p className="text-xs text-muted-foreground mt-1">{form.title.length}/80 — kurz & klickstark</p>
+                      </div>
+                      <div>
+                        <Label>Untertitel (optional)</Label>
+                        <Input value={form.subtitle} onChange={e => setForm({...form, subtitle: e.target.value})} placeholder="z.B. Erfahrener Makler · 200+ verkaufte Objekte" maxLength={120} />
+                      </div>
+                      <div>
+                        <Label>Dein Firmenname / Anbieter</Label>
+                        <Input value={form.sponsor_name} onChange={e => setForm({...form, sponsor_name: e.target.value})} placeholder='z.B. "Mustermann Immobilien GmbH"' maxLength={60} />
+                      </div>
+                      <div>
+                        <Label>Link bei Klick * <span className="text-muted-foreground">(deine Website)</span></Label>
+                        <Input value={form.click_url} onChange={e => setForm({...form, click_url: e.target.value})} placeholder="https://deine-website.de" />
+                      </div>
+                      <div>
+                        <Label>Button-Text</Label>
+                        <Input value={form.cta_label} onChange={e => setForm({...form, cta_label: e.target.value})} maxLength={30} placeholder="z.B. Termin buchen" />
+                      </div>
+                    </div>
 
-              {/* Schritt 2 */}
-              <div className="rounded-lg border p-4 space-y-3 bg-muted/30">
-                <p className="text-xs font-bold uppercase tracking-wider text-primary">Schritt 2 — Wo & für wen?</p>
-                <div>
-                  <Label>Platzierung</Label>
-                  <Select value={form.placement} onValueChange={v => setForm({...form, placement: v})}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {PLACEMENTS.map(p => (
-                        <SelectItem key={p.value} value={p.value}>
-                          <div>
-                            <div className="font-medium">{p.label}</div>
-                            <div className="text-xs text-muted-foreground">{p.desc}</div>
+                    {/* Schritt 2 */}
+                    <div className="rounded-lg border p-4 space-y-3 bg-muted/30">
+                      <p className="text-xs font-bold uppercase tracking-wider text-primary">Schritt 2 — Wo & für wen?</p>
+                      <div>
+                        <Label>Platzierung</Label>
+                        <Select value={form.placement} onValueChange={v => setForm({...form, placement: v})}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            {PLACEMENTS.map(p => (
+                              <SelectItem key={p.value} value={p.value}>
+                                <div>
+                                  <div className="font-medium">{p.label}</div>
+                                  <div className="text-xs text-muted-foreground">{p.desc}</div>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Geschätzte Reichweite: <strong>{PLACEMENTS.find(p => p.value === form.placement)?.reach}</strong>
+                        </p>
+                      </div>
+                      <div>
+                        <Label>PLZ-Bereich (optional, kommagetrennt)</Label>
+                        <Input value={form.target_zips} onChange={e => setForm({...form, target_zips: e.target.value})} placeholder="10115, 10117, 80331" />
+                        <p className="text-xs text-muted-foreground mt-1">Tipp: Auch 3-stellig möglich (z.B. "101" trifft alle 101xx)</p>
+                      </div>
+                      <div>
+                        <Label>Städte (optional)</Label>
+                        <Input value={form.target_cities} onChange={e => setForm({...form, target_cities: e.target.value})} placeholder="Berlin, München" />
+                      </div>
+                      <div>
+                        <Label>Wer soll deine Anzeige sehen?</Label>
+                        <Select value={form.target_kind} onValueChange={v => setForm({...form, target_kind: v})}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="any">Alle Nutzer</SelectItem>
+                            <SelectItem value="rent">Nur Mieter / Mietinteressenten</SelectItem>
+                            <SelectItem value="sale">Nur Käufer / Kaufinteressenten</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    {/* Vorschau */}
+                    <div className="rounded-lg border-2 border-dashed border-primary/30 p-4 bg-background">
+                      <p className="text-xs font-bold uppercase tracking-wider text-primary mb-2 flex items-center gap-1">
+                        <Sparkles className="h-3 w-3" /> Live-Vorschau
+                      </p>
+                      <div className="rounded-lg border bg-card p-4 shadow-sm">
+                        <div className="flex items-start gap-3">
+                          <div className="h-12 w-12 rounded-lg bg-gradient-gold flex items-center justify-center flex-shrink-0">
+                            <Megaphone className="h-5 w-5 text-primary-foreground" />
                           </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Geschätzte Reichweite: <strong>{PLACEMENTS.find(p => p.value === form.placement)?.reach}</strong>
-                  </p>
-                </div>
-                <div>
-                  <Label>PLZ-Bereich (optional, kommagetrennt)</Label>
-                  <Input value={form.target_zips} onChange={e => setForm({...form, target_zips: e.target.value})} placeholder="10115, 10117, 80331" />
-                  <p className="text-xs text-muted-foreground mt-1">Tipp: Auch 3-stellig möglich (z.B. "101" trifft alle 101xx)</p>
-                </div>
-                <div>
-                  <Label>Städte (optional)</Label>
-                  <Input value={form.target_cities} onChange={e => setForm({...form, target_cities: e.target.value})} placeholder="Berlin, München" />
-                </div>
-                <div>
-                  <Label>Wer soll deine Anzeige sehen?</Label>
-                  <Select value={form.target_kind} onValueChange={v => setForm({...form, target_kind: v})}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="any">Alle Nutzer</SelectItem>
-                      <SelectItem value="rent">Nur Mieter / Mietinteressenten</SelectItem>
-                      <SelectItem value="sale">Nur Käufer / Kaufinteressenten</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+                          <div className="min-w-0 flex-1">
+                            <Badge variant="outline" className="text-[9px] mb-1">ANZEIGE</Badge>
+                            <p className="font-semibold leading-tight">{form.title || "Deine Überschrift hier"}</p>
+                            {form.subtitle && <p className="text-sm text-muted-foreground">{form.subtitle}</p>}
+                            {form.sponsor_name && <p className="text-xs text-muted-foreground mt-1">— {form.sponsor_name}</p>}
+                            <Button size="sm" className="mt-2 h-7 text-xs" disabled>{form.cta_label || "Mehr erfahren"}</Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
 
-              {/* Vorschau */}
-              <div className="rounded-lg border-2 border-dashed border-primary/30 p-4 bg-background">
-                <p className="text-xs font-bold uppercase tracking-wider text-primary mb-2 flex items-center gap-1">
-                  <Sparkles className="h-3 w-3" /> Live-Vorschau
-                </p>
-                <div className="rounded-lg border bg-card p-4 shadow-sm">
-                  <div className="flex items-start gap-3">
-                    <div className="h-12 w-12 rounded-lg bg-gradient-gold flex items-center justify-center flex-shrink-0">
-                      <Megaphone className="h-5 w-5 text-primary-foreground" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <Badge variant="outline" className="text-[9px] mb-1">ANZEIGE</Badge>
-                      <p className="font-semibold leading-tight">{form.title || "Deine Überschrift hier"}</p>
-                      {form.subtitle && <p className="text-sm text-muted-foreground">{form.subtitle}</p>}
-                      {form.sponsor_name && <p className="text-xs text-muted-foreground mt-1">— {form.sponsor_name}</p>}
-                      <Button size="sm" className="mt-2 h-7 text-xs" disabled>{form.cta_label || "Mehr erfahren"}</Button>
-                    </div>
+                    <Button onClick={submit} className="w-full" size="lg">
+                      Zur Prüfung einreichen — kostenlos
+                    </Button>
+                    <p className="text-xs text-center text-muted-foreground">
+                      Erstellen ist kostenlos. Bezahlt wird erst, wenn du nach Freigabe wirklich buchst.
+                    </p>
                   </div>
-                </div>
-              </div>
+                </DialogContent>
+              </Dialog>
+              <a href="#roi" className="inline-flex">
+                <Button size="lg" variant="outline" className="gap-2"><Calculator className="h-4 w-4" /> Lohnt sich das?</Button>
+              </a>
+            </div>
+            <div className="flex items-center gap-3 mt-5 text-xs text-muted-foreground flex-wrap">
+              <span className="flex items-center gap-1"><ShieldCheck className="h-3 w-3 text-primary" /> Geld-zurück-Garantie</span>
+              <span className="flex items-center gap-1"><Zap className="h-3 w-3 text-primary" /> Live in 24h</span>
+              <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-primary" /> Rechnung mit MwSt.</span>
+            </div>
+          </div>
 
-              <Button onClick={submit} className="w-full" size="lg">
-                Zur Prüfung einreichen — kostenlos
-              </Button>
-              <p className="text-xs text-center text-muted-foreground">
-                Erstellen ist kostenlos. Bezahlt wird erst, wenn du nach Freigabe wirklich buchst.
+          {/* Vs comparison */}
+          <div className="grid gap-3">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">So viel zahlst du anderswo:</p>
+            <div className="grid grid-cols-2 gap-3">
+              <Card className="p-4 bg-muted/40 border-dashed">
+                <p className="text-xs text-muted-foreground">ImmoScout24 Pro</p>
+                <p className="text-2xl font-bold line-through text-muted-foreground">499 €</p>
+                <p className="text-[11px] text-muted-foreground">/ Monat · Bindung</p>
+              </Card>
+              <Card className="p-4 bg-primary/10 border-primary shadow-gold">
+                <p className="text-xs text-primary font-semibold">ImmoNIQ</p>
+                <p className="text-2xl font-bold text-primary">49 €</p>
+                <p className="text-[11px] text-muted-foreground">/ Woche · keine Bindung</p>
+              </Card>
+            </div>
+            <Card className="p-3 bg-emerald-500/10 border-emerald-500/30">
+              <p className="text-xs flex items-start gap-2">
+                <Quote className="h-3 w-3 text-emerald-700 dark:text-emerald-400 shrink-0 mt-0.5" />
+                <span><strong>3 Klicks → 1 ernsthafte Anfrage.</strong> Bei 49 € macht jeder Lead unter 17 € — billiger als jede Maklerprovision.</span>
               </p>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      {/* Win-Win Erklärung */}
-      <Card className="p-5 bg-gradient-gold-soft border-primary/20">
-        <div className="grid md:grid-cols-3 gap-4 text-sm">
-          <div className="flex gap-3">
-            <Target className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold">Zielgenau</p>
-              <p className="text-muted-foreground text-xs">Nur Nutzer in deiner PLZ / Stadt — keine Streuverluste.</p>
-            </div>
+            </Card>
           </div>
-          <div className="flex gap-3">
-            <Users className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold">Echte Eigentümer</p>
-              <p className="text-muted-foreground text-xs">ImmoNIQ-Nutzer sind verifizierte Vermieter, Käufer & Mieter.</p>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <TrendingUp className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold">Transparent</p>
-              <p className="text-muted-foreground text-xs">Du siehst Impressions & Klicks live. Pausieren jederzeit.</p>
-            </div>
-          </div>
-        </div>
-        <div className="mt-4 pt-4 border-t border-primary/20 grid grid-cols-3 gap-3 text-center">
-          <div><p className="text-2xl font-bold text-primary">49 €</p><p className="text-xs text-muted-foreground">pro Woche</p></div>
-          <div><p className="text-2xl font-bold text-primary">24h</p><p className="text-xs text-muted-foreground">Prüfung</p></div>
-          <div><p className="text-2xl font-bold text-primary">0 €</p><p className="text-xs text-muted-foreground">Setup-Gebühr</p></div>
         </div>
       </Card>
+
+      {/* ROI Calculator */}
+      <Card id="roi" className="p-5 md:p-6 border-primary/20">
+        <div className="flex items-start gap-3 mb-4">
+          <Calculator className="h-6 w-6 text-primary shrink-0" />
+          <div>
+            <p className="font-bold text-lg">Lohnt sich das für dich?</p>
+            <p className="text-sm text-muted-foreground">Stell deinen Use-Case ein — wir rechnen ehrlich nach.</p>
+          </div>
+        </div>
+        <RoiCalculator />
+      </Card>
+
+      {/* Use-Case Templates */}
+      <div>
+        <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-3">Wer wirbt erfolgreich auf ImmoNIQ?</p>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {[
+            { Icon: Building2, role: "Makler", outcome: "1 Mandat = 8.000 €+ Provision", angle: "PLZ-genaue Eigentümer-Ansprache" },
+            { Icon: Wrench, role: "Handwerker", outcome: "1 Auftrag = 1.500 €+ Umsatz", angle: "Sichtbar wenn Eigentümer Schäden suchen" },
+            { Icon: Banknote, role: "Finanzierer", outcome: "1 Baufi-Abschluss = 3.000 €+", angle: "Käufer im Suchprozess abfangen" },
+            { Icon: Lightbulb, role: "Energieberater", outcome: "1 GEG-Beratung = 800 €", angle: "Eigentümer mit altem Energieausweis" },
+          ].map((u, i) => (
+            <Card key={i} className="p-4 hover:shadow-md hover:border-primary/40 transition cursor-pointer group" onClick={() => setCreateOpen(true)}>
+              <u.Icon className="h-6 w-6 text-primary mb-2" />
+              <p className="font-semibold text-sm">{u.role}</p>
+              <p className="text-xs text-emerald-700 dark:text-emerald-400 font-medium mt-1">{u.outcome}</p>
+              <p className="text-xs text-muted-foreground mt-1">{u.angle}</p>
+              <p className="text-xs text-primary mt-2 flex items-center gap-1 group-hover:gap-2 transition-all">
+                Vorlage nutzen <ArrowRight className="h-3 w-3" />
+              </p>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* Trust strip */}
+      <Card className="p-4 bg-muted/30">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+          <div><p className="text-xl font-bold text-primary">24h</p><p className="text-[11px] text-muted-foreground">Freigabe</p></div>
+          <div><p className="text-xl font-bold text-primary">0 €</p><p className="text-[11px] text-muted-foreground">Setup</p></div>
+          <div><p className="text-xl font-bold text-primary">500+</p><p className="text-[11px] text-muted-foreground">Views-Garantie</p></div>
+          <div><p className="text-xl font-bold text-primary">∞</p><p className="text-[11px] text-muted-foreground">Pausieren</p></div>
+        </div>
+      </Card>
+
+      <div className="pt-2 border-t">
+        <h2 className="text-xl font-bold tracking-tight flex items-center gap-2">
+          <Megaphone className="h-5 w-5 text-primary" /> Deine Anzeigen
+        </h2>
+      </div>
 
       {/* Stats */}
       {slots.length > 0 && (
