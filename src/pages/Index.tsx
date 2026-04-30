@@ -8,7 +8,6 @@ import {
   Home, Search, KeyRound, Wrench, Bell, FolderLock, Wallet,
   HeartHandshake, Clock, MapPin, Star,
 } from "lucide-react";
-import logoImg from "@/assets/immoniq-logo.png";
 import QuickStartFlow from "@/components/QuickStartFlow";
 
 type PersonaKey = "owner" | "landlord" | "buyer" | "tenant" | "family";
@@ -134,15 +133,6 @@ const Index = () => {
               <Shield className="h-3 w-3 text-primary" />
               Made in Germany · DSGVO · Verschlüsselt · Kostenlos für Privatnutzer
             </div>
-
-            {/* Wordmark Logo */}
-            <img
-              src={logoImg}
-              alt="ImmonIQ"
-              width={1536}
-              height={1024}
-              className="mx-auto mb-8 h-16 md:h-24 w-auto select-none"
-            />
 
             <h1 className="text-[2rem] leading-[1.1] sm:text-5xl md:text-6xl font-bold tracking-tight mb-6 font-display">
               Deine Immobilie.{" "}
