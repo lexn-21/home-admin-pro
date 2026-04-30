@@ -49,12 +49,31 @@ export default function AdminAds() {
 
   const decide = async (id: string, status: "approved" | "rejected") => {
     const update: any = { moderation_status: status, updated_at: new Date().toISOString() };
-    if (status === "rejected") update.rejection_reason = reasons[id] || "Inhalt entspricht nicht den Richtlinien";
+    const reason = reasons[id] || "Inhalt entspricht nicht den Richtlinien";
+    if (status === "rejected") update.rejection_reason = reason;
     const { error } = await supabase.from("ad_slots").update(update).eq("id", id);
     if (error) return toast.error(error.message);
     toast.success(status === "approved" ? "Freigegeben" : "Abgelehnt");
+
+    // Notify advertiser (best-effort)
+    try {
+      const { data: info } = await supabase.rpc("notify_get_ad_advertiser_email", { _ad_id: id });
+      const i = info as { email?: string; opted_in?: boolean; ad_title?: string } | null;
+      if (i?.email && i.opted_in) {
+        await supabase.functions.invoke("send-transactional-email", {
+          body: {
+            templateName: status === "approved" ? "ad-approved" : "ad-rejected",
+            recipientEmail: i.email,
+            idempotencyKey: `ad-${status}-${id}`,
+            templateData: { adTitle: i.ad_title, ...(status === "rejected" ? { reason } : {}) },
+          },
+        });
+      }
+    } catch (e) { console.warn("notify advertiser failed", e); }
+
     load();
   };
+
 
   if (isAdmin === null) return <p className="text-muted-foreground">Lädt...</p>;
   if (!isAdmin) return (
