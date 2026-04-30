@@ -71,6 +71,36 @@ async function handleSubscriptionDeleted(subscription: any, env: StripeEnv) {
     .eq("environment", env);
 }
 
+async function handleAdCheckoutCompleted(session: any, env: StripeEnv) {
+  const meta = session.metadata || {};
+  if (meta.type !== "ad_order") return;
+  const adSlotId = meta.adSlotId;
+  const weeks = Math.max(1, Number(meta.weeks) || 1);
+  if (!adSlotId) return;
+
+  const sb = getSupabase();
+  // Order bezahlt markieren
+  await sb.from("ad_orders").update({
+    status: "paid",
+    stripe_payment_intent: session.payment_intent,
+    paid_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  }).eq("stripe_session_id", session.id).eq("environment", env);
+
+  // paid_until verlängern (von max(now, paid_until) + weeks*7d)
+  const { data: slot } = await sb.from("ad_slots").select("paid_until").eq("id", adSlotId).single();
+  const baseMs = slot?.paid_until && new Date(slot.paid_until as string) > new Date()
+    ? new Date(slot.paid_until as string).getTime()
+    : Date.now();
+  const newUntil = new Date(baseMs + weeks * 7 * 86400000).toISOString();
+
+  await sb.from("ad_slots").update({
+    paid_until: newUntil,
+    active: true,
+    updated_at: new Date().toISOString(),
+  }).eq("id", adSlotId);
+}
+
 async function handleWebhook(req: Request, env: StripeEnv) {
   const event = await verifyWebhook(req, env);
   switch (event.type) {
@@ -82,6 +112,9 @@ async function handleWebhook(req: Request, env: StripeEnv) {
       break;
     case "customer.subscription.deleted":
       await handleSubscriptionDeleted(event.data.object, env);
+      break;
+    case "checkout.session.completed":
+      await handleAdCheckoutCompleted(event.data.object, env);
       break;
     default:
       console.log("Unhandled event:", event.type);
