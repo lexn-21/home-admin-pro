@@ -10,7 +10,15 @@ export interface TemplateEntry {
 }
 
 import { template as welcome } from './welcome.tsx'
+import { template as newApplication } from './new-application.tsx'
+import { template as applicationStatus } from './application-status.tsx'
+import { template as adApproved } from './ad-approved.tsx'
+import { template as adRejected } from './ad-rejected.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'welcome': welcome,
+  'new-application': newApplication,
+  'application-status': applicationStatus,
+  'ad-approved': adApproved,
+  'ad-rejected': adRejected,
 }

@@ -11,6 +11,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import NotificationSettings from "@/components/NotificationSettings";
 
 const Settings = () => {
   const { user } = useAuth();
@@ -120,6 +121,9 @@ const Settings = () => {
           {loading ? "Speichern…" : "Speichern"}
         </Button>
       </Card>
+
+      <NotificationSettings />
+
 
       <Card className="p-6 glass">
         <div className="flex items-center gap-3 mb-3">

@@ -53,7 +53,9 @@ const MarktDetail = () => {
       nav("/app/profile-seeker");
       return;
     }
+    const appId = crypto.randomUUID();
     const { error } = await supabase.from("applications").insert({
+      id: appId,
       listing_id: l.id,
       seeker_user_id: user.id,
       owner_user_id: l.user_id,
@@ -64,7 +66,29 @@ const MarktDetail = () => {
     setApplied(true);
     setDlg(false);
     toast.success("Bewerbung gesendet!");
+
+    // Notify owner via email (best-effort, non-blocking)
+    try {
+      const { data: ownerInfo } = await supabase.rpc("notify_get_listing_owner_email", { _listing_id: l.id });
+      const info = ownerInfo as { email?: string; opted_in?: boolean; listing_title?: string } | null;
+      if (info?.email && info.opted_in) {
+        await supabase.functions.invoke("send-transactional-email", {
+          body: {
+            templateName: "new-application",
+            recipientEmail: info.email,
+            idempotencyKey: `new-application-${appId}`,
+            templateData: {
+              listingTitle: info.listing_title,
+              applicantName: seeker.full_name,
+              coverMessage: msg || undefined,
+              applicationId: l.id,
+            },
+          },
+        });
+      }
+    } catch (e) { console.warn("notify owner failed", e); }
   };
+
 
   const save = async () => {
     if (!user) { nav(`/auth?redirect=/markt/${id}`); return; }
