@@ -29,7 +29,19 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
 
-  const redirect = new URLSearchParams(window.location.search).get("redirect") || "/app";
+  const params = new URLSearchParams(window.location.search);
+  const redirect = params.get("redirect") || params.get("next") || "/app";
+  const as = params.get("as"); // owner | landlord | advisor | buyer | tenant | family
+
+  const SUBTITLES: Record<string, string> = {
+    owner: "Dein sicherer Ort für alles rund um dein Zuhause.",
+    landlord: "Dein Verwalten +-Cockpit wartet.",
+    advisor: "Mandanten-Daten in Minuten — read-only & DSGVO-sicher.",
+    buyer: "Marktwerte, Rendite & Inserate — direkt zwischen Eigentümern.",
+    tenant: "Wohnung finden, Profil pflegen, ohne Maklerprovision.",
+    family: "Schritt für Schritt durch Erbschaft und Immobilien-Fragen.",
+  };
+  const subtitle = (as && SUBTITLES[as]) || "Alles für deine Immobilie — an einem sicheren Ort.";
 
   useEffect(() => {
     document.title = "Anmelden · ImmonIQ";
@@ -104,7 +116,7 @@ const Auth = () => {
         <Card className="w-full max-w-md p-8 glass shadow-glass">
           <div className="text-center mb-6">
             <h1 className="text-2xl font-bold tracking-tight">Willkommen</h1>
-            <p className="text-sm text-muted-foreground mt-1">Dein Vermieter-Cockpit wartet.</p>
+            <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
           </div>
 
           <Button onClick={handleGoogle} disabled={oauthLoading} variant="outline" className="w-full mb-4 gap-2">
