@@ -52,17 +52,71 @@ export type Database = {
           },
         ]
       }
+      ad_orders: {
+        Row: {
+          ad_slot_id: string
+          amount_cents: number
+          created_at: string
+          currency: string
+          duration_days: number
+          environment: string
+          id: string
+          paid_at: string | null
+          status: string
+          stripe_payment_intent: string | null
+          stripe_session_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ad_slot_id: string
+          amount_cents: number
+          created_at?: string
+          currency?: string
+          duration_days: number
+          environment?: string
+          id?: string
+          paid_at?: string | null
+          status?: string
+          stripe_payment_intent?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ad_slot_id?: string
+          amount_cents?: number
+          created_at?: string
+          currency?: string
+          duration_days?: number
+          environment?: string
+          id?: string
+          paid_at?: string | null
+          status?: string
+          stripe_payment_intent?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ad_slots: {
         Row: {
           active: boolean
+          advertiser_user_id: string | null
           click_url: string
+          clicks_count: number
           created_at: string
           cta_label: string | null
           ends_at: string | null
           id: string
           image_url: string | null
+          impressions_count: number
+          moderation_status: string
+          paid_until: string | null
           placement: string
           priority: number
+          rejection_reason: string | null
           sponsor_name: string | null
           starts_at: string
           subtitle: string | null
@@ -74,14 +128,20 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          advertiser_user_id?: string | null
           click_url: string
+          clicks_count?: number
           created_at?: string
           cta_label?: string | null
           ends_at?: string | null
           id?: string
           image_url?: string | null
+          impressions_count?: number
+          moderation_status?: string
+          paid_until?: string | null
           placement?: string
           priority?: number
+          rejection_reason?: string | null
           sponsor_name?: string | null
           starts_at?: string
           subtitle?: string | null
@@ -93,14 +153,20 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          advertiser_user_id?: string | null
           click_url?: string
+          clicks_count?: number
           created_at?: string
           cta_label?: string | null
           ends_at?: string | null
           id?: string
           image_url?: string | null
+          impressions_count?: number
+          moderation_status?: string
+          paid_until?: string | null
           placement?: string
           priority?: number
+          rejection_reason?: string | null
           sponsor_name?: string | null
           starts_at?: string
           subtitle?: string | null
@@ -198,6 +264,21 @@ export type Database = {
           revoked?: boolean
           token?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      app_admins: {
+        Row: {
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
           user_id?: string
         }
         Relationships: []
@@ -1424,14 +1505,20 @@ export type Database = {
         }
         Returns: {
           active: boolean
+          advertiser_user_id: string | null
           click_url: string
+          clicks_count: number
           created_at: string
           cta_label: string | null
           ends_at: string | null
           id: string
           image_url: string | null
+          impressions_count: number
+          moderation_status: string
+          paid_until: string | null
           placement: string
           priority: number
+          rejection_reason: string | null
           sponsor_name: string | null
           starts_at: string
           subtitle: string | null
@@ -1447,6 +1534,16 @@ export type Database = {
           isOneToOne: false
           isSetofReturn: true
         }
+      }
+      ad_track_event: {
+        Args: {
+          _ad_id: string
+          _city?: string
+          _event_type: string
+          _listing_id?: string
+          _zip?: string
+        }
+        Returns: undefined
       }
       advisor_get_data: { Args: { _token: string }; Returns: Json }
       advisor_owner_for_token: { Args: { _token: string }; Returns: string }
@@ -1464,6 +1561,7 @@ export type Database = {
         Args: { _env?: string; _user_id: string }
         Returns: boolean
       }
+      is_admin: { Args: { _user: string }; Returns: boolean }
       is_app_participant: {
         Args: { _app_id: string; _user: string }
         Returns: boolean
