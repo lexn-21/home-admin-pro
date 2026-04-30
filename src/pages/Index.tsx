@@ -156,6 +156,18 @@ const Index = () => {
               Made in Germany · DSGVO · Verschlüsselt · Kostenlos für Privatnutzer
             </div>
 
+            {/* Großes ImmonIQ Wordmark — pure Typografie, maximale Präsenz */}
+            <div className="relative mb-8 select-none">
+              <h2
+                aria-label="ImmonIQ"
+                className="font-display font-black tracking-[-0.04em] leading-[0.85] text-[clamp(3.5rem,12vw,8rem)]"
+              >
+                <span className="text-foreground">Immon</span>
+                <span className="text-gradient-gold drop-shadow-[0_0_30px_hsl(var(--primary)/0.35)]">IQ</span>
+              </h2>
+              <div className="mt-3 mx-auto h-px w-24 bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
+            </div>
+
             <h1 className="text-[2rem] leading-[1.1] sm:text-5xl md:text-6xl font-bold tracking-tight mb-6 font-display">
               Deine Immobilie.{" "}
               <span className="text-gradient-gold">Endlich verstanden.</span>
@@ -163,7 +175,7 @@ const Index = () => {
               Endlich an einem Ort.
             </h1>
             <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto mb-4 leading-relaxed">
-              Egal ob du selbst wohnst, vermietest, gerade erbst oder suchst —
+              Egal ob du selbst wohnst, vermietest, Steuerberater bist oder suchst —
               ImmonIQ holt dich genau dort ab, wo du stehst. Ohne Fachjargon. Ohne Stress.
             </p>
             <p className="text-sm md:text-base text-foreground/80 max-w-xl mx-auto mb-8 font-medium">
@@ -209,14 +221,74 @@ const Index = () => {
                   </div>
                 ))}
               </div>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button asChild size="lg" className="bg-gradient-gold text-primary-foreground hover:opacity-90 shadow-gold h-12 px-8 text-base">
-                  <Link to={p.primary.to}>{p.primary.label} <ArrowRight className="ml-2 h-4 w-4" /></Link>
-                </Button>
+
+              {/* Persona-CTA-Grid: 3 starke Buttons mit Sub-Labels */}
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {/* Primary — Gold, dominant */}
+                <Link
+                  to={p.primary.to}
+                  className="group relative overflow-hidden rounded-2xl bg-gradient-gold p-4 text-left shadow-gold transition-all hover:scale-[1.02] hover:shadow-[0_0_40px_-5px_hsl(var(--primary)/0.5)] sm:col-span-2 lg:col-span-1"
+                >
+                  <div className="flex items-center gap-3">
+                    {p.primary.icon && (
+                      <div className="h-10 w-10 rounded-xl bg-black/15 flex items-center justify-center flex-shrink-0">
+                        <p.primary.icon className="h-5 w-5 text-primary-foreground" />
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-primary-foreground leading-tight">{p.primary.label}</p>
+                      {p.primary.sub && (
+                        <p className="text-[11px] text-primary-foreground/80 leading-tight mt-0.5">{p.primary.sub}</p>
+                      )}
+                    </div>
+                    <ArrowRight className="h-4 w-4 text-primary-foreground transition-transform group-hover:translate-x-1 flex-shrink-0" />
+                  </div>
+                </Link>
+
+                {/* Secondary */}
                 {p.secondary && (
-                  <Button asChild size="lg" variant="outline" className="h-12 px-8 text-base">
-                    <Link to={p.secondary.to}>{p.secondary.label}</Link>
-                  </Button>
+                  <Link
+                    to={p.secondary.to}
+                    className="group rounded-2xl glass border border-primary/20 p-4 text-left transition-all hover:scale-[1.02] hover:border-primary/40"
+                  >
+                    <div className="flex items-center gap-3">
+                      {p.secondary.icon && (
+                        <div className="h-10 w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
+                          <p.secondary.icon className="h-5 w-5 text-primary" />
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <p className="font-bold text-foreground leading-tight">{p.secondary.label}</p>
+                        {p.secondary.sub && (
+                          <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">{p.secondary.sub}</p>
+                        )}
+                      </div>
+                      <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1 flex-shrink-0" />
+                    </div>
+                  </Link>
+                )}
+
+                {/* Tertiary */}
+                {p.tertiary && (
+                  <Link
+                    to={p.tertiary.to}
+                    className="group rounded-2xl border border-border bg-background/50 p-4 text-left transition-all hover:scale-[1.02] hover:border-primary/30 hover:bg-primary/5"
+                  >
+                    <div className="flex items-center gap-3">
+                      {p.tertiary.icon && (
+                        <div className="h-10 w-10 rounded-xl bg-muted border border-border flex items-center justify-center flex-shrink-0">
+                          <p.tertiary.icon className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <p className="font-bold text-foreground leading-tight">{p.tertiary.label}</p>
+                        {p.tertiary.sub && (
+                          <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">{p.tertiary.sub}</p>
+                        )}
+                      </div>
+                      <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1 flex-shrink-0" />
+                    </div>
+                  </Link>
                 )}
               </div>
             </div>
