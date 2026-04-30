@@ -99,6 +99,71 @@ async function handleAdCheckoutCompleted(session: any, env: StripeEnv) {
     active: true,
     updated_at: new Date().toISOString(),
   }).eq("id", adSlotId);
+
+  // Send invoice email for ad payment
+  try {
+    const userId = meta.userId;
+    if (userId) {
+      const { data: u } = await sb.auth.admin.getUserById(userId);
+      const email = u?.user?.email;
+      const prefs = await sb.from("notification_prefs").select("email_invoice").eq("user_id", userId).maybeSingle();
+      const optIn = prefs.data?.email_invoice ?? true;
+      if (email && optIn) {
+        const amount = (session.amount_total ?? 0) / 100;
+        const formatter = new Intl.NumberFormat("de-DE", { style: "currency", currency: (session.currency ?? "eur").toUpperCase() });
+        await sb.functions.invoke("send-transactional-email", {
+          body: {
+            templateName: "invoice",
+            recipientEmail: email,
+            idempotencyKey: `invoice-ad-${session.id}`,
+            templateData: {
+              description: `ImmoNIQ Werbeplatz · ${weeks} Woche${weeks === 1 ? "" : "n"}`,
+              amountFormatted: formatter.format(amount),
+              invoiceNumber: session.id?.slice(-12).toUpperCase(),
+              invoiceDate: new Date().toLocaleDateString("de-DE"),
+              hostedInvoiceUrl: session.url || undefined,
+            },
+          },
+        });
+      }
+    }
+  } catch (e) { console.warn("ad invoice mail failed", e); }
+}
+
+async function handleInvoicePaid(invoice: any, env: StripeEnv) {
+  // Subscription invoice — Stripe generates a GoBD-compliant PDF.
+  try {
+    const sb = getSupabase();
+    const customerId = invoice.customer;
+    const { data: sub } = await sb.from("subscriptions").select("user_id").eq("stripe_customer_id", customerId).eq("environment", env).maybeSingle();
+    const userId = sub?.user_id;
+    if (!userId) return;
+    const { data: u } = await sb.auth.admin.getUserById(userId);
+    const email = u?.user?.email;
+    if (!email) return;
+    const prefs = await sb.from("notification_prefs").select("email_invoice").eq("user_id", userId).maybeSingle();
+    if (prefs.data?.email_invoice === false) return;
+
+    const amount = (invoice.amount_paid ?? invoice.total ?? 0) / 100;
+    const formatter = new Intl.NumberFormat("de-DE", { style: "currency", currency: (invoice.currency ?? "eur").toUpperCase() });
+    const lineDesc = invoice.lines?.data?.[0]?.description ?? "ImmoNIQ Pro";
+
+    await sb.functions.invoke("send-transactional-email", {
+      body: {
+        templateName: "invoice",
+        recipientEmail: email,
+        idempotencyKey: `invoice-sub-${invoice.id}`,
+        templateData: {
+          description: lineDesc,
+          amountFormatted: formatter.format(amount),
+          invoiceNumber: invoice.number || invoice.id?.slice(-12).toUpperCase(),
+          invoiceDate: invoice.created ? new Date(invoice.created * 1000).toLocaleDateString("de-DE") : new Date().toLocaleDateString("de-DE"),
+          invoicePdfUrl: invoice.invoice_pdf || undefined,
+          hostedInvoiceUrl: invoice.hosted_invoice_url || undefined,
+        },
+      },
+    });
+  } catch (e) { console.warn("subscription invoice mail failed", e); }
 }
 
 async function handleWebhook(req: Request, env: StripeEnv) {
@@ -115,6 +180,10 @@ async function handleWebhook(req: Request, env: StripeEnv) {
       break;
     case "checkout.session.completed":
       await handleAdCheckoutCompleted(event.data.object, env);
+      break;
+    case "invoice.paid":
+    case "invoice.payment_succeeded":
+      await handleInvoicePaid(event.data.object, env);
       break;
     default:
       console.log("Unhandled event:", event.type);
