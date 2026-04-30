@@ -391,6 +391,7 @@ const Index = () => {
             <Link to="/impressum" className="hover:text-foreground">Impressum</Link>
             <Link to="/datenschutz" className="hover:text-foreground">Datenschutz</Link>
             <Link to="/agb" className="hover:text-foreground">AGB</Link>
+            <Link to="/widerruf" className="hover:text-foreground">Widerruf</Link>
             <a href="mailto:leonboomgaarden@gmail.com" className="hover:text-foreground">Kontakt</a>
           </nav>
           <p className="text-xs text-muted-foreground">

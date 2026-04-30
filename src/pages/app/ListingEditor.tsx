@@ -344,6 +344,7 @@ const ListingEditor = () => {
             KI: Beschreibung & Miete vorschlagen
           </Button>
         </div>
+        <p className="text-[11px] text-muted-foreground -mt-1">KI-generiert — bitte vor Veröffentlichung prüfen. Keine Mietpreisberatung.</p>
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
           {photos.map((p) => (
             <div key={p} className="relative aspect-video rounded-lg overflow-hidden bg-muted group">
