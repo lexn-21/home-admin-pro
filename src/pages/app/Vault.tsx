@@ -177,6 +177,23 @@ const Vault = () => {
     }
   };
 
+  const finalizeUnlock = async (key: CryptoKey, rawPin: string, viaBio: boolean) => {
+    keyRef.current = key;
+    lastPinRef.current = rawPin;
+    setShowUnlockAnim(true);
+    await loadData();
+    // Animation läuft ~1.1s; danach auf entsperrte Ansicht wechseln
+    setTimeout(() => {
+      setUnlocked(true);
+      setPin("");
+      setShowUnlockAnim(false);
+      // Biometrie-Enroll anbieten, wenn verfügbar und noch nicht eingerichtet und gerade per PIN entsperrt
+      if (!viaBio && bioAvailable && !hasBiometricSetup()) {
+        setEnrollPromptOpen(true);
+      }
+    }, 1100);
+  };
+
   const unlock = async (e: React.FormEvent) => {
     e.preventDefault();
     if (pin.length < 4) {
@@ -192,15 +209,59 @@ const Vault = () => {
         toast.error("Falscher PIN");
         return;
       }
-      keyRef.current = key;
-      setUnlocked(true);
-      setPin("");
-      await loadData();
+      await finalizeUnlock(key, pin, false);
     } catch (e: any) {
       toast.error(e.message ?? "Fehler");
     } finally {
       setUnlocking(false);
     }
+  };
+
+  const unlockBio = async () => {
+    if (!bioEnrolled) return;
+    setBioBusy(true);
+    try {
+      const recoveredPin = await unlockWithBiometric();
+      const { data, error } = await supabase.from("vault_settings").select("*").maybeSingle();
+      if (error || !data) throw new Error("Tresor-Setup nicht gefunden");
+      const key = await verifyPin(recoveredPin, data.pin_salt, data.verifier_iv, data.verifier_ct);
+      if (!key) {
+        // Lokaler PIN passt nicht mehr — Biometrie zurücksetzen
+        clearBiometric();
+        setBioEnrolled(false);
+        toast.error("Biometrie ungültig — bitte PIN eingeben");
+        return;
+      }
+      await finalizeUnlock(key, recoveredPin, true);
+    } catch (e: any) {
+      // NotAllowedError = abgebrochen — still
+      if (e?.name !== "NotAllowedError") {
+        toast.error(e?.message ?? "Biometrie fehlgeschlagen");
+      }
+    } finally {
+      setBioBusy(false);
+    }
+  };
+
+  const enrollBio = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Nicht angemeldet");
+      await enrollBiometric(lastPinRef.current, user.id, user.email ?? "user");
+      setBioEnrolled(true);
+      setEnrollPromptOpen(false);
+      toast.success("Biometrie aktiviert — beim nächsten Öffnen verfügbar");
+    } catch (e: any) {
+      if (e?.name !== "NotAllowedError") {
+        toast.error(e?.message ?? "Aktivierung fehlgeschlagen");
+      }
+    }
+  };
+
+  const disableBio = () => {
+    clearBiometric();
+    setBioEnrolled(false);
+    toast.success("Biometrie deaktiviert");
   };
 
   const lock = () => {
