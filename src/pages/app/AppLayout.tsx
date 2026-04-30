@@ -25,7 +25,7 @@ import {
 type NavItem = { to: string; label: string; icon: any; end?: boolean; badge?: string; hint?: string };
 type NavGroup = { title: string; subtitle?: string; items: NavItem[] };
 
-// 4 klare Bereiche statt 6 — psychologisch sortiert nach „was tust du gerade?"
+// 5 Bereiche — Markt & Netzwerk jetzt prominent oben
 const groups: NavGroup[] = [
   {
     title: "Überblick",
@@ -35,13 +35,21 @@ const groups: NavGroup[] = [
     ],
   },
   {
+    title: "Markt & Netzwerk",
+    subtitle: "Finden · Anbieten · Werben",
+    items: [
+      { to: "/markt", label: "Markt durchsuchen", icon: SearchIcon, badge: "LIVE", hint: "Inserate von Eigentümern — mit Umkreissuche" },
+      { to: "/app/listings", label: "Meine Inserate", icon: Megaphone, hint: "Vermieten & verkaufen — provisionsfrei" },
+      { to: "/app/applications", label: "Bewerbungen", icon: Inbox, hint: "Mit KI-Score" },
+      { to: "/app/marketplace", label: "Handwerker-Netzwerk", icon: Wrench, hint: "Verifizierte Profis in deiner PLZ" },
+      { to: "/app/ads", label: "Werben", icon: Megaphone, badge: "€49/Wo", hint: "Eigene Anzeigen schalten" },
+    ],
+  },
+  {
     title: "Vermieten & Verwalten",
-    subtitle: "Vom Inserat bis zur Miete",
     items: [
       { to: "/app/properties", label: "Objekte", icon: Building2, hint: "Deine Immobilien" },
       { to: "/app/tenants", label: "Mieter", icon: Users, hint: "Mit Verträgen" },
-      { to: "/app/listings", label: "Inserate", icon: Megaphone, hint: "Veröffentlichen & Markt" },
-      { to: "/app/applications", label: "Bewerbungen", icon: Inbox, hint: "Mit KI-Score" },
       { to: "/app/payments", label: "Einnahmen", icon: Wallet },
       { to: "/app/expenses", label: "Ausgaben", icon: Receipt, hint: "Belege scannen" },
       { to: "/app/templates", label: "Vorlagen", icon: FileText, hint: "Verträge & Schreiben" },
@@ -57,20 +65,11 @@ const groups: NavGroup[] = [
     ],
   },
   {
-    title: "Schutz & Hilfe",
+    title: "Schutz & Suche",
     items: [
       { to: "/app/vault", label: "Tresor", icon: Lock, badge: "AES-256", hint: "Verschlüsselte Dokumente" },
       { to: "/app/law", label: "Rechts-Ecke", icon: Scale, hint: "BGB, WEG, HeizkostenV" },
-      { to: "/app/marketplace", label: "Handwerker", icon: Wrench, hint: "Verifizierte Profis" },
-      { to: "/app/ads", label: "Werbeplätze", icon: Megaphone, badge: "AD", hint: "Eigene Werbung schalten" },
-    ],
-  },
-  {
-    title: "Wohnung suchen",
-    subtitle: "Du suchst selbst?",
-    items: [
-      { to: "/markt", label: "Markt durchsuchen", icon: SearchIcon, hint: "Direkt vom Eigentümer" },
-      { to: "/app/profile-seeker", label: "Mein Mieter-Profil", icon: Inbox, hint: "Damit Vermieter dich finden" },
+      { to: "/app/profile-seeker", label: "Mein Mieter-Profil", icon: Inbox, hint: "Du suchst selbst?" },
       { to: "/app/my-applications", label: "Meine Bewerbungen", icon: FileText },
     ],
   },
