@@ -25,6 +25,7 @@ import AdvisorView from "./pages/AdvisorView";
 import TenantPortal from "./pages/TenantPortal";
 import Markt from "./pages/Markt";
 import MarktDetail from "./pages/MarktDetail";
+import MarktVergleich from "./pages/MarktVergleich";
 import Valuation from "./pages/app/Valuation";
 import Benchmark from "./pages/app/Benchmark";
 import Bookings from "./pages/app/Bookings";
@@ -61,6 +62,7 @@ const App = () => (
           <Route path="/advisor/:token" element={<AdvisorView />} />
           <Route path="/mieter/:token" element={<TenantPortal />} />
           <Route path="/markt" element={<Markt />} />
+          <Route path="/markt/vergleich" element={<MarktVergleich />} />
           <Route path="/markt/:id" element={<MarktDetail />} />
           <Route path="/impressum" element={<Impressum />} />
           <Route path="/datenschutz" element={<Datenschutz />} />
