@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 import {
   ArrowUpRight, Building2, Wallet, Receipt, TrendingUp, Plus,
   Lock, Wrench, CalendarClock, Scale, ShieldCheck, Sparkles,
-  BarChart3, Briefcase, Megaphone,
+  BarChart3, Briefcase, Megaphone, CalendarCheck,
 } from "lucide-react";
 
 const KPI = ({ label, value, hint, trend, icon: Icon, tone = "default", progress }: {
@@ -140,10 +140,10 @@ const Dashboard = () => {
   })();
 
   const intents = [
-    { to: "/app/listings/new", icon: Megaphone, title: "Vermieten", desc: "Inserat in 60 Sek.", tone: "primary" },
-    { to: "/app/properties", icon: Building2, title: "Verwalten", desc: "Objekt anlegen", tone: "default" },
-    { to: "/app/valuation", icon: TrendingUp, title: "Bewerten", desc: "Was ist es wert?", tone: "default" },
-    { to: "/app/vault", icon: Lock, title: "Sichern", desc: "Dokumente schützen", tone: "dark" },
+    { to: "/app/properties", icon: Building2, title: "Verwalten", desc: "Objekte & Mieter", tone: "primary" },
+    { to: "/app/listings/new", icon: Megaphone, title: "Vermieten", desc: "Inserat in 60 Sek.", tone: "default" },
+    { to: "/app/vault", icon: Lock, title: "Sichern", desc: "Tresor — verschlüsselt", tone: "default" },
+    { to: "/app/tasks", icon: CalendarCheck, title: "Mein Plan", desc: "Fristen & To-Dos", tone: "dark" },
   ];
 
   return (
@@ -428,15 +428,6 @@ const Dashboard = () => {
           <QuickAction to="/app/listings" icon={Megaphone} badge="USP"
             label="Inserate"
             desc="Vermieten/verkaufen — direkt." />
-          <QuickAction to="/app/valuation" icon={TrendingUp} badge="AVM"
-            label="Live-Bewertung"
-            desc="Was ist mein Objekt heute wert?" />
-          <QuickAction to="/app/benchmark" icon={BarChart3}
-            label="Marktindex"
-            desc="Vergleich gegen anonyme Marktdaten." />
-          <QuickAction to="/app/bookings" icon={Briefcase} badge="10 % Take"
-            label="Handwerker buchen"
-            desc="Festpreis-Angebote in 24 h." />
           <QuickAction to="/app/vault" icon={Lock}
             label="Dokumenten-Tresor"
             desc="Zero-Knowledge verschlüsselt." />
@@ -446,12 +437,21 @@ const Dashboard = () => {
           <QuickAction to="/app/marketplace" icon={Wrench}
             label="Marktplatz"
             desc="Profis in deiner Region." />
+          <QuickAction to="/app/bookings" icon={Briefcase} badge="10 % Take"
+            label="Handwerker buchen"
+            desc="Festpreis-Angebote in 24 h." />
           <QuickAction to="/app/law" icon={Scale}
             label="Rechts-Ecke"
             desc="BGB, EStG — original verlinkt." />
           <QuickAction to="/app/advisor" icon={ShieldCheck}
             label="Steuerberater-Link"
             desc="Sicherer Read-only-Zugang." />
+          <QuickAction to="/app/benchmark" icon={BarChart3}
+            label="Marktindex"
+            desc="Vergleich gegen anonyme Marktdaten." />
+          <QuickAction to="/app/valuation" icon={TrendingUp} badge="AVM"
+            label="Bewertung"
+            desc="Was ist mein Objekt wert?" />
         </div>
       </div>
 
