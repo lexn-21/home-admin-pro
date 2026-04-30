@@ -9,6 +9,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Slider } from "@/components/ui/slider";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription,
 } from "@/components/ui/dialog";
@@ -579,15 +580,86 @@ function StripeEmbeddedCheckoutInline({ clientSecret }: { clientSecret: string }
   );
 }
 
+type SliderRowProps = {
+  label: string;
+  hint?: string;
+  value: number;
+  set: (n: number) => void;
+  min: number;
+  max: number;
+  step: number;
+  suffix?: string;
+  presets?: { label: string; value: number }[];
+  format?: (n: number) => string;
+};
+
+function SliderRow({ label, hint, value, set, min, max, step, suffix, presets, format }: SliderRowProps) {
+  const display = format ? format(value) : `${value}${suffix ?? ""}`;
+  const dec = () => set(Math.max(min, +(value - step).toFixed(2)));
+  const inc = () => set(Math.min(max, +(value + step).toFixed(2)));
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-end justify-between gap-2">
+        <div>
+          <p className="text-sm font-medium">{label}</p>
+          {hint && <p className="text-[11px] text-muted-foreground">{hint}</p>}
+        </div>
+        <div className="flex items-center gap-1">
+          <Button
+            type="button" variant="outline" size="icon"
+            onClick={dec} disabled={value <= min}
+            className="h-8 w-8 shrink-0"
+            aria-label="Weniger"
+          >−</Button>
+          <span className="font-bold text-primary tabular-nums min-w-[64px] text-center bg-primary/10 rounded-md px-2 py-1.5 text-sm">
+            {display}
+          </span>
+          <Button
+            type="button" variant="outline" size="icon"
+            onClick={inc} disabled={value >= max}
+            className="h-8 w-8 shrink-0"
+            aria-label="Mehr"
+          >+</Button>
+        </div>
+      </div>
+      <Slider
+        min={min} max={max} step={step}
+        value={[value]}
+        onValueChange={(v) => set(v[0])}
+        className="touch-none"
+      />
+      {presets && presets.length > 0 && (
+        <div className="flex gap-1.5 flex-wrap">
+          {presets.map(p => (
+            <button
+              key={p.label}
+              type="button"
+              onClick={() => set(p.value)}
+              className={`text-[11px] px-2 py-1 rounded-full border transition ${
+                value === p.value
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-background hover:bg-muted border-border text-muted-foreground"
+              }`}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function RoiCalculator() {
   const [weeks, setWeeks] = useState(4);
-  const [ctr, setCtr] = useState(2.5); // % click-through rate
-  const [convRate, setConvRate] = useState(15); // % of clicks → real lead
-  const [leadValue, setLeadValue] = useState(2000); // € value of one closed deal
-  const [closeRate, setCloseRate] = useState(20); // % leads that close
+  const [ctr, setCtr] = useState(2.5);
+  const [convRate, setConvRate] = useState(15);
+  const [leadValue, setLeadValue] = useState(2000);
+  const [closeRate, setCloseRate] = useState(20);
 
   const cost = weeks * 49;
-  const impressions = weeks * 800; // average estimate
+  const impressions = weeks * 800;
   const clicks = Math.round(impressions * (ctr / 100));
   const leads = Math.round(clicks * (convRate / 100));
   const deals = Math.max(0, Math.round(leads * (closeRate / 100)));
@@ -595,33 +667,45 @@ function RoiCalculator() {
   const roi = cost > 0 ? Math.round(((revenue - cost) / cost) * 100) : 0;
   const profit = revenue - cost;
 
-  const Slider2 = ({ label, value, set, min, max, step, suffix }: any) => (
-    <div>
-      <div className="flex justify-between text-xs mb-1">
-        <span className="text-muted-foreground">{label}</span>
-        <span className="font-semibold">{value}{suffix}</span>
-      </div>
-      <input
-        type="range" min={min} max={max} step={step} value={value}
-        onChange={(e) => set(Number(e.target.value))}
-        className="w-full accent-primary"
-      />
-    </div>
-  );
-
   return (
-    <div className="grid md:grid-cols-2 gap-5">
-      <div className="space-y-4">
-        <Slider2 label="Laufzeit" value={weeks} set={setWeeks} min={1} max={12} step={1} suffix=" Wochen" />
-        <Slider2 label="Klickrate (Branchenschnitt 2–4 %)" value={ctr} set={setCtr} min={0.5} max={6} step={0.1} suffix=" %" />
-        <Slider2 label="Anteil ernsthafter Anfragen" value={convRate} set={setConvRate} min={5} max={40} step={1} suffix=" %" />
-        <Slider2 label="Abschlussquote bei Leads" value={closeRate} set={setCloseRate} min={5} max={50} step={1} suffix=" %" />
-        <Slider2 label="Gewinn pro Abschluss (€)" value={leadValue} set={setLeadValue} min={100} max={10000} step={100} suffix=" €" />
+    <div className="grid md:grid-cols-2 gap-6">
+      <div className="space-y-5">
+        <SliderRow
+          label="Laufzeit" hint="Wie lange soll deine Anzeige laufen?"
+          value={weeks} set={setWeeks} min={1} max={12} step={1} suffix=" Wo."
+          presets={[{label:"1 Wo", value:1},{label:"4 Wo", value:4},{label:"8 Wo", value:8},{label:"12 Wo", value:12}]}
+        />
+        <SliderRow
+          label="Klickrate" hint="Branchenschnitt 2–4 %"
+          value={ctr} set={setCtr} min={0.5} max={6} step={0.1}
+          format={(v) => `${v.toFixed(1).replace(".", ",")} %`}
+          presets={[{label:"konservativ", value:1.5},{label:"normal", value:2.5},{label:"stark", value:4}]}
+        />
+        <SliderRow
+          label="Anteil ernsthafter Anfragen" hint="Wie viele Klicks werden zu echten Leads?"
+          value={convRate} set={setConvRate} min={5} max={40} step={1} suffix=" %"
+          presets={[{label:"10 %", value:10},{label:"15 %", value:15},{label:"25 %", value:25}]}
+        />
+        <SliderRow
+          label="Abschlussquote bei Leads" hint="Wie viele Leads werden zu Kunden?"
+          value={closeRate} set={setCloseRate} min={5} max={50} step={1} suffix=" %"
+          presets={[{label:"10 %", value:10},{label:"20 %", value:20},{label:"30 %", value:30}]}
+        />
+        <SliderRow
+          label="Gewinn pro Abschluss" hint="Was bringt dir ein neuer Kunde / Auftrag?"
+          value={leadValue} set={setLeadValue} min={100} max={10000} step={100}
+          format={(v) => `${v.toLocaleString("de-DE")} €`}
+          presets={[
+            {label:"Handwerker 1.500 €", value:1500},
+            {label:"Makler 8.000 €", value:8000},
+            {label:"Energieberater 800 €", value:800},
+          ]}
+        />
       </div>
-      <div className="space-y-3">
+      <div className="space-y-3 md:sticky md:top-4 self-start">
         <div className="grid grid-cols-2 gap-3">
           <Card className="p-3 bg-muted/30">
-            <p className="text-xs text-muted-foreground">Investition</p>
+            <p className="text-xs text-muted-foreground">Du investierst</p>
             <p className="text-2xl font-bold">{cost} €</p>
             <p className="text-[11px] text-muted-foreground">{weeks} × 49 €</p>
           </Card>
@@ -631,9 +715,9 @@ function RoiCalculator() {
             <p className="text-[11px] text-muted-foreground">{clicks} Klicks erwartet</p>
           </Card>
         </div>
-        <Card className={`p-4 ${profit > 0 ? "bg-emerald-500/10 border-emerald-500/40" : "bg-amber-500/10 border-amber-500/40"}`}>
+        <Card className={`p-4 transition ${profit > 0 ? "bg-emerald-500/10 border-emerald-500/40" : "bg-amber-500/10 border-amber-500/40"}`}>
           <p className="text-xs text-muted-foreground">Erwarteter Gewinn (Umsatz − Werbekosten)</p>
-          <p className={`text-3xl font-bold ${profit > 0 ? "text-emerald-700 dark:text-emerald-400" : "text-amber-700 dark:text-amber-400"}`}>
+          <p className={`text-3xl font-bold tabular-nums ${profit > 0 ? "text-emerald-700 dark:text-emerald-400" : "text-amber-700 dark:text-amber-400"}`}>
             {profit >= 0 ? "+" : ""}{profit.toLocaleString("de-DE")} €
           </p>
           <p className="text-xs mt-1">
@@ -643,13 +727,14 @@ function RoiCalculator() {
         {profit > 0 && (
           <p className="text-xs text-emerald-700 dark:text-emerald-400 flex items-start gap-1">
             <CheckCircle2 className="h-3.5 w-3.5 shrink-0 mt-0.5" />
-            <span>Aus jedem investierten Euro werden statistisch <strong>{(revenue / cost).toFixed(1)} €</strong> Umsatz.</span>
+            <span>Aus jedem Euro werden statistisch <strong>{(revenue / Math.max(cost,1)).toFixed(1)} €</strong> Umsatz.</span>
           </p>
         )}
         <p className="text-[10px] text-muted-foreground">
-          Konservative Schätzung — keine Garantie. Tatsächliche Ergebnisse hängen von Anzeige, Targeting und Angebot ab.
+          Konservative Schätzung — keine Garantie. Ergebnisse hängen von Anzeige, Targeting und Angebot ab.
         </p>
       </div>
     </div>
   );
 }
+
