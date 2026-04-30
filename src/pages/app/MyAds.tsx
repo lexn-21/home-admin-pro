@@ -579,22 +579,6 @@ function StripeEmbeddedCheckoutInline({ clientSecret }: { clientSecret: string }
   );
 }
 
-function RoiCalculator() {
-  const [weeks, setWeeks] = useState(4);
-  const [ctr, setCtr] = useState(2.5); // % click-through rate
-  const [convRate, setConvRate] = useState(15); // % of clicks → real lead
-  const [leadValue, setLeadValue] = useState(2000); // € value of one closed deal
-  const [closeRate, setCloseRate] = useState(20); // % leads that close
-
-  const cost = weeks * 49;
-  const impressions = weeks * 800; // average estimate
-  const clicks = Math.round(impressions * (ctr / 100));
-  const leads = Math.round(clicks * (convRate / 100));
-  const deals = Math.max(0, Math.round(leads * (closeRate / 100)));
-  const revenue = deals * leadValue;
-  const roi = cost > 0 ? Math.round(((revenue - cost) / cost) * 100) : 0;
-  const profit = revenue - cost;
-
 type SliderRowProps = {
   label: string;
   hint?: string;
