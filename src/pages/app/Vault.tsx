@@ -23,6 +23,12 @@ import {
 import {
   buildVerifier, verifyPin, encryptBytes, decryptBytes, b64, randomBytes, deriveKey,
 } from "@/lib/vaultCrypto";
+import {
+  platformAuthenticatorAvailable, hasBiometricSetup,
+  enrollBiometric, unlockWithBiometric, clearBiometric,
+} from "@/lib/vaultBiometric";
+import { VaultUnlockAnimation } from "@/components/VaultUnlockAnimation";
+import { AnimatePresence as AP } from "framer-motion";
 
 type VaultDoc = {
   id: string;
@@ -76,6 +82,14 @@ const Vault = () => {
   const [shake, setShake] = useState(false);
   const keyRef = useRef<CryptoKey | null>(null);
 
+  // Biometrie + Animation
+  const [bioAvailable, setBioAvailable] = useState(false);
+  const [bioEnrolled, setBioEnrolled] = useState(false);
+  const [bioBusy, setBioBusy] = useState(false);
+  const [showUnlockAnim, setShowUnlockAnim] = useState(false);
+  const [enrollPromptOpen, setEnrollPromptOpen] = useState(false);
+  const lastPinRef = useRef<string>("");
+
   // Data
   const [docs, setDocs] = useState<VaultDoc[]>([]);
   const [properties, setProperties] = useState<Property[]>([]);
@@ -92,7 +106,12 @@ const Vault = () => {
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
 
-  useEffect(() => { document.title = "Tresor · ImmoNIQ"; loadSettings(); }, []);
+  useEffect(() => {
+    document.title = "Tresor · ImmoNIQ";
+    loadSettings();
+    setBioEnrolled(hasBiometricSetup());
+    platformAuthenticatorAvailable().then(setBioAvailable);
+  }, []);
 
   // Wenn Scanner / externer Flow eine Datei "geliefert" hat, automatisch nach Unlock speichern.
   const [searchParams, setSearchParams] = useSearchParams();
@@ -147,15 +166,34 @@ const Vault = () => {
       if (error) throw error;
       const key = await deriveKey(setupForm.pin, v.pin_salt);
       keyRef.current = key;
+      lastPinRef.current = setupForm.pin;
       setUnlocked(true);
       setHasPin(true);
       await loadData();
       toast.success("Tresor erstellt & geöffnet");
+      if (bioAvailable) setTimeout(() => setEnrollPromptOpen(true), 600);
     } catch (e: any) {
       toast.error(e.message ?? "Fehler beim Anlegen");
     } finally {
       setUnlocking(false);
     }
+  };
+
+  const finalizeUnlock = async (key: CryptoKey, rawPin: string, viaBio: boolean) => {
+    keyRef.current = key;
+    lastPinRef.current = rawPin;
+    setShowUnlockAnim(true);
+    await loadData();
+    // Animation läuft ~1.1s; danach auf entsperrte Ansicht wechseln
+    setTimeout(() => {
+      setUnlocked(true);
+      setPin("");
+      setShowUnlockAnim(false);
+      // Biometrie-Enroll anbieten, wenn verfügbar und noch nicht eingerichtet und gerade per PIN entsperrt
+      if (!viaBio && bioAvailable && !hasBiometricSetup()) {
+        setEnrollPromptOpen(true);
+      }
+    }, 1100);
   };
 
   const unlock = async (e: React.FormEvent) => {
@@ -173,10 +211,7 @@ const Vault = () => {
         toast.error("Falscher PIN");
         return;
       }
-      keyRef.current = key;
-      setUnlocked(true);
-      setPin("");
-      await loadData();
+      await finalizeUnlock(key, pin, false);
     } catch (e: any) {
       toast.error(e.message ?? "Fehler");
     } finally {
@@ -184,8 +219,56 @@ const Vault = () => {
     }
   };
 
+  const unlockBio = async () => {
+    if (!bioEnrolled) return;
+    setBioBusy(true);
+    try {
+      const recoveredPin = await unlockWithBiometric();
+      const { data, error } = await supabase.from("vault_settings").select("*").maybeSingle();
+      if (error || !data) throw new Error("Tresor-Setup nicht gefunden");
+      const key = await verifyPin(recoveredPin, data.pin_salt, data.verifier_iv, data.verifier_ct);
+      if (!key) {
+        // Lokaler PIN passt nicht mehr — Biometrie zurücksetzen
+        clearBiometric();
+        setBioEnrolled(false);
+        toast.error("Biometrie ungültig — bitte PIN eingeben");
+        return;
+      }
+      await finalizeUnlock(key, recoveredPin, true);
+    } catch (e: any) {
+      // NotAllowedError = abgebrochen — still
+      if (e?.name !== "NotAllowedError") {
+        toast.error(e?.message ?? "Biometrie fehlgeschlagen");
+      }
+    } finally {
+      setBioBusy(false);
+    }
+  };
+
+  const enrollBio = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Nicht angemeldet");
+      await enrollBiometric(lastPinRef.current, user.id, user.email ?? "user");
+      setBioEnrolled(true);
+      setEnrollPromptOpen(false);
+      toast.success("Biometrie aktiviert — beim nächsten Öffnen verfügbar");
+    } catch (e: any) {
+      if (e?.name !== "NotAllowedError") {
+        toast.error(e?.message ?? "Aktivierung fehlgeschlagen");
+      }
+    }
+  };
+
+  const disableBio = () => {
+    clearBiometric();
+    setBioEnrolled(false);
+    toast.success("Biometrie deaktiviert");
+  };
+
   const lock = () => {
     keyRef.current = null;
+    lastPinRef.current = "";
     setUnlocked(false);
     setDocs([]);
   };
@@ -479,6 +562,19 @@ const Vault = () => {
                   <Button type="submit" disabled={unlocking} size="lg" className="w-full bg-gradient-gold text-black hover:opacity-90 shadow-gold font-bold h-12">
                     {unlocking ? "Entsperren…" : "Tresor öffnen"}
                   </Button>
+                  {bioAvailable && bioEnrolled && (
+                    <Button
+                      type="button"
+                      onClick={unlockBio}
+                      disabled={bioBusy}
+                      variant="outline"
+                      size="lg"
+                      className="w-full mt-3 h-12 bg-white/5 border-white/20 text-white hover:bg-white/10 hover:text-white gap-2"
+                    >
+                      <Fingerprint className="h-5 w-5" />
+                      {bioBusy ? "Warte auf Freigabe…" : "Mit Biometrie öffnen"}
+                    </Button>
+                  )}
                   <p className="text-[11px] text-white/40 mt-6 flex items-center justify-center gap-1.5">
                     <ShieldCheck className="h-3 w-3" /> Dein PIN verlässt niemals dein Gerät
                   </p>
@@ -487,6 +583,11 @@ const Vault = () => {
             </Card>
           </motion.div>
         </Item>
+
+        {/* Animation Overlay */}
+        <AP>
+          {showUnlockAnim && <VaultUnlockAnimation key="unlock-anim" onComplete={() => {}} />}
+        </AP>
       </Stagger>
     );
   }
@@ -509,6 +610,17 @@ const Vault = () => {
           </div>
           <div className="flex gap-2 flex-wrap">
             <Button variant="outline" onClick={lock}><Lock className="h-4 w-4 mr-2" />Sperren</Button>
+            {bioAvailable && (
+              bioEnrolled ? (
+                <Button variant="outline" onClick={disableBio} className="gap-2" title="Biometrie für diesen Tresor entfernen">
+                  <Fingerprint className="h-4 w-4 text-success" /> Biometrie aktiv
+                </Button>
+              ) : (
+                <Button variant="outline" onClick={() => setEnrollPromptOpen(true)} className="gap-2">
+                  <Fingerprint className="h-4 w-4" /> Biometrie aktivieren
+                </Button>
+              )
+            )}
             <input id="vault-camera-input" type="file" accept="image/*" capture="environment" hidden
               onChange={(e) => e.target.files && handleFiles(e.target.files)} />
             <Button
@@ -730,6 +842,42 @@ const Vault = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Enroll-Biometrie Dialog */}
+      <Dialog open={enrollPromptOpen} onOpenChange={setEnrollPromptOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Fingerprint className="h-5 w-5 text-primary" /> Biometrie aktivieren?
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 text-sm">
+            <p>
+              Öffne den Tresor künftig per <strong>Fingerprint</strong>, <strong>Face ID</strong> oder
+              <strong> Geräte-PIN</strong> — schneller und ohne PIN-Eingabe.
+            </p>
+            <div className="rounded-xl border bg-muted/40 p-3 text-[12px] leading-relaxed text-muted-foreground">
+              <p className="flex items-center gap-1.5 font-semibold text-foreground mb-1">
+                <ShieldCheck className="h-3.5 w-3.5 text-success" /> So sicher wie der PIN
+              </p>
+              Dein PIN wird nur <strong>auf diesem Gerät</strong> gespeichert — verschlüsselt mit einem
+              Schlüssel, den nur deine Biometrie freigibt. Server sehen ihn nie. Bei Verlust des Geräts
+              bleibt dein Tresor durch den ursprünglichen PIN geschützt.
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEnrollPromptOpen(false)}>Später</Button>
+            <Button onClick={enrollBio} className="bg-gradient-gold text-primary-foreground shadow-gold gap-2">
+              <Fingerprint className="h-4 w-4" /> Jetzt aktivieren
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Unlock-Animation auch im entsperrten Zustand möglich (Edge-Cases) */}
+      <AP>
+        {showUnlockAnim && <VaultUnlockAnimation key="unlock-anim-2" onComplete={() => {}} />}
+      </AP>
     </Stagger>
   );
 };
