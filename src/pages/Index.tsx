@@ -12,14 +12,17 @@ import QuickStartFlow from "@/components/QuickStartFlow";
 
 type PersonaKey = "owner" | "landlord" | "buyer" | "tenant" | "family";
 
+type CTA = { label: string; sub?: string; to: string; icon?: any };
+
 const PERSONAS: Record<PersonaKey, {
   label: string;
   icon: any;
   headline: string;
   sub: string;
   bullets: { icon: any; text: string }[];
-  primary: { label: string; to: string };
-  secondary?: { label: string; to: string };
+  primary: CTA;
+  secondary?: CTA;
+  tertiary?: CTA;
 }> = {
   owner: {
     label: "Ich wohne selbst",
@@ -31,8 +34,9 @@ const PERSONAS: Record<PersonaKey, {
       { icon: Bell, text: "Versicherung, Wartung, Steuer — wir melden uns" },
       { icon: TrendingUp, text: "Was ist deine Wohnung heute wert? Auf Knopfdruck." },
     ],
-    primary: { label: "Kostenlos starten — in 60 Sekunden", to: "/auth" },
-    secondary: { label: "Marktwert ansehen", to: "/markt" },
+    primary: { label: "Kostenlos starten", sub: "In 60 Sekunden — ohne Kreditkarte", to: "/auth", icon: Sparkles },
+    secondary: { label: "Marktwert ansehen", sub: "Für deine PLZ — gratis", to: "/markt", icon: TrendingUp },
+    tertiary: { label: "Tresor-Demo öffnen", sub: "So sicher liegen deine Dokumente", to: "/auth", icon: FolderLock },
   },
   landlord: {
     label: "Ich vermiete",
@@ -44,8 +48,23 @@ const PERSONAS: Record<PersonaKey, {
       { icon: Calculator, text: "DATEV-CSV für deinen Steuerberater" },
       { icon: Users, text: "Inserieren ohne Provision (Bestellerprinzip)" },
     ],
-    primary: { label: "Vermieter werden — 14 Tage gratis", to: "/auth" },
-    secondary: { label: "Inserate ansehen", to: "/markt" },
+    primary: { label: "14 Tage gratis testen", sub: "Voller Vermieter-Funktionsumfang", to: "/auth", icon: Sparkles },
+    secondary: { label: "Wohnung inserieren", sub: "Direkt — ohne Maklerprovision", to: "/auth", icon: KeyRound },
+    tertiary: { label: "Anlage V Vorschau", sub: "DATEV-CSV-Export ansehen", to: "/pricing", icon: Receipt },
+  },
+  advisor: {
+    label: "Ich bin Steuerberater",
+    icon: FileText,
+    headline: "Mandanten-Daten in 5 Minuten statt 5 Stunden.",
+    sub: "Read-only Zugang zu deinen Mandanten: Anlage V, DATEV-CSV, Belege, Mieten — alles vorsortiert. Kein Excel-Pingpong, kein Belege-Chaos. Du bekommst saubere Daten, dein Mandant bleibt entspannt.",
+    bullets: [
+      { icon: FileText, text: "DATEV-CSV & Anlage V — ein Klick" },
+      { icon: Shield, text: "Read-only Zugang — DSGVO-konform" },
+      { icon: Clock, text: "Stundensatz schonen, mehr Mandanten" },
+    ],
+    primary: { label: "Demo-Mandant ansehen", sub: "Live-Beispiel ohne Anmeldung", to: "/markt", icon: Search },
+    secondary: { label: "Berater-Konto anlegen", sub: "Kostenlos — pro Mandant abrechnen", to: "/auth", icon: UserPlus },
+    tertiary: { label: "Preise & Konditionen", sub: "Faire Kanzlei-Lizenzen", to: "/pricing", icon: Receipt },
   },
   buyer: {
     label: "Ich kaufe / verkaufe",
@@ -57,8 +76,9 @@ const PERSONAS: Record<PersonaKey, {
       { icon: Search, text: "Privater Markt mit Umkreissuche" },
       { icon: Calculator, text: "Finanzierung & Rendite in einem Klick" },
     ],
-    primary: { label: "Marktwert prüfen — gratis", to: "/auth" },
-    secondary: { label: "Markt entdecken", to: "/markt" },
+    primary: { label: "Marktwert prüfen", sub: "Gratis — kein Konto nötig", to: "/markt", icon: TrendingUp },
+    secondary: { label: "Privat-Markt entdecken", sub: "Direkt zwischen Eigentümern", to: "/markt", icon: Search },
+    tertiary: { label: "Rendite-Rechner", sub: "Kaufpreis, Finanzierung, Cashflow", to: "/auth", icon: Calculator },
   },
   tenant: {
     label: "Ich miete / suche",
@@ -70,8 +90,9 @@ const PERSONAS: Record<PersonaKey, {
       { icon: Shield, text: "Mieter-Profil DSGVO-sicher — du kontrollierst alles" },
       { icon: FolderLock, text: "Mietvertrag, NK, SCHUFA — verschlüsselt im Tresor" },
     ],
-    primary: { label: "Wohnung suchen — kostenlos", to: "/markt" },
-    secondary: { label: "Mieter-Profil anlegen", to: "/auth" },
+    primary: { label: "Wohnung suchen", sub: "Kostenlos — ohne Anmeldung", to: "/markt", icon: Search },
+    secondary: { label: "Mieter-Profil anlegen", sub: "Einmal pflegen, immer bewerben", to: "/auth", icon: UserPlus },
+    tertiary: { label: "Tresor für Mietunterlagen", sub: "SCHUFA & Verträge sicher ablegen", to: "/auth", icon: FolderLock },
   },
   family: {
     label: "Erbschaft / Familie",
@@ -83,8 +104,9 @@ const PERSONAS: Record<PersonaKey, {
       { icon: TrendingUp, text: "Realer Marktwert für die Erbschaftsteuer" },
       { icon: FileText, text: "Vorlagen: Mitteilung ans Finanzamt, Versicherung, Verwalter" },
     ],
-    primary: { label: "Schritt für Schritt starten", to: "/auth" },
-    secondary: { label: "Marktwert prüfen", to: "/markt" },
+    primary: { label: "Schritt für Schritt starten", sub: "Kostenloser Erbschafts-Guide", to: "/auth", icon: HeartHandshake },
+    secondary: { label: "Marktwert prüfen", sub: "Für die Erbschaftsteuer", to: "/markt", icon: TrendingUp },
+    tertiary: { label: "Fristen-Checkliste", sub: "Was wann ans Finanzamt", to: "/auth", icon: Clock },
   },
 };
 
