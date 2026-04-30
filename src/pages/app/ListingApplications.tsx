@@ -132,6 +132,7 @@ const ListingApplications = () => {
                         {a.ai_concerns?.length > 0 && (
                           <p className="text-xs text-warning mt-1">! {a.ai_concerns.join(" · ")}</p>
                         )}
+                        <p className="text-[10px] text-muted-foreground mt-2 italic">KI-Vorschlag — bitte selbst prüfen, keine Rechtsberatung.</p>
                       </div>
                     )}
                   </div>
