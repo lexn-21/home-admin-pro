@@ -921,6 +921,33 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_prefs: {
+        Row: {
+          email_ad_moderation: boolean
+          email_application_status: boolean
+          email_invoice: boolean
+          email_new_application: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          email_ad_moderation?: boolean
+          email_application_status?: boolean
+          email_invoice?: boolean
+          email_new_application?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          email_ad_moderation?: boolean
+          email_application_status?: boolean
+          email_invoice?: boolean
+          email_new_application?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number
@@ -1720,6 +1747,18 @@ export type Database = {
           source_queue: string
         }
         Returns: number
+      }
+      notify_get_ad_advertiser_email: {
+        Args: { _ad_id: string }
+        Returns: Json
+      }
+      notify_get_application_seeker_email: {
+        Args: { _application_id: string }
+        Returns: Json
+      }
+      notify_get_listing_owner_email: {
+        Args: { _listing_id: string }
+        Returns: Json
       }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
