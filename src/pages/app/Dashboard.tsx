@@ -140,10 +140,10 @@ const Dashboard = () => {
   })();
 
   const intents = [
-    { to: "/app/listings/new", icon: Megaphone, title: "Vermieten", desc: "Inserat in 60 Sek.", tone: "primary" },
-    { to: "/app/properties", icon: Building2, title: "Verwalten", desc: "Objekt anlegen", tone: "default" },
-    { to: "/app/valuation", icon: TrendingUp, title: "Bewerten", desc: "Was ist es wert?", tone: "default" },
-    { to: "/app/vault", icon: Lock, title: "Sichern", desc: "Dokumente schützen", tone: "dark" },
+    { to: "/app/properties", icon: Building2, title: "Verwalten", desc: "Objekte & Mieter", tone: "primary" },
+    { to: "/app/listings/new", icon: Megaphone, title: "Vermieten", desc: "Inserat in 60 Sek.", tone: "default" },
+    { to: "/app/vault", icon: Lock, title: "Sichern", desc: "Tresor — verschlüsselt", tone: "default" },
+    { to: "/app/tasks", icon: CalendarCheck, title: "Mein Plan", desc: "Fristen & To-Dos", tone: "dark" },
   ];
 
   return (
