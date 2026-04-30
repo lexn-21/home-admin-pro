@@ -14,6 +14,7 @@ import {
 import { AskCopilot } from "@/components/AskCopilot";
 import { DocScanner } from "@/components/DocScanner";
 import { pendingIngest } from "@/lib/ingest";
+import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from "@/components/ui/tooltip";
@@ -292,6 +293,7 @@ const AppLayout = () => {
 
         <main className="lg:pl-64 relative">
           <div className="container py-6 lg:py-10 max-w-6xl pb-32 lg:pb-10">
+            <PaymentTestModeBanner />
             <AnimatePresence mode="wait">
               <motion.div
                 key={location.pathname}
