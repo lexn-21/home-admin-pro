@@ -268,6 +268,7 @@ const Vault = () => {
 
   const lock = () => {
     keyRef.current = null;
+    lastPinRef.current = "";
     setUnlocked(false);
     setDocs([]);
   };
