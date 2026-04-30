@@ -142,8 +142,8 @@ const Dashboard = () => {
   const intents = [
     { to: "/app/properties", icon: Building2, title: "Verwalten", desc: "Objekte & Mieter", tone: "primary" },
     { to: "/app/listings/new", icon: Megaphone, title: "Vermieten", desc: "Inserat in 60 Sek.", tone: "default" },
-    { to: "/app/vault", icon: Lock, title: "Sichern", desc: "Tresor — verschlüsselt", tone: "default" },
-    { to: "/app/tasks", icon: CalendarCheck, title: "Mein Plan", desc: "Fristen & To-Dos", tone: "dark" },
+    { to: "/app/vault", icon: Lock, title: "Sichern", desc: "Tresor — verschlüsselt", tone: "dark" },
+    { to: "/app/tasks", icon: CalendarCheck, title: "Mein Plan", desc: "Fristen & To-Dos", tone: "default" },
   ];
 
   return (
