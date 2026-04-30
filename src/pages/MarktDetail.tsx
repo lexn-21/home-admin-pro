@@ -11,6 +11,7 @@ import { eur } from "@/lib/format";
 import { ArrowLeft, MapPin, Bed, Maximize2, Calendar, Euro, ShieldCheck, Heart, Target } from "lucide-react";
 import { toast } from "sonner";
 import { SponsoredSlot } from "@/components/market/SponsoredSlot";
+import LegalSnippet from "@/components/LegalSnippet";
 
 const MarktDetail = () => {
   const { id } = useParams();
