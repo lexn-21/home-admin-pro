@@ -92,11 +92,11 @@ const Index = () => {
   const [persona, setPersona] = useState<PersonaKey>("owner");
 
   useEffect(() => {
-    document.title = "ImmonIQ — Alles rund um deine Immobilie. An einem Ort.";
+    document.title = "ImmonIQ — Deine Immobilie. Endlich verstanden. An einem Ort.";
     const meta = document.querySelector('meta[name="description"]') || (() => {
       const m = document.createElement("meta"); m.setAttribute("name", "description"); document.head.appendChild(m); return m;
     })();
-    meta.setAttribute("content", "Die All-in-One App für alles rund um deine Immobilie: Tresor, Fristen, Marktwert, Mieten, Suchen — für Eigennutzer, Vermieter, Käufer und Mieter. Made in Germany.");
+    meta.setAttribute("content", "Die deutsche All-in-One App für jede Lebenslage rund um Immobilien: Tresor, Fristen, Marktwert, Mieten, Suchen, Erben. Verschlüsselt, DSGVO, kostenlos für Privatnutzer.");
   }, []);
 
   const p = PERSONAS[persona];
