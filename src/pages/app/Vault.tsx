@@ -106,7 +106,12 @@ const Vault = () => {
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
 
-  useEffect(() => { document.title = "Tresor · ImmoNIQ"; loadSettings(); }, []);
+  useEffect(() => {
+    document.title = "Tresor · ImmoNIQ";
+    loadSettings();
+    setBioEnrolled(hasBiometricSetup());
+    platformAuthenticatorAvailable().then(setBioAvailable);
+  }, []);
 
   // Wenn Scanner / externer Flow eine Datei "geliefert" hat, automatisch nach Unlock speichern.
   const [searchParams, setSearchParams] = useSearchParams();
