@@ -842,6 +842,42 @@ const Vault = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Enroll-Biometrie Dialog */}
+      <Dialog open={enrollPromptOpen} onOpenChange={setEnrollPromptOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Fingerprint className="h-5 w-5 text-primary" /> Biometrie aktivieren?
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 text-sm">
+            <p>
+              Öffne den Tresor künftig per <strong>Fingerprint</strong>, <strong>Face ID</strong> oder
+              <strong> Geräte-PIN</strong> — schneller und ohne PIN-Eingabe.
+            </p>
+            <div className="rounded-xl border bg-muted/40 p-3 text-[12px] leading-relaxed text-muted-foreground">
+              <p className="flex items-center gap-1.5 font-semibold text-foreground mb-1">
+                <ShieldCheck className="h-3.5 w-3.5 text-success" /> So sicher wie der PIN
+              </p>
+              Dein PIN wird nur <strong>auf diesem Gerät</strong> gespeichert — verschlüsselt mit einem
+              Schlüssel, den nur deine Biometrie freigibt. Server sehen ihn nie. Bei Verlust des Geräts
+              bleibt dein Tresor durch den ursprünglichen PIN geschützt.
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEnrollPromptOpen(false)}>Später</Button>
+            <Button onClick={enrollBio} className="bg-gradient-gold text-primary-foreground shadow-gold gap-2">
+              <Fingerprint className="h-4 w-4" /> Jetzt aktivieren
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Unlock-Animation auch im entsperrten Zustand möglich (Edge-Cases) */}
+      <AP>
+        {showUnlockAnim && <VaultUnlockAnimation key="unlock-anim-2" onComplete={() => {}} />}
+      </AP>
     </Stagger>
   );
 };
