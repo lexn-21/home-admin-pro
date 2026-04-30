@@ -48,6 +48,7 @@ import Pricing from "./pages/Pricing";
 import CheckoutReturn from "./pages/CheckoutReturn";
 import NotFound from "./pages/NotFound";
 import Unsubscribe from "./pages/Unsubscribe";
+import Install from "./pages/Install";
 import CookieBanner from "./components/CookieBanner";
 
 const queryClient = new QueryClient();
