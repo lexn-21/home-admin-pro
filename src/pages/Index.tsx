@@ -170,7 +170,7 @@ const Index = () => {
 
             <h1 className="text-[2rem] leading-[1.1] sm:text-5xl md:text-6xl font-bold tracking-tight mb-6 font-display">
               Deine Immobilie.{" "}
-              <span className="text-gradient-gold">Endlich verstanden.</span>
+              <span className="text-gradient-gold">Endlich verstanden.</span>{" "}
               <br className="hidden sm:block" />
               Endlich an einem Ort.
             </h1>
