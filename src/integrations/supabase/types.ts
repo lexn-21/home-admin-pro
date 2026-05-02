@@ -1784,6 +1784,7 @@ export type Database = {
       }
       tenant_portal_resolve: { Args: { _token: string }; Returns: Json }
       trial_days_left: { Args: { _user_id: string }; Returns: number }
+      user_plan_tier: { Args: { _user_id: string }; Returns: string }
     }
     Enums: {
       application_status:
