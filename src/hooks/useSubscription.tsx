@@ -12,10 +12,14 @@ export type SubscriptionRow = {
   stripe_customer_id: string;
 };
 
+export type PlanTier = "free" | "verwalten_plus" | "pro";
+
 export type PlanState = {
   loading: boolean;
-  isPro: boolean;       // hat Pro-Zugriff (Abo ODER Trial)
-  isTrial: boolean;     // ist im 30-Tage-Trial-Fenster
+  tier: PlanTier;
+  isPro: boolean;            // hat Pro-Zugriff (Pro-Abo ODER Trial)
+  hasManageAccess: boolean;  // Verwalten+ ODER Pro ODER Trial
+  isTrial: boolean;          // 30-Tage-Pro-Trial aktiv
   trialDaysLeft: number;
   hasActiveSubscription: boolean;
   cancelAtPeriodEnd: boolean;
@@ -23,11 +27,24 @@ export type PlanState = {
   subscription: SubscriptionRow | null;
 };
 
+// Mapping: Welcher price_id gehört zu welchem Tier?
+const PRO_PRICES = new Set(["pro_monthly", "pro_yearly"]);
+const VERWALTEN_PRICES = new Set(["verwalten_plus_monthly", "verwalten_plus_yearly"]);
+
+const tierFromPriceId = (priceId: string | null | undefined): PlanTier => {
+  if (!priceId) return "free";
+  if (PRO_PRICES.has(priceId)) return "pro";
+  if (VERWALTEN_PRICES.has(priceId)) return "verwalten_plus";
+  return "free";
+};
+
 export const useSubscription = (): PlanState => {
   const { user } = useAuth();
   const [state, setState] = useState<PlanState>({
     loading: true,
+    tier: "free",
     isPro: false,
+    hasManageAccess: false,
     isTrial: false,
     trialDaysLeft: 0,
     hasActiveSubscription: false,
@@ -65,10 +82,17 @@ export const useSubscription = (): PlanState => {
         (sub.status === "canceled" && sub.current_period_end && new Date(sub.current_period_end) > new Date())
       );
 
+      const subTier = active ? tierFromPriceId(sub?.price_id) : "free";
+      // Trial gibt Pro-Zugriff, sofern kein bezahltes Abo existiert
+      const trialActive = days > 0 && !active;
+      const tier: PlanTier = active ? subTier : (trialActive ? "pro" : "free");
+
       setState({
         loading: false,
-        isPro: !!hasPro,
-        isTrial: days > 0 && !active,
+        tier,
+        isPro: tier === "pro" || !!hasPro,
+        hasManageAccess: tier === "pro" || tier === "verwalten_plus" || !!hasPro,
+        isTrial: trialActive,
         trialDaysLeft: days,
         hasActiveSubscription: active,
         cancelAtPeriodEnd: sub?.cancel_at_period_end ?? false,
