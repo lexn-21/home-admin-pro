@@ -87,6 +87,8 @@ const PropertyDetail = () => {
         </div>
       </Card>
 
+      <MietspiegelCard zip={property.zip} city={property.city} />
+
       <NeighborhoodInsight
         zip={property.zip}
         city={property.city}
