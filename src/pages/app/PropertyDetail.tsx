@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { eur } from "@/lib/format";
 import { z } from "zod";
 import { NeighborhoodInsight } from "@/components/market/NeighborhoodInsight";
+import { MietspiegelCard } from "@/components/market/MietspiegelCard";
 
 const unitSchema = z.object({
   label: z.string().trim().min(1).max(100),
@@ -85,6 +86,8 @@ const PropertyDetail = () => {
           <div><p className="text-xs text-muted-foreground">Sollmiete/Mo</p><p className="font-semibold text-gradient-gold">{eur(monthlyTotal)}</p></div>
         </div>
       </Card>
+
+      <MietspiegelCard zip={property.zip} city={property.city} />
 
       <NeighborhoodInsight
         zip={property.zip}
