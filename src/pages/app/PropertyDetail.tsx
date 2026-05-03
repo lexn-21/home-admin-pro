@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { eur } from "@/lib/format";
 import { z } from "zod";
 import { NeighborhoodInsight } from "@/components/market/NeighborhoodInsight";
+import { MietspiegelCard } from "@/components/market/MietspiegelCard";
 
 const unitSchema = z.object({
   label: z.string().trim().min(1).max(100),
