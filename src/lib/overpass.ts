@@ -70,9 +70,9 @@ export async function searchProviders(
 
   const radiusM = Math.round(radiusKm * 1000);
   const filled = tmpl
-    .replaceAll("{R}", String(radiusM))
-    .replaceAll("{LAT}", String(center.lat))
-    .replaceAll("{LNG}", String(center.lng));
+    .replace(/\{R\}/g, String(radiusM))
+    .replace(/\{LAT\}/g, String(center.lat))
+    .replace(/\{LNG\}/g, String(center.lng));
 
   const query = `[out:json][timeout:25];(${filled});out tags center 60;`;
 
