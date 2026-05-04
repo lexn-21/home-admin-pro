@@ -6,17 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import {
   Search, ExternalLink, Wrench, Calculator, Paintbrush, Zap,
   Droplets, Hammer, Building2, Sparkles, Phone, MapPin, Globe,
-  ShieldCheck, Loader2, Trees, Key, Sprout, Mail,
+  ShieldCheck, Loader2, Key, Sprout, Mail, Star, AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
-import { searchProviders, type OsmPlace } from "@/lib/overpass";
+import { searchProviders, type Provider } from "@/lib/places";
+import { num } from "@/lib/format";
 
-type Category = {
-  id: string;
-  label: string;
-  icon: any;
-  description: string;
-};
+type Category = { id: string; label: string; icon: any; description: string };
 
 const CATEGORIES: Category[] = [
   { id: "electrician", label: "Elektriker", icon: Zap, description: "Zähler, Smart Home, E-Check, Wallbox." },
@@ -35,9 +31,11 @@ const CATEGORIES: Category[] = [
 const Marketplace = () => {
   const [zip, setZip] = useState("");
   const [activeCat, setActiveCat] = useState<string | null>(null);
-  const [results, setResults] = useState<OsmPlace[]>([]);
+  const [results, setResults] = useState<Provider[]>([]);
   const [loading, setLoading] = useState(false);
   const [radius, setRadius] = useState(15);
+  const [source, setSource] = useState<"google" | "osm" | "cache" | null>(null);
+  const [warning, setWarning] = useState<string | null>(null);
 
   useEffect(() => {
     document.title = "Handwerker & Steuerberater · ImmonIQ";
@@ -53,10 +51,14 @@ const Marketplace = () => {
     setActiveCat(catId);
     setLoading(true);
     setResults([]);
+    setWarning(null);
+    setSource(null);
     try {
-      const items = await searchProviders(catId, zip, radius);
-      setResults(items);
-      if (items.length === 0) {
+      const { providers, source: src, warning: w } = await searchProviders(catId, zip, radius);
+      setResults(providers);
+      setSource(src);
+      if (w) setWarning(w);
+      if (providers.length === 0) {
         toast.info("Keine Anbieter im Umkreis gefunden. Erhöhe den Radius oder probiere eine andere Kategorie.");
       }
     } catch (e: any) {
@@ -67,25 +69,16 @@ const Marketplace = () => {
     }
   };
 
-  const formatAddr = (p: OsmPlace) => {
-    const parts = [
-      [p.street, p.housenumber].filter(Boolean).join(" "),
-      [p.zip, p.city].filter(Boolean).join(" "),
-    ].filter(Boolean);
-    return parts.join(", ");
-  };
-
   return (
     <div className="space-y-6">
       <header className="space-y-2">
         <h1 className="text-2xl md:text-3xl font-bold">Handwerker & Steuerberater finden</h1>
         <p className="text-sm text-muted-foreground max-w-2xl">
-          Echte Anbieter aus deiner Region — Live-Daten aus OpenStreetMap. Name, Adresse, Telefon,
-          Website. Kostenlos, ohne Anmeldung, ohne Werbung.
+          Echte Anbieter aus deiner Region — mit Bewertungen, Telefon, Öffnungszeiten.
+          Powered by Google Maps.
         </p>
       </header>
 
-      {/* PLZ + Radius */}
       <Card className="p-4 md:p-5">
         <div className="grid sm:grid-cols-[1fr,160px] gap-3">
           <div>
@@ -122,7 +115,6 @@ const Marketplace = () => {
         </div>
       </Card>
 
-      {/* Kategorien */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {CATEGORIES.map((c) => {
           const Icon = c.icon;
@@ -132,9 +124,7 @@ const Marketplace = () => {
               key={c.id}
               onClick={() => runSearch(c.id)}
               className={`text-left p-4 rounded-lg border transition-colors ${
-                isActive
-                  ? "border-primary bg-primary/5"
-                  : "border-border hover:border-primary/40 hover:bg-accent/30"
+                isActive ? "border-primary bg-primary/5" : "border-border hover:border-primary/40 hover:bg-accent/30"
               }`}
             >
               <div className="flex items-start gap-3">
@@ -151,16 +141,27 @@ const Marketplace = () => {
         })}
       </div>
 
-      {/* Ergebnisse */}
       {activeCat && (
         <Card className="p-5 space-y-4 border-primary/30">
           <div className="flex items-center gap-2 flex-wrap">
             {activeMeta && <activeMeta.icon className="h-5 w-5 text-primary" />}
             <h2 className="font-bold">{activeMeta?.label}</h2>
+            {source && (
+              <Badge variant="outline" className="text-[10px] uppercase">
+                {source === "osm" ? "OpenStreetMap" : "Google Maps"}
+              </Badge>
+            )}
             <Badge variant="outline" className="ml-auto">
-              {loading ? "Suche…" : `${results.length} Treffer · ${radius} km`}
+              {loading ? "Suche…" : `${num(results.length)} Treffer · ${radius} km`}
             </Badge>
           </div>
+
+          {warning && (
+            <div className="flex items-start gap-2 text-xs p-2.5 rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300">
+              <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+              <span>{warning}</span>
+            </div>
+          )}
 
           {loading ? (
             <div className="flex items-center gap-2 text-sm text-muted-foreground py-8 justify-center">
@@ -180,15 +181,24 @@ const Marketplace = () => {
                   <div className="min-w-0 flex-1 space-y-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium text-sm">{p.name}</span>
+                      {typeof p.rating === "number" && (
+                        <span className="inline-flex items-center gap-0.5 text-xs text-amber-600 dark:text-amber-400">
+                          <Star className="h-3 w-3 fill-current" />
+                          {p.rating.toFixed(1)}
+                          {p.rating_count ? (
+                            <span className="text-muted-foreground ml-0.5">({num(p.rating_count)})</span>
+                          ) : null}
+                        </span>
+                      )}
                       {typeof p.distance_km === "number" && (
                         <Badge variant="outline" className="text-[10px]">
                           {p.distance_km < 1 ? "< 1" : Math.round(p.distance_km)} km
                         </Badge>
                       )}
                     </div>
-                    {formatAddr(p) && (
+                    {p.address && (
                       <p className="text-xs text-muted-foreground flex items-start gap-1">
-                        <MapPin className="h-3 w-3 mt-0.5 shrink-0" /> {formatAddr(p)}
+                        <MapPin className="h-3 w-3 mt-0.5 shrink-0" /> {p.address}
                       </p>
                     )}
                     <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
@@ -200,32 +210,21 @@ const Marketplace = () => {
                       {p.website && (
                         <a
                           href={p.website.startsWith("http") ? p.website : `https://${p.website}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                          target="_blank" rel="noopener noreferrer"
                           className="flex items-center gap-1 hover:text-foreground"
                         >
                           <Globe className="h-3 w-3" /> Website
                         </a>
                       )}
-                      {p.email && (
-                        <a href={`mailto:${p.email}`} className="flex items-center gap-1 hover:text-foreground">
-                          <Mail className="h-3 w-3" /> {p.email}
-                        </a>
-                      )}
                     </div>
                   </div>
-                  <Button
-                    asChild
-                    size="sm"
-                    variant="outline"
-                    className="shrink-0 w-full sm:w-auto"
-                  >
+                  <Button asChild size="sm" variant="outline" className="shrink-0 w-full sm:w-auto">
                     <a
-                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                        `${p.name} ${formatAddr(p)}`,
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      href={
+                        p.google_maps ??
+                        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${p.name} ${p.address ?? ""}`)}`
+                      }
+                      target="_blank" rel="noopener noreferrer"
                     >
                       Auf Karte <ExternalLink className="h-3 w-3 ml-1" />
                     </a>
@@ -236,13 +235,13 @@ const Marketplace = () => {
           )}
 
           <p className="text-[11px] text-muted-foreground bg-muted/40 p-2.5 rounded-md">
-            Daten von <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer" className="underline">OpenStreetMap-Mitwirkenden</a>.
-            Vollständigkeit hängt davon ab, ob Anbieter in OSM eingetragen sind.
+            {source === "osm"
+              ? <>Daten von <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer" className="underline">OpenStreetMap-Mitwirkenden</a>.</>
+              : <>Daten von Google Maps. Anrufe über die angezeigten Nummern sind direkt mit dem Anbieter — ImmonIQ ist nicht Vertragspartner.</>}
           </p>
         </Card>
       )}
 
-      {/* Anbieter-Anmeldung */}
       <Card className="p-5 border-dashed">
         <div className="flex items-start gap-3">
           <Sparkles className="h-5 w-5 text-primary shrink-0 mt-0.5" />
