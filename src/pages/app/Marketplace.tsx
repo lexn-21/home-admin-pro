@@ -29,13 +29,14 @@ const CATEGORIES: Category[] = [
 ];
 
 const Marketplace = () => {
-  const [zip, setZip] = useState("");
+  const [query, setQuery] = useState("");
   const [activeCat, setActiveCat] = useState<string | null>(null);
   const [results, setResults] = useState<Provider[]>([]);
   const [loading, setLoading] = useState(false);
   const [radius, setRadius] = useState(15);
   const [source, setSource] = useState<"google" | "osm" | "cache" | null>(null);
   const [warning, setWarning] = useState<string | null>(null);
+  const [centerLabel, setCenterLabel] = useState<string | null>(null);
 
   useEffect(() => {
     document.title = "Handwerker & Steuerberater · ImmonIQ";
@@ -44,8 +45,9 @@ const Marketplace = () => {
   const activeMeta = useMemo(() => CATEGORIES.find((c) => c.id === activeCat), [activeCat]);
 
   const runSearch = async (catId: string) => {
-    if (!/^\d{5}$/.test(zip)) {
-      toast.error("Bitte erst eine 5-stellige PLZ eingeben.");
+    const q = query.trim();
+    if (q.length < 3) {
+      toast.error("Bitte PLZ (z. B. 59320) oder Ort (z. B. Ennigerloh) eingeben.");
       return;
     }
     setActiveCat(catId);
@@ -53,10 +55,12 @@ const Marketplace = () => {
     setResults([]);
     setWarning(null);
     setSource(null);
+    setCenterLabel(null);
     try {
-      const { providers, source: src, warning: w } = await searchProviders(catId, zip, radius);
+      const { providers, source: src, warning: w, centerLabel: cl } = await searchProviders(catId, q, radius);
       setResults(providers);
       setSource(src);
+      setCenterLabel(cl ?? null);
       if (w) setWarning(w);
       if (providers.length === 0) {
         toast.info("Keine Anbieter im Umkreis gefunden. Erhöhe den Radius oder probiere eine andere Kategorie.");
@@ -74,7 +78,7 @@ const Marketplace = () => {
       <header className="space-y-2">
         <h1 className="text-2xl md:text-3xl font-bold">Handwerker & Steuerberater finden</h1>
         <p className="text-sm text-muted-foreground max-w-2xl">
-          Echte Anbieter aus deiner Region — mit Bewertungen, Telefon, Öffnungszeiten.
+          Echte Anbieter aus deiner Region — mit Bewertungen, Telefon, Website, Öffnungszeiten.
           Powered by Google Maps.
         </p>
       </header>
@@ -83,18 +87,18 @@ const Marketplace = () => {
         <div className="grid sm:grid-cols-[1fr,160px] gap-3">
           <div>
             <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Deine Postleitzahl
+              PLZ oder Ort
             </label>
             <div className="relative mt-2">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                inputMode="numeric"
-                pattern="[0-9]*"
-                maxLength={5}
-                placeholder="z. B. 59320"
+                placeholder="z. B. 59320 oder Ennigerloh"
                 className="pl-9"
-                value={zip}
-                onChange={(e) => setZip(e.target.value.replace(/\D/g, "").slice(0, 5))}
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && activeCat) runSearch(activeCat);
+                }}
               />
             </div>
           </div>
@@ -113,6 +117,11 @@ const Marketplace = () => {
             </select>
           </div>
         </div>
+        {centerLabel && (
+          <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+            <MapPin className="h-3 w-3" /> Suchgebiet: {centerLabel}
+          </p>
+        )}
       </Card>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -173,64 +182,90 @@ const Marketplace = () => {
             </p>
           ) : (
             <div className="space-y-2">
-              {results.map((p) => (
-                <div
-                  key={p.id}
-                  className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 p-3 rounded-md bg-accent/20 border border-border"
-                >
-                  <div className="min-w-0 flex-1 space-y-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium text-sm">{p.name}</span>
-                      {typeof p.rating === "number" && (
-                        <span className="inline-flex items-center gap-0.5 text-xs text-amber-600 dark:text-amber-400">
-                          <Star className="h-3 w-3 fill-current" />
-                          {p.rating.toFixed(1)}
-                          {p.rating_count ? (
-                            <span className="text-muted-foreground ml-0.5">({num(p.rating_count)})</span>
-                          ) : null}
-                        </span>
-                      )}
-                      {typeof p.distance_km === "number" && (
-                        <Badge variant="outline" className="text-[10px]">
-                          {p.distance_km < 1 ? "< 1" : Math.round(p.distance_km)} km
-                        </Badge>
-                      )}
+              {results.map((p) => {
+                const websiteUrl = p.website
+                  ? (p.website.startsWith("http") ? p.website : `https://${p.website}`)
+                  : null;
+                const mapsUrl = p.google_maps
+                  ?? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${p.name} ${p.address ?? ""}`)}`;
+                const directionsUrl = p.lat && p.lng
+                  ? `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`
+                  : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${p.name} ${p.address ?? ""}`)}`;
+                const today = (new Date().getDay() + 6) % 7; // Mo=0
+                const hoursToday = p.opening_hours?.[today] ?? null;
+                return (
+                  <div
+                    key={p.id}
+                    className="flex flex-col gap-2 p-3 rounded-md bg-accent/20 border border-border hover:border-primary/40 transition-colors"
+                  >
+                    <div className="flex items-start justify-between gap-3 flex-wrap">
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-semibold text-sm">{p.name}</span>
+                          {p.category && (
+                            <Badge variant="secondary" className="text-[10px]">{p.category}</Badge>
+                          )}
+                          {typeof p.rating === "number" && (
+                            <span className="inline-flex items-center gap-0.5 text-xs text-amber-600 dark:text-amber-400">
+                              <Star className="h-3 w-3 fill-current" />
+                              {p.rating.toFixed(1)}
+                              {p.rating_count ? (
+                                <span className="text-muted-foreground ml-0.5">({num(p.rating_count)})</span>
+                              ) : null}
+                            </span>
+                          )}
+                          {typeof p.distance_km === "number" && (
+                            <Badge variant="outline" className="text-[10px]">
+                              {p.distance_km < 1 ? "< 1" : p.distance_km.toFixed(1)} km
+                            </Badge>
+                          )}
+                        </div>
+                        {p.address && (
+                          <a
+                            href={mapsUrl}
+                            target="_blank" rel="noopener noreferrer"
+                            className="text-xs text-muted-foreground hover:text-foreground flex items-start gap-1"
+                          >
+                            <MapPin className="h-3 w-3 mt-0.5 shrink-0" /> {p.address}
+                          </a>
+                        )}
+                        {hoursToday && (
+                          <p className="text-[11px] text-muted-foreground">
+                            Heute: <span className="text-foreground">{hoursToday.replace(/^[^:]+:\s*/, "")}</span>
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    {p.address && (
-                      <p className="text-xs text-muted-foreground flex items-start gap-1">
-                        <MapPin className="h-3 w-3 mt-0.5 shrink-0" /> {p.address}
-                      </p>
-                    )}
-                    <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+
+                    <div className="flex flex-wrap gap-2 pt-1">
                       {p.phone && (
-                        <a href={`tel:${p.phone}`} className="flex items-center gap-1 hover:text-foreground">
-                          <Phone className="h-3 w-3" /> {p.phone}
-                        </a>
+                        <Button asChild size="sm" variant="default" className="h-8 gap-1.5">
+                          <a href={`tel:${p.phone.replace(/\s/g, "")}`}>
+                            <Phone className="h-3.5 w-3.5" /> {p.phone}
+                          </a>
+                        </Button>
                       )}
-                      {p.website && (
-                        <a
-                          href={p.website.startsWith("http") ? p.website : `https://${p.website}`}
-                          target="_blank" rel="noopener noreferrer"
-                          className="flex items-center gap-1 hover:text-foreground"
-                        >
-                          <Globe className="h-3 w-3" /> Website
-                        </a>
+                      {websiteUrl && (
+                        <Button asChild size="sm" variant="outline" className="h-8 gap-1.5">
+                          <a href={websiteUrl} target="_blank" rel="noopener noreferrer">
+                            <Globe className="h-3.5 w-3.5" /> Website
+                          </a>
+                        </Button>
                       )}
+                      <Button asChild size="sm" variant="outline" className="h-8 gap-1.5">
+                        <a href={directionsUrl} target="_blank" rel="noopener noreferrer">
+                          <MapPin className="h-3.5 w-3.5" /> Route
+                        </a>
+                      </Button>
+                      <Button asChild size="sm" variant="ghost" className="h-8 gap-1.5">
+                        <a href={mapsUrl} target="_blank" rel="noopener noreferrer">
+                          Auf Google Maps <ExternalLink className="h-3 w-3" />
+                        </a>
+                      </Button>
                     </div>
                   </div>
-                  <Button asChild size="sm" variant="outline" className="shrink-0 w-full sm:w-auto">
-                    <a
-                      href={
-                        p.google_maps ??
-                        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${p.name} ${p.address ?? ""}`)}`
-                      }
-                      target="_blank" rel="noopener noreferrer"
-                    >
-                      Auf Karte <ExternalLink className="h-3 w-3 ml-1" />
-                    </a>
-                  </Button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
