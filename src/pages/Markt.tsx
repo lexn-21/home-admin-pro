@@ -42,7 +42,7 @@ const Markt = () => {
 
   // filter state (URL-synced)
   const [q, setQ] = useState(params.get("q") ?? "");
-  const [kind, setKind] = useState<"rent" | "sale">((params.get("k") as any) || "rent");
+  const [kind, setKind] = useState<"rent" | "sale" | "wg_room">((params.get("k") as any) || "rent");
   const [maxPrice, setMaxPrice] = useState(params.get("maxp") ?? "");
   const [minRooms, setMinRooms] = useState(params.get("minr") ?? "");
   const [minSpace, setMinSpace] = useState(params.get("mins") ?? "");
@@ -58,7 +58,7 @@ const Markt = () => {
   // anchor radius search (kept from before)
   const anchorId = params.get("near");
   const anchorZip = params.get("zip");
-  const anchorKindParam = (params.get("kind") as "rent" | "sale" | null) ?? null;
+  const anchorKindParam = (params.get("kind") as "rent" | "sale" | "wg_room" | null) ?? null;
   const anchorLabel = params.get("label");
   const [anchor, setAnchor] = useState<any>(null);
   const [radiusKm, setRadiusKm] = useState<number>(Number(params.get("r") ?? 10));
@@ -177,7 +177,7 @@ const Markt = () => {
   const displayList = showNearby ? nearbyResults ?? [] : filtered;
   const adZip = anchor?.zip ?? null;
   const adCity = anchor?.city ?? null;
-  const adKind = (anchor?.kind ?? kind) as "rent" | "sale";
+  const adKind = (anchor?.kind ?? kind) as "rent" | "sale" | "wg_room";
 
   const clearAnchor = () => {
     const next = new URLSearchParams(params);
@@ -314,7 +314,7 @@ const Markt = () => {
                   <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <Input className="pl-9" placeholder="Stadt, PLZ oder Stichwort" value={q} onChange={(e) => setQ(e.target.value)} />
                 </div>
-                <Select value={kind} onValueChange={(v) => setKind(v as "rent" | "sale")}>
+                <Select value={kind} onValueChange={(v) => setKind(v as "rent" | "sale" | "wg_room")}>
                   <SelectTrigger className="w-[110px]"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="rent">Mieten</SelectItem>
