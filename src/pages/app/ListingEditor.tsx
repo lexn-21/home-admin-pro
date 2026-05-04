@@ -272,11 +272,12 @@ const ListingEditor = () => {
               <SelectContent>
                 <SelectItem value="rent">Vermieten</SelectItem>
                 <SelectItem value="sale">Verkaufen</SelectItem>
+                <SelectItem value="wg_room">WG-Zimmer</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div>
-            <Label>{form.kind === "rent" ? "Kaltmiete (€/Mo)" : "Kaufpreis (€)"}</Label>
+            <Label>{form.kind === "sale" ? "Kaufpreis (€)" : form.kind === "wg_room" ? "Zimmer-Miete warm (€/Mo)" : "Kaltmiete (€/Mo)"}</Label>
             <div className="flex gap-2">
               <Input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
               <Button type="button" variant="outline" size="icon" title="Marktwert vorschlagen" onClick={suggestPrice}>
