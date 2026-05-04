@@ -200,6 +200,15 @@ const ListingEditor = () => {
       features: form.features,
       status: publish ? "published" : (editing ? form.status : "draft"),
       published_at: publish ? new Date().toISOString() : (form.published_at ?? null),
+      wg_total_rooms: form.wg_total_rooms ? Number(form.wg_total_rooms) : null,
+      wg_current_flatmates: form.wg_current_flatmates ? Number(form.wg_current_flatmates) : null,
+      wg_room_size_sqm: form.wg_room_size_sqm ? Number(form.wg_room_size_sqm) : null,
+      wg_furnished: !!form.wg_furnished,
+      wg_shared_facilities: form.wg_shared_facilities,
+      wg_flatmate_age_min: form.wg_flatmate_age_min ? Number(form.wg_flatmate_age_min) : null,
+      wg_flatmate_age_max: form.wg_flatmate_age_max ? Number(form.wg_flatmate_age_max) : null,
+      wg_flatmate_gender_pref: form.wg_flatmate_gender_pref || null,
+      students_welcome: !!form.students_welcome,
     };
 
     if (publish && !form.energy_class) {
