@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Star, X, Check, MessageSquare, ShieldCheck, Sparkles, Loader2, TrendingUp } from "lucide-react";
 import ChatDialog from "@/components/market/ChatDialog";
 import LegalSnippet from "@/components/LegalSnippet";
+import { AIDisclaimer } from "@/components/AIDisclaimer";
 
 const labelStatus: Record<string, string> = {
   sent: "Neu", shortlisted: "Favorit", rejected: "Abgelehnt", accepted: "Angenommen", withdrawn: "Zurückgezogen",
