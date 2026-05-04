@@ -302,6 +302,60 @@ const ListingEditor = () => {
         </div>
       </Card>
 
+      {form.kind === "wg_room" && (
+        <Card className="p-6 glass space-y-4 border-violet-500/30">
+          <h2 className="font-bold flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-violet-500" /> WG-Details
+          </h2>
+          <div className="grid grid-cols-3 gap-3">
+            <div><Label>Zimmergröße (m²)</Label>
+              <Input type="number" value={form.wg_room_size_sqm} onChange={(e) => setForm({ ...form, wg_room_size_sqm: e.target.value })} /></div>
+            <div><Label>Gesamtzimmer in der WG</Label>
+              <Input type="number" value={form.wg_total_rooms} onChange={(e) => setForm({ ...form, wg_total_rooms: e.target.value })} /></div>
+            <div><Label>Aktuelle Mitbewohner</Label>
+              <Input type="number" value={form.wg_current_flatmates} onChange={(e) => setForm({ ...form, wg_current_flatmates: e.target.value })} /></div>
+            <div><Label>Alter min</Label>
+              <Input type="number" value={form.wg_flatmate_age_min} onChange={(e) => setForm({ ...form, wg_flatmate_age_min: e.target.value })} /></div>
+            <div><Label>Alter max</Label>
+              <Input type="number" value={form.wg_flatmate_age_max} onChange={(e) => setForm({ ...form, wg_flatmate_age_max: e.target.value })} /></div>
+            <div>
+              <Label>Geschlecht (Präferenz)</Label>
+              <Select value={form.wg_flatmate_gender_pref} onValueChange={(v) => setForm({ ...form, wg_flatmate_gender_pref: v })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="any">Egal</SelectItem>
+                  <SelectItem value="female">Weiblich</SelectItem>
+                  <SelectItem value="male">Männlich</SelectItem>
+                  <SelectItem value="divers">Divers</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2 pt-2">
+            {(["bad", "kueche", "balkon", "garten"] as const).map((k) => {
+              const on = !!form.wg_shared_facilities?.[k];
+              return (
+                <button key={k} type="button"
+                  onClick={() => setForm({ ...form, wg_shared_facilities: { ...form.wg_shared_facilities, [k]: !on } })}
+                  className={`px-3 py-1.5 rounded-full text-xs border ${on ? "bg-violet-500/15 border-violet-500/40 text-violet-700 dark:text-violet-300" : "border-border text-muted-foreground"}`}>
+                  Geteilt: {k === "kueche" ? "Küche" : k === "bad" ? "Bad" : k.charAt(0).toUpperCase() + k.slice(1)}
+                </button>
+              );
+            })}
+            <button type="button"
+              onClick={() => setForm({ ...form, wg_furnished: !form.wg_furnished })}
+              className={`px-3 py-1.5 rounded-full text-xs border ${form.wg_furnished ? "bg-violet-500/15 border-violet-500/40 text-violet-700 dark:text-violet-300" : "border-border text-muted-foreground"}`}>
+              Möbliert
+            </button>
+            <button type="button"
+              onClick={() => setForm({ ...form, students_welcome: !form.students_welcome })}
+              className={`px-3 py-1.5 rounded-full text-xs border ${form.students_welcome ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-700 dark:text-emerald-300" : "border-border text-muted-foreground"}`}>
+              🎓 Studenten willkommen
+            </button>
+          </div>
+        </Card>
+      )}
+
       <Card className="p-6 glass space-y-4">
         <h2 className="font-bold">Adresse (öffentlich)</h2>
         <div className="grid grid-cols-3 gap-3">
