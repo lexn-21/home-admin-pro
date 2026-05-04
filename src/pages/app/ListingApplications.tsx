@@ -121,9 +121,44 @@ const ListingApplications = () => {
       <button onClick={() => nav("/app/listings")} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
         <ArrowLeft className="h-4 w-4" /> Inserate
       </button>
-      <header>
-        <h1 className="text-3xl font-bold">{listing.title}</h1>
-        <p className="text-muted-foreground text-sm mt-1">{apps.length} Bewerbungen</p>
+      <header className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-3xl font-bold">{listing.title}</h1>
+          <p className="text-muted-foreground text-sm mt-1">{apps.length} Bewerbungen</p>
+        </div>
+        {listing.kind === "wg_room" && (
+          <Dialog open={wgOpen} onOpenChange={setWgOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm"><Users className="h-4 w-4 mr-1" /> WG-Casting verwalten</Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-lg">
+              <DialogHeader><DialogTitle>WG-Mitbewohner einladen</DialogTitle></DialogHeader>
+              <p className="text-xs text-muted-foreground">Lade deine bestehenden Mitbewohner:innen ein, über neue Bewerber abzustimmen.</p>
+              <div className="flex gap-2">
+                <Input placeholder="Name" value={newMember.name} onChange={(e) => setNewMember({ ...newMember, name: e.target.value })} />
+                <Input placeholder="E-Mail (optional)" value={newMember.email} onChange={(e) => setNewMember({ ...newMember, email: e.target.value })} />
+                <Button size="sm" onClick={addWgMember}><Plus className="h-4 w-4" /></Button>
+              </div>
+              <div className="space-y-2 max-h-72 overflow-y-auto">
+                {wgMembers.map((m) => (
+                  <div key={m.id} className="flex items-center justify-between gap-2 p-2 border rounded-lg text-sm">
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium">{m.member_name} {m.revoked && <Badge variant="outline" className="ml-1 text-[10px]">widerrufen</Badge>}</div>
+                      {m.member_email && <div className="text-xs text-muted-foreground truncate">{m.member_email}</div>}
+                    </div>
+                    {!m.revoked && (
+                      <>
+                        <Button size="sm" variant="ghost" onClick={() => copyLink(m.token)}><Copy className="h-3 w-3" /></Button>
+                        <Button size="sm" variant="ghost" onClick={() => revokeMember(m.id)} className="text-destructive"><Trash2 className="h-3 w-3" /></Button>
+                      </>
+                    )}
+                  </div>
+                ))}
+                {wgMembers.length === 0 && <p className="text-xs text-muted-foreground text-center py-3">Noch keine Mitbewohner:innen eingeladen.</p>}
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
       </header>
 
       <LegalSnippet
