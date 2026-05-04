@@ -86,6 +86,7 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/advisor/:token" element={<AdvisorView />} />
               <Route path="/mieter/:token" element={<TenantPortal />} />
+              <Route path="/wg-casting/:token" element={<WgCasting />} />
               <Route path="/markt" element={<Markt />} />
               <Route path="/markt/vergleich" element={<MarktVergleich />} />
               <Route path="/markt/:id" element={<MarktDetail />} />
