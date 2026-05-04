@@ -465,8 +465,8 @@ const Markt = () => {
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">Kein Foto</div>
                           )}
-                          <Badge className="absolute top-2 left-2 bg-background/85 backdrop-blur text-foreground border">
-                            {l.kind === "rent" ? "Miete" : "Kauf"}
+                          <Badge className={`absolute top-2 left-2 backdrop-blur border ${l.kind === "wg_room" ? "bg-violet-500/85 text-white border-violet-500" : "bg-background/85 text-foreground"}`}>
+                            {l.kind === "rent" ? "Miete" : l.kind === "sale" ? "Kauf" : "WG-Zimmer"}
                           </Badge>
                           {fr?.fresh && (
                             <Badge className="absolute top-2 left-[5.5rem] bg-emerald-600 text-white border-0 gap-1">
