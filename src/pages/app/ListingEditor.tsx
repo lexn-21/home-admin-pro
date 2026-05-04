@@ -285,7 +285,7 @@ const ListingEditor = () => {
               </Button>
             </div>
           </div>
-          {form.kind === "rent" && <>
+          {(form.kind === "rent" || form.kind === "wg_room") && <>
             <div><Label>Nebenkosten (€)</Label>
               <Input type="number" value={form.utilities} onChange={(e) => setForm({ ...form, utilities: e.target.value })} /></div>
             <div><Label>Kaution (€)</Label>
