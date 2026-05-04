@@ -79,6 +79,14 @@ const SeekerProfile = () => {
         ? String(form.preferred_zips).split(",").map((s: string) => s.trim()).filter(Boolean)
         : [],
       about_me: form.about_me || null,
+      is_student: !!form.is_student,
+      university: form.university || null,
+      study_program: form.study_program || null,
+      study_semester: form.study_semester ? Number(form.study_semester) : null,
+      bafoeg_amount: form.bafoeg_amount ? Number(form.bafoeg_amount) : null,
+      guarantor_name: form.guarantor_name || null,
+      guarantor_relation: form.guarantor_relation || null,
+      guarantor_income: form.guarantor_income ? Number(form.guarantor_income) : null,
       completeness_score: score(form),
     };
     const { error } = await supabase.from("seeker_profiles").upsert(payload, { onConflict: "user_id" });
