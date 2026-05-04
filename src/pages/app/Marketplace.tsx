@@ -69,7 +69,7 @@ const Marketplace = () => {
   const [centerLabel, setCenterLabel] = useState<string | null>(null);
 
   useEffect(() => {
-    document.title = "Handwerker & Steuerberater · ImmonIQ";
+    document.title = "Experten finden · ImmonIQ";
   }, []);
 
   const activeMeta = useMemo(() => CATEGORIES.find((c) => c.id === activeCat), [activeCat]);
