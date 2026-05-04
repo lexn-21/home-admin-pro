@@ -32,7 +32,7 @@ Deno.serve(async (req) => {
 
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);
     const { data: app } = await admin.from("applications")
-      .select("*, listings(price, deposit, utilities, rooms, living_space, city)")
+      .select("*, listings(price, deposit, utilities, rooms, living_space, city, kind, students_welcome, wg_flatmate_age_min, wg_flatmate_age_max)")
       .eq("id", application_id).maybeSingle();
     if (!app) return new Response(JSON.stringify({ error: "not found" }), { status: 404, headers: corsHeaders });
     if (app.owner_user_id !== user.id) return new Response("forbidden", { status: 403, headers: corsHeaders });
