@@ -42,6 +42,7 @@ const STATUS_LABEL: Record<string, string> = {
 const TenantPortal = () => {
   const { token } = useParams();
   const [data, setData] = useState<Resolved | null>(null);
+  const [nka, setNka] = useState<NkaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ category: "sanitaer", severity: "minor", title: "", description: "" });
@@ -49,11 +50,23 @@ const TenantPortal = () => {
   const load = async () => {
     if (!token) return;
     setLoading(true);
-    const { data: r } = await supabase.rpc("tenant_portal_resolve", { _token: token });
+    const [{ data: r }, { data: n }] = await Promise.all([
+      supabase.rpc("tenant_portal_resolve", { _token: token }),
+      supabase.rpc("tenant_portal_get_nka", { _token: token }),
+    ]);
     setData(r as unknown as Resolved);
+    setNka(((n as unknown) as NkaItem[]) ?? []);
     setLoading(false);
   };
   useEffect(() => { load(); }, [token]);
+
+  const downloadPdf = async (item: NkaItem) => {
+    if (!item.pdf_path) return toast.error("Noch keine PDF verfügbar");
+    const { data: signed, error } = await supabase.storage
+      .from("documents").createSignedUrl(item.pdf_path, 60);
+    if (error || !signed?.signedUrl) return toast.error("Download fehlgeschlagen");
+    window.open(signed.signedUrl, "_blank");
+  };
 
   const submit = async () => {
     const { error } = await supabase.rpc("tenant_portal_report_issue", {
