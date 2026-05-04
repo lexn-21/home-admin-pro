@@ -52,6 +52,38 @@ const ListingApplications = () => {
     setListing(l.data);
     setApps(a.data ?? []);
     if (l.data) document.title = `Bewerbungen · ${l.data.title}`;
+    if (l.data?.kind === "wg_room") loadWgMembers();
+  };
+
+  const loadWgMembers = async () => {
+    const { data } = await supabase.from("wg_member_links").select("*").eq("listing_id", id!).order("created_at", { ascending: false });
+    setWgMembers(data ?? []);
+  };
+
+  const addWgMember = async () => {
+    if (!newMember.name) return toast.error("Name fehlt");
+    const { data: u } = await supabase.auth.getUser();
+    const { error } = await supabase.from("wg_member_links").insert({
+      user_id: u.user!.id,
+      listing_id: id!,
+      member_name: newMember.name,
+      member_email: newMember.email || null,
+    });
+    if (error) return toast.error(error.message);
+    setNewMember({ name: "", email: "" });
+    toast.success("Mitbewohner:in hinzugefügt");
+    loadWgMembers();
+  };
+
+  const revokeMember = async (mid: string) => {
+    await supabase.from("wg_member_links").update({ revoked: true }).eq("id", mid);
+    loadWgMembers();
+  };
+
+  const copyLink = (token: string) => {
+    const url = `${window.location.origin}/wg-casting/${token}`;
+    navigator.clipboard.writeText(url);
+    toast.success("Link kopiert");
   };
 
   const setStatus = async (appId: string, status: "sent" | "shortlisted" | "rejected" | "accepted" | "withdrawn") => {
