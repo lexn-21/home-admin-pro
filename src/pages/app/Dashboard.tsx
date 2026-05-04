@@ -94,6 +94,8 @@ const Dashboard = () => {
   const [listings, setListings] = useState<any[]>([]);
   const [appsIn, setAppsIn] = useState<number>(0);
   const [appsOut, setAppsOut] = useState<number>(0);
+  const [nkaOpen, setNkaOpen] = useState<number>(0);
+  const [nkaDraft, setNkaDraft] = useState<number>(0);
 
   useEffect(() => { document.title = "Übersicht · ImmonIQ"; }, []);
 
@@ -120,6 +122,15 @@ const Dashboard = () => {
       setListings(li.data ?? []);
       setAppsIn(ai.count ?? 0);
       setAppsOut(ao.count ?? 0);
+
+      const [nkaOpenRes, nkaDraftRes] = await Promise.all([
+        supabase.from("payments").select("id", { count: "exact", head: true })
+          .eq("user_id", user.id).eq("kind", "nka_nachzahlung").eq("status", "open"),
+        supabase.from("nka_periods").select("id", { count: "exact", head: true })
+          .eq("user_id", user.id).eq("status", "draft"),
+      ]);
+      setNkaOpen(nkaOpenRes.count ?? 0);
+      setNkaDraft(nkaDraftRes.count ?? 0);
     })();
   }, [user]);
 
@@ -351,6 +362,30 @@ const Dashboard = () => {
               <Link to="/app/applications" className="text-xs text-primary mt-1 inline-flex items-center gap-1">Status →</Link>
             </Card>
           </div>
+        </Item>
+      )}
+
+      {/* Nebenkosten-Status */}
+      {(nkaOpen > 0 || nkaDraft > 0) && (
+        <Item>
+          <Link to="/app/nebenkosten">
+            <Card className="p-5 glass border-primary/30 interactive-card">
+              <div className="flex items-center gap-4 flex-wrap">
+                <div className="h-11 w-11 rounded-xl bg-gradient-gold-soft border border-primary/15 flex items-center justify-center">
+                  <Receipt className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-base">Nebenkostenabrechnung</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {nkaDraft > 0 && <span>{nkaDraft} Periode{nkaDraft > 1 ? "n" : ""} im Entwurf</span>}
+                    {nkaDraft > 0 && nkaOpen > 0 && " · "}
+                    {nkaOpen > 0 && <span className="text-warning font-semibold">{nkaOpen} offene Nachzahlung{nkaOpen > 1 ? "en" : ""}</span>}
+                  </p>
+                </div>
+                <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+              </div>
+            </Card>
+          </Link>
         </Item>
       )}
 

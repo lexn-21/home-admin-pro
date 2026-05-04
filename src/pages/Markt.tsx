@@ -13,7 +13,7 @@ import { eur, num } from "@/lib/format";
 import {
   Search, MapPin, Bed, Maximize2, SlidersHorizontal, Target, X, Bell,
   ArrowDownAZ, Zap, Heart, Scale, CheckCircle2, Sparkles, Clock, ShieldCheck,
-  TrendingDown, Home as HomeIcon,
+  TrendingDown, Home as HomeIcon, GraduationCap,
 } from "lucide-react";
 import { SponsoredSlot } from "@/components/market/SponsoredSlot";
 import { approxLatLngFromZip } from "@/lib/geo";
@@ -28,6 +28,7 @@ const QUICK_FILTERS = [
   { key: "wg", label: "WG-tauglich", icon: Bed },
   { key: "new_build", label: "Erstbezug", icon: Sparkles },
   { key: "low_energy", label: "Energie A–B", icon: TrendingDown },
+  { key: "students_ok", label: "Studenten ok", icon: GraduationCap },
 ];
 
 const SAVED_KEY = "immoniq.savedSearches.v1";
@@ -143,6 +144,7 @@ const Markt = () => {
     if (quick.has("wg") && !(f.wg || f.shared_living || (l.rooms ?? 0) >= 3)) return false;
     if (quick.has("new_build") && !(f.new_build || f.erstbezug)) return false;
     if (quick.has("low_energy") && !["A+", "A", "B"].includes((l.energy_class || "").toUpperCase())) return false;
+    if (quick.has("students_ok") && !l.students_welcome) return false;
     return true;
   };
 
