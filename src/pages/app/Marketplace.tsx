@@ -29,13 +29,14 @@ const CATEGORIES: Category[] = [
 ];
 
 const Marketplace = () => {
-  const [zip, setZip] = useState("");
+  const [query, setQuery] = useState("");
   const [activeCat, setActiveCat] = useState<string | null>(null);
   const [results, setResults] = useState<Provider[]>([]);
   const [loading, setLoading] = useState(false);
   const [radius, setRadius] = useState(15);
   const [source, setSource] = useState<"google" | "osm" | "cache" | null>(null);
   const [warning, setWarning] = useState<string | null>(null);
+  const [centerLabel, setCenterLabel] = useState<string | null>(null);
 
   useEffect(() => {
     document.title = "Handwerker & Steuerberater · ImmonIQ";
@@ -44,8 +45,9 @@ const Marketplace = () => {
   const activeMeta = useMemo(() => CATEGORIES.find((c) => c.id === activeCat), [activeCat]);
 
   const runSearch = async (catId: string) => {
-    if (!/^\d{5}$/.test(zip)) {
-      toast.error("Bitte erst eine 5-stellige PLZ eingeben.");
+    const q = query.trim();
+    if (q.length < 3) {
+      toast.error("Bitte PLZ (z. B. 59320) oder Ort (z. B. Ennigerloh) eingeben.");
       return;
     }
     setActiveCat(catId);
@@ -53,10 +55,12 @@ const Marketplace = () => {
     setResults([]);
     setWarning(null);
     setSource(null);
+    setCenterLabel(null);
     try {
-      const { providers, source: src, warning: w } = await searchProviders(catId, zip, radius);
+      const { providers, source: src, warning: w, centerLabel: cl } = await searchProviders(catId, q, radius);
       setResults(providers);
       setSource(src);
+      setCenterLabel(cl ?? null);
       if (w) setWarning(w);
       if (providers.length === 0) {
         toast.info("Keine Anbieter im Umkreis gefunden. Erhöhe den Radius oder probiere eine andere Kategorie.");
@@ -74,7 +78,7 @@ const Marketplace = () => {
       <header className="space-y-2">
         <h1 className="text-2xl md:text-3xl font-bold">Handwerker & Steuerberater finden</h1>
         <p className="text-sm text-muted-foreground max-w-2xl">
-          Echte Anbieter aus deiner Region — mit Bewertungen, Telefon, Öffnungszeiten.
+          Echte Anbieter aus deiner Region — mit Bewertungen, Telefon, Website, Öffnungszeiten.
           Powered by Google Maps.
         </p>
       </header>
@@ -83,18 +87,18 @@ const Marketplace = () => {
         <div className="grid sm:grid-cols-[1fr,160px] gap-3">
           <div>
             <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Deine Postleitzahl
+              PLZ oder Ort
             </label>
             <div className="relative mt-2">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                inputMode="numeric"
-                pattern="[0-9]*"
-                maxLength={5}
-                placeholder="z. B. 59320"
+                placeholder="z. B. 59320 oder Ennigerloh"
                 className="pl-9"
-                value={zip}
-                onChange={(e) => setZip(e.target.value.replace(/\D/g, "").slice(0, 5))}
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && activeCat) runSearch(activeCat);
+                }}
               />
             </div>
           </div>
@@ -113,6 +117,11 @@ const Marketplace = () => {
             </select>
           </div>
         </div>
+        {centerLabel && (
+          <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+            <MapPin className="h-3 w-3" /> Suchgebiet: {centerLabel}
+          </p>
+        )}
       </Card>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
