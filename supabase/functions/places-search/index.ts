@@ -104,15 +104,47 @@ Deno.serve(async (req) => {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const center2 = PLZ2[zip.slice(0, 2)];
-    if (!center2) {
-      return new Response(JSON.stringify({ error: "PLZ-Region unbekannt" }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-    const center = { lat: center2[0], lng: center2[1] };
-
     const admin = createClient(SUPABASE_URL, SERVICE_ROLE);
+
+    // Exakte PLZ-Koordinaten via Google Geocoding (mit Cache in places_cache als zip+__geo__)
+    let center: { lat: number; lng: number } | null = null;
+    const GOOGLE_KEY_EARLY = Deno.env.get("GOOGLE_PLACES_API_KEY");
+
+    const { data: geoCached } = await admin
+      .from("places_cache")
+      .select("payload")
+      .eq("zip", zip).eq("category", "__geo__").eq("radius_km", 0)
+      .gt("expires_at", new Date().toISOString())
+      .maybeSingle();
+
+    if (geoCached?.payload && (geoCached.payload as any).lat) {
+      center = geoCached.payload as any;
+    } else if (GOOGLE_KEY_EARLY) {
+      const gr = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?components=country:DE|postal_code:${zip}&key=${GOOGLE_KEY_EARLY}`
+      );
+      const gj = await gr.json();
+      const loc = gj?.results?.[0]?.geometry?.location;
+      if (loc?.lat && loc?.lng) {
+        center = { lat: loc.lat, lng: loc.lng };
+        await admin.from("places_cache").upsert({
+          zip, category: "__geo__", radius_km: 0,
+          payload: center,
+          expires_at: new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString(),
+        }, { onConflict: "zip,category,radius_km" });
+      }
+    }
+
+    // Fallback: 2-stellige PLZ-Region
+    if (!center) {
+      const center2 = PLZ2[zip.slice(0, 2)];
+      if (!center2) {
+        return new Response(JSON.stringify({ error: "PLZ unbekannt" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      center = { lat: center2[0], lng: center2[1] };
+    }
 
     // 1) Cache lookup
     const { data: cached } = await admin
