@@ -19,6 +19,7 @@ const unitSchema = z.object({
   rooms: z.number().min(0).max(50).optional(),
   rent_cold: z.number().min(0).max(99999),
   utilities: z.number().min(0).max(99999),
+  persons_count: z.number().int().min(0).max(20).optional(),
 });
 
 const PropertyDetail = () => {
@@ -26,7 +27,7 @@ const PropertyDetail = () => {
   const [property, setProperty] = useState<any>(null);
   const [units, setUnits] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ label: "", living_space: "", rooms: "", rent_cold: "", utilities: "" });
+  const [form, setForm] = useState({ label: "", living_space: "", rooms: "", rent_cold: "", utilities: "", persons_count: "" });
 
   useEffect(() => { if (id) load(); }, [id]);
 
@@ -47,6 +48,7 @@ const PropertyDetail = () => {
       rooms: form.rooms ? Number(form.rooms) : undefined,
       rent_cold: Number(form.rent_cold || 0),
       utilities: Number(form.utilities || 0),
+      persons_count: form.persons_count ? Number(form.persons_count) : undefined,
     });
     if (!parsed.success) return toast.error(parsed.error.issues[0].message);
     const { data: { user } } = await supabase.auth.getUser();
@@ -56,7 +58,7 @@ const PropertyDetail = () => {
     if (error) return toast.error(error.message);
     toast.success("Einheit angelegt.");
     setOpen(false);
-    setForm({ label: "", living_space: "", rooms: "", rent_cold: "", utilities: "" });
+    setForm({ label: "", living_space: "", rooms: "", rent_cold: "", utilities: "", persons_count: "" });
     load();
   };
 
@@ -111,6 +113,7 @@ const PropertyDetail = () => {
               <div><Label>Zimmer</Label><Input type="number" step="0.5" value={form.rooms} onChange={(e) => setForm({ ...form, rooms: e.target.value })} /></div>
               <div><Label>Kaltmiete (€)</Label><Input type="number" step="0.01" value={form.rent_cold} onChange={(e) => setForm({ ...form, rent_cold: e.target.value })} /></div>
               <div><Label>Nebenkosten (€)</Label><Input type="number" step="0.01" value={form.utilities} onChange={(e) => setForm({ ...form, utilities: e.target.value })} /></div>
+              <div className="col-span-2"><Label>Bewohner-Anzahl <span className="text-muted-foreground text-[10px]">(für NK-Verteilung nach Personen)</span></Label><Input type="number" step="1" value={form.persons_count} onChange={(e) => setForm({ ...form, persons_count: e.target.value })} placeholder="z.B. 2" /></div>
             </div>
             <DialogFooter><Button onClick={addUnit} className="bg-gradient-gold text-primary-foreground shadow-gold">Hinzufügen</Button></DialogFooter>
           </DialogContent>
@@ -130,9 +133,10 @@ const PropertyDetail = () => {
                 <h3 className="font-bold">{u.label}</h3>
                 <span className="text-sm font-semibold text-gradient-gold">{eur(Number(u.rent_cold) + Number(u.utilities))}</span>
               </div>
-              <div className="flex gap-4 text-xs text-muted-foreground">
+              <div className="flex gap-4 text-xs text-muted-foreground flex-wrap">
                 <span>{u.living_space ?? "—"} m²</span>
                 <span>{u.rooms ?? "—"} Zi.</span>
+                {u.persons_count != null && <span>{u.persons_count} Pers.</span>}
                 <span>Kalt {eur(u.rent_cold)} · NK {eur(u.utilities)}</span>
               </div>
             </Card>
