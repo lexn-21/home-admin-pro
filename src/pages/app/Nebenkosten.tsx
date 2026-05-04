@@ -195,8 +195,7 @@ export default function Nebenkosten() {
         .lte("paid_on", period.period_end);
       const sums: Record<string, number> = {};
       (data ?? []).forEach((p: any) => {
-        if (p.kind === "utilities" || p.kind === "rent_warm") {
-          // Nur Vorauszahlungs-Anteile zählen — vereinfachung: 'utilities' Posten oder Schätzung
+        if (p.kind === "utilities") {
           sums[p.tenant_id] = (sums[p.tenant_id] || 0) + Number(p.amount);
         }
       });
