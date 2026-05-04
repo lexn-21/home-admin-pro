@@ -435,11 +435,8 @@ const Dashboard = () => {
             label="Fristen"
             desc="NK-Abrechnung, § 147 AO." />
           <QuickAction to="/app/marketplace" icon={Wrench}
-            label="Marktplatz"
-            desc="Profis in deiner Region." />
-          <QuickAction to="/app/bookings" icon={Briefcase} badge="10 % Take"
-            label="Handwerker buchen"
-            desc="Festpreis-Angebote in 24 h." />
+            label="Experten finden"
+            desc="Handwerker, Steuerberater & mehr." />
           <QuickAction to="/app/law" icon={Scale}
             label="Rechts-Ecke"
             desc="BGB, EStG — original verlinkt." />
