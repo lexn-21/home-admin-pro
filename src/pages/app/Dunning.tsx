@@ -8,6 +8,7 @@ import { AlertTriangle, FileText, Mail, ShieldAlert, CheckCircle2, Printer } fro
 import { eur, date } from "@/lib/format";
 import { computeBalances, generateDunningHTML, openDunningWindow, type TenantBalance } from "@/lib/dunning";
 import { toast } from "sonner";
+import { AIDisclaimer } from "@/components/AIDisclaimer";
 
 const LEVEL_BADGE: Record<number, { label: string; cls: string; icon: any }> = {
   0: { label: "Aktuell", cls: "bg-success/15 text-success border-success/30", icon: CheckCircle2 },
@@ -66,6 +67,7 @@ const Dunning = () => {
         </p>
       </header>
 
+      <AIDisclaimer />
       <div className="grid sm:grid-cols-3 gap-4">
         <Card className="p-5 glass">
           <p className="text-xs text-muted-foreground">Offene Forderungen</p>

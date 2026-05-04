@@ -1,8 +1,15 @@
 import { corsHeaders } from "https://esm.sh/@supabase/supabase-js@2.95.0/cors";
+import { enforceAiQuota } from "../_shared/ai-quota.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
+    const quota = await enforceAiQuota(req, "ai-dunning-letter");
+    if (!quota.ok) {
+      return new Response(JSON.stringify({ error: quota.error }), {
+        status: quota.status, headers: { ...corsHeaders, "Content-Type": "application/json" }
+      });
+    }
     const { tenant_name, property_name, amount_due, period, days_overdue, level } = await req.json();
     const apiKey = Deno.env.get("LOVABLE_API_KEY")!;
 

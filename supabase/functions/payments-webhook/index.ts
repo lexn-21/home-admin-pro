@@ -168,6 +168,22 @@ async function handleInvoicePaid(invoice: any, env: StripeEnv) {
 
 async function handleWebhook(req: Request, env: StripeEnv) {
   const event = await verifyWebhook(req, env);
+
+  // Idempotenz: Stripe liefert at-least-once. Doppel-Events ignorieren.
+  const sb = getSupabase();
+  const { error: dupErr } = await sb
+    .from("stripe_webhook_events")
+    .insert({ event_id: event.id, environment: env, event_type: event.type });
+  if (dupErr) {
+    // 23505 = unique_violation → schon verarbeitet
+    if ((dupErr as any).code === "23505") {
+      console.log("Duplicate webhook event ignored:", event.id);
+      return;
+    }
+    // Anderer Fehler: weitermachen, aber loggen — lieber doppelt als verloren
+    console.warn("webhook dedup insert failed:", dupErr);
+  }
+
   switch (event.type) {
     case "customer.subscription.created":
       await handleSubscriptionCreated(event.data.object, env);

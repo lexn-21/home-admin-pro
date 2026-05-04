@@ -1,4 +1,5 @@
 import { corsHeaders } from "https://esm.sh/@supabase/supabase-js@2.95.0/cors";
+import { enforceAiQuota } from "../_shared/ai-quota.ts";
 
 const SYSTEM = `Du bist ImmoNIQ-Co-Pilot, der führende deutsche KI-Experte für privates Vermieten, Immobilienverwaltung, Mietrecht und Vermietungs-Steuer in Deutschland. Du bist der beste Ansprechpartner für Eigentümer, Vermieter, Mieter, WEG-Verwalter und Steuerberater.
 
@@ -28,6 +29,13 @@ Deno.serve(async (req) => {
     if (!Array.isArray(messages)) {
       return new Response(JSON.stringify({ error: "messages required" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" }
+      });
+    }
+
+    const quota = await enforceAiQuota(req, "ai-copilot");
+    if (!quota.ok) {
+      return new Response(JSON.stringify({ error: quota.error }), {
+        status: quota.status, headers: { ...corsHeaders, "Content-Type": "application/json" }
       });
     }
 

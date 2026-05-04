@@ -268,6 +268,27 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_usage_log: {
+        Row: {
+          created_at: string
+          function_name: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          function_name: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          function_name?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       app_admins: {
         Row: {
           created_at: string
@@ -1240,6 +1261,27 @@ export type Database = {
         }
         Relationships: []
       }
+      stripe_webhook_events: {
+        Row: {
+          environment: string
+          event_id: string
+          event_type: string | null
+          processed_at: string
+        }
+        Insert: {
+          environment: string
+          event_id: string
+          event_type?: string | null
+          processed_at?: string
+        }
+        Update: {
+          environment?: string
+          event_id?: string
+          event_type?: string | null
+          processed_at?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           cancel_at_period_end: boolean | null
@@ -1693,6 +1735,10 @@ export type Database = {
       can_view_seeker_profile: {
         Args: { _seeker: string; _viewer: string }
         Returns: boolean
+      }
+      check_ai_quota: {
+        Args: { _function: string; _user_id: string }
+        Returns: undefined
       }
       check_user_quota: {
         Args: { _resource: string; _user_id: string }
