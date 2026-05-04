@@ -140,6 +140,39 @@ const TenantPortal = () => {
           </Card>
         </motion.div>
 
+        {nka.length > 0 && (
+          <div>
+            <h2 className="font-display text-xl font-semibold mb-3 flex items-center gap-2">
+              <FileText className="h-5 w-5 text-primary" /> Nebenkostenabrechnungen
+            </h2>
+            <Card className="divide-y">
+              {nka.map((n) => (
+                <div key={n.id} className="p-4 flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-semibold">Abrechnung {n.year}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {date(n.period_start)} – {date(n.period_end)} · Vorauszahlung {eur(n.vorauszahlung_summe)} · Ist {eur(n.ist_summe)}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                        {n.saldo > 0 ? "Nachzahlung" : n.saldo < 0 ? "Erstattung" : "Saldo"}
+                      </p>
+                      <p className={`font-mono font-bold ${n.saldo > 0 ? "text-destructive" : n.saldo < 0 ? "text-success" : ""}`}>
+                        {eur(Math.abs(n.saldo))}
+                      </p>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={() => downloadPdf(n)} disabled={!n.pdf_path}>
+                      <Download className="h-3 w-3 mr-1" /> PDF
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </Card>
+          </div>
+        )}
+
         <div className="flex items-center justify-between">
           <h2 className="font-display text-xl font-semibold">Schadensmeldungen</h2>
           <Dialog open={open} onOpenChange={setOpen}>
