@@ -436,7 +436,7 @@ const Dashboard = () => {
             desc="NK-Abrechnung, § 147 AO." />
           <QuickAction to="/app/marketplace" icon={Wrench}
             label="Experten finden"
-            desc="Festpreis-Angebote in 24 h." />
+            desc="Handwerker, Steuerberater & mehr." />
           <QuickAction to="/app/law" icon={Scale}
             label="Rechts-Ecke"
             desc="BGB, EStG — original verlinkt." />
