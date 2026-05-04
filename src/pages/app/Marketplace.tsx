@@ -12,21 +12,51 @@ import { toast } from "sonner";
 import { searchProviders, type Provider } from "@/lib/places";
 import { num } from "@/lib/format";
 
-type Category = { id: string; label: string; icon: any; description: string };
+type Category = {
+  id: string;
+  label: string;
+  icon: any;
+  description: string;
+  group: "trade" | "advisor" | "service";
+};
 
 const CATEGORIES: Category[] = [
-  { id: "electrician", label: "Elektriker", icon: Zap, description: "Zähler, Smart Home, E-Check, Wallbox." },
-  { id: "plumber", label: "Sanitär & Heizung", icon: Droplets, description: "Heizung, Bad, Wärmepumpe, GEG-Beratung." },
-  { id: "painter", label: "Maler & Lackierer", icon: Paintbrush, description: "Innenanstrich, Fassade, Tapete, Putz." },
-  { id: "roofer", label: "Dachdecker", icon: Building2, description: "Dachsanierung, Flachdach, Dämmung." },
-  { id: "carpenter", label: "Tischler & Schreiner", icon: Hammer, description: "Möbelbau, Türen, Einbauten." },
-  { id: "handyman", label: "Hausmeister", icon: Wrench, description: "Kleinreparaturen, Treppenhaus, Winterdienst." },
-  { id: "tax", label: "Steuerberater", icon: Calculator, description: "V&V, Anlage V, GbR, Immobilien." },
-  { id: "lawyer", label: "Anwalt für Mietrecht", icon: ShieldCheck, description: "Mietrecht, WEG, Räumung." },
-  { id: "cleaner", label: "Reinigung", icon: Sparkles, description: "Treppenhaus, Endreinigung, Fenster." },
-  { id: "gardener", label: "Gartenpflege", icon: Sprout, description: "Hecke, Rasen, Baumschnitt." },
-  { id: "locksmith", label: "Schlüsseldienst", icon: Key, description: "Notöffnung, Schloss tauschen." },
+  { id: "tax", label: "Steuerberater", icon: Calculator, description: "V&V, Anlage V, GbR, Immobilien.", group: "advisor" },
+  { id: "lawyer", label: "Anwalt für Mietrecht", icon: ShieldCheck, description: "Mietrecht, WEG, Räumung.", group: "advisor" },
+  { id: "electrician", label: "Elektriker", icon: Zap, description: "Zähler, Smart Home, E-Check, Wallbox.", group: "trade" },
+  { id: "plumber", label: "Sanitär & Heizung", icon: Droplets, description: "Heizung, Bad, Wärmepumpe, GEG-Beratung.", group: "trade" },
+  { id: "painter", label: "Maler & Lackierer", icon: Paintbrush, description: "Innenanstrich, Fassade, Tapete, Putz.", group: "trade" },
+  { id: "roofer", label: "Dachdecker", icon: Building2, description: "Dachsanierung, Flachdach, Dämmung.", group: "trade" },
+  { id: "carpenter", label: "Tischler & Schreiner", icon: Hammer, description: "Möbelbau, Türen, Einbauten.", group: "trade" },
+  { id: "handyman", label: "Hausmeister", icon: Wrench, description: "Kleinreparaturen, Treppenhaus, Winterdienst.", group: "service" },
+  { id: "cleaner", label: "Reinigung", icon: Sparkles, description: "Treppenhaus, Endreinigung, Fenster.", group: "service" },
+  { id: "gardener", label: "Gartenpflege", icon: Sprout, description: "Hecke, Rasen, Baumschnitt.", group: "service" },
+  { id: "locksmith", label: "Schlüsseldienst", icon: Key, description: "Notöffnung, Schloss tauschen.", group: "trade" },
 ];
+
+const GROUP_STYLE: Record<Category["group"], { dot: string; tile: string; iconBg: string; badge: string; label: string }> = {
+  advisor: {
+    dot: "bg-violet-500",
+    tile: "border-violet-500/30 hover:border-violet-500 hover:bg-violet-500/5",
+    iconBg: "bg-violet-500/15 text-violet-600 dark:text-violet-400",
+    badge: "bg-violet-500/15 text-violet-700 dark:text-violet-300 border-violet-500/30",
+    label: "Berater",
+  },
+  trade: {
+    dot: "bg-primary",
+    tile: "hover:border-primary/40 hover:bg-accent/30",
+    iconBg: "bg-primary/10 text-primary",
+    badge: "bg-primary/10 text-primary border-primary/30",
+    label: "Handwerk",
+  },
+  service: {
+    dot: "bg-emerald-500",
+    tile: "hover:border-emerald-500/40 hover:bg-emerald-500/5",
+    iconBg: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+    badge: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30",
+    label: "Service",
+  },
+};
 
 const Marketplace = () => {
   const [query, setQuery] = useState("");
