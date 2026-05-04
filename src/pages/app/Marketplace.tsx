@@ -182,64 +182,90 @@ const Marketplace = () => {
             </p>
           ) : (
             <div className="space-y-2">
-              {results.map((p) => (
-                <div
-                  key={p.id}
-                  className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 p-3 rounded-md bg-accent/20 border border-border"
-                >
-                  <div className="min-w-0 flex-1 space-y-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium text-sm">{p.name}</span>
-                      {typeof p.rating === "number" && (
-                        <span className="inline-flex items-center gap-0.5 text-xs text-amber-600 dark:text-amber-400">
-                          <Star className="h-3 w-3 fill-current" />
-                          {p.rating.toFixed(1)}
-                          {p.rating_count ? (
-                            <span className="text-muted-foreground ml-0.5">({num(p.rating_count)})</span>
-                          ) : null}
-                        </span>
-                      )}
-                      {typeof p.distance_km === "number" && (
-                        <Badge variant="outline" className="text-[10px]">
-                          {p.distance_km < 1 ? "< 1" : Math.round(p.distance_km)} km
-                        </Badge>
-                      )}
+              {results.map((p) => {
+                const websiteUrl = p.website
+                  ? (p.website.startsWith("http") ? p.website : `https://${p.website}`)
+                  : null;
+                const mapsUrl = p.google_maps
+                  ?? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${p.name} ${p.address ?? ""}`)}`;
+                const directionsUrl = p.lat && p.lng
+                  ? `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`
+                  : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${p.name} ${p.address ?? ""}`)}`;
+                const today = (new Date().getDay() + 6) % 7; // Mo=0
+                const hoursToday = p.opening_hours?.[today] ?? null;
+                return (
+                  <div
+                    key={p.id}
+                    className="flex flex-col gap-2 p-3 rounded-md bg-accent/20 border border-border hover:border-primary/40 transition-colors"
+                  >
+                    <div className="flex items-start justify-between gap-3 flex-wrap">
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-semibold text-sm">{p.name}</span>
+                          {p.category && (
+                            <Badge variant="secondary" className="text-[10px]">{p.category}</Badge>
+                          )}
+                          {typeof p.rating === "number" && (
+                            <span className="inline-flex items-center gap-0.5 text-xs text-amber-600 dark:text-amber-400">
+                              <Star className="h-3 w-3 fill-current" />
+                              {p.rating.toFixed(1)}
+                              {p.rating_count ? (
+                                <span className="text-muted-foreground ml-0.5">({num(p.rating_count)})</span>
+                              ) : null}
+                            </span>
+                          )}
+                          {typeof p.distance_km === "number" && (
+                            <Badge variant="outline" className="text-[10px]">
+                              {p.distance_km < 1 ? "< 1" : p.distance_km.toFixed(1)} km
+                            </Badge>
+                          )}
+                        </div>
+                        {p.address && (
+                          <a
+                            href={mapsUrl}
+                            target="_blank" rel="noopener noreferrer"
+                            className="text-xs text-muted-foreground hover:text-foreground flex items-start gap-1"
+                          >
+                            <MapPin className="h-3 w-3 mt-0.5 shrink-0" /> {p.address}
+                          </a>
+                        )}
+                        {hoursToday && (
+                          <p className="text-[11px] text-muted-foreground">
+                            Heute: <span className="text-foreground">{hoursToday.replace(/^[^:]+:\s*/, "")}</span>
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    {p.address && (
-                      <p className="text-xs text-muted-foreground flex items-start gap-1">
-                        <MapPin className="h-3 w-3 mt-0.5 shrink-0" /> {p.address}
-                      </p>
-                    )}
-                    <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+
+                    <div className="flex flex-wrap gap-2 pt-1">
                       {p.phone && (
-                        <a href={`tel:${p.phone}`} className="flex items-center gap-1 hover:text-foreground">
-                          <Phone className="h-3 w-3" /> {p.phone}
-                        </a>
+                        <Button asChild size="sm" variant="default" className="h-8 gap-1.5">
+                          <a href={`tel:${p.phone.replace(/\s/g, "")}`}>
+                            <Phone className="h-3.5 w-3.5" /> {p.phone}
+                          </a>
+                        </Button>
                       )}
-                      {p.website && (
-                        <a
-                          href={p.website.startsWith("http") ? p.website : `https://${p.website}`}
-                          target="_blank" rel="noopener noreferrer"
-                          className="flex items-center gap-1 hover:text-foreground"
-                        >
-                          <Globe className="h-3 w-3" /> Website
-                        </a>
+                      {websiteUrl && (
+                        <Button asChild size="sm" variant="outline" className="h-8 gap-1.5">
+                          <a href={websiteUrl} target="_blank" rel="noopener noreferrer">
+                            <Globe className="h-3.5 w-3.5" /> Website
+                          </a>
+                        </Button>
                       )}
+                      <Button asChild size="sm" variant="outline" className="h-8 gap-1.5">
+                        <a href={directionsUrl} target="_blank" rel="noopener noreferrer">
+                          <MapPin className="h-3.5 w-3.5" /> Route
+                        </a>
+                      </Button>
+                      <Button asChild size="sm" variant="ghost" className="h-8 gap-1.5">
+                        <a href={mapsUrl} target="_blank" rel="noopener noreferrer">
+                          Auf Google Maps <ExternalLink className="h-3 w-3" />
+                        </a>
+                      </Button>
                     </div>
                   </div>
-                  <Button asChild size="sm" variant="outline" className="shrink-0 w-full sm:w-auto">
-                    <a
-                      href={
-                        p.google_maps ??
-                        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${p.name} ${p.address ?? ""}`)}`
-                      }
-                      target="_blank" rel="noopener noreferrer"
-                    >
-                      Auf Karte <ExternalLink className="h-3 w-3 ml-1" />
-                    </a>
-                  </Button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
