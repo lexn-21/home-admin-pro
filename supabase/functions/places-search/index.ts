@@ -90,11 +90,12 @@ Deno.serve(async (req) => {
 
     const body = await req.json().catch(() => ({}));
     const category = String(body.category ?? "");
-    const zip = String(body.zip ?? "");
+    // query = PLZ ODER Ortsname ("59320", "Ennigerloh", "Berlin Mitte" …)
+    const query = String(body.query ?? body.zip ?? "").trim();
     const radiusKm = Math.min(50, Math.max(1, Number(body.radius ?? 15)));
 
-    if (!/^\d{5}$/.test(zip)) {
-      return new Response(JSON.stringify({ error: "Ungültige PLZ" }), {
+    if (!query) {
+      return new Response(JSON.stringify({ error: "Bitte PLZ oder Ort eingeben" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -104,31 +105,36 @@ Deno.serve(async (req) => {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    const isZip = /^\d{5}$/.test(query);
+    const cacheKey = isZip ? query : query.toLowerCase().replace(/\s+/g, "_").slice(0, 60);
+
     const admin = createClient(SUPABASE_URL, SERVICE_ROLE);
 
-    // Exakte PLZ-Koordinaten via Google Geocoding (mit Cache in places_cache als zip+__geo__)
-    let center: { lat: number; lng: number } | null = null;
+    // Koordinaten via Google Geocoding (PLZ oder Ortsname). Cache 30 Tage.
+    let center: { lat: number; lng: number; label?: string } | null = null;
     const GOOGLE_KEY_EARLY = Deno.env.get("GOOGLE_PLACES_API_KEY");
 
     const { data: geoCached } = await admin
       .from("places_cache")
       .select("payload")
-      .eq("zip", zip).eq("category", "__geo__").eq("radius_km", 0)
+      .eq("zip", cacheKey).eq("category", "__geo__").eq("radius_km", 0)
       .gt("expires_at", new Date().toISOString())
       .maybeSingle();
 
     if (geoCached?.payload && (geoCached.payload as any).lat) {
       center = geoCached.payload as any;
     } else if (GOOGLE_KEY_EARLY) {
-      const gr = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?components=country:DE|postal_code:${zip}&key=${GOOGLE_KEY_EARLY}`
-      );
+      const url = isZip
+        ? `https://maps.googleapis.com/maps/api/geocode/json?components=country:DE|postal_code:${query}&key=${GOOGLE_KEY_EARLY}`
+        : `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(query + ", Deutschland")}&key=${GOOGLE_KEY_EARLY}`;
+      const gr = await fetch(url);
       const gj = await gr.json();
-      const loc = gj?.results?.[0]?.geometry?.location;
+      const r0 = gj?.results?.[0];
+      const loc = r0?.geometry?.location;
       if (loc?.lat && loc?.lng) {
-        center = { lat: loc.lat, lng: loc.lng };
+        center = { lat: loc.lat, lng: loc.lng, label: r0?.formatted_address };
         await admin.from("places_cache").upsert({
-          zip, category: "__geo__", radius_km: 0,
+          zip: cacheKey, category: "__geo__", radius_km: 0,
           payload: center,
           expires_at: new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString(),
         }, { onConflict: "zip,category,radius_km" });
@@ -136,26 +142,26 @@ Deno.serve(async (req) => {
     }
 
     // Fallback: 2-stellige PLZ-Region
+    if (!center && isZip) {
+      const center2 = PLZ2[query.slice(0, 2)];
+      if (center2) center = { lat: center2[0], lng: center2[1] };
+    }
     if (!center) {
-      const center2 = PLZ2[zip.slice(0, 2)];
-      if (!center2) {
-        return new Response(JSON.stringify({ error: "PLZ unbekannt" }), {
-          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      center = { lat: center2[0], lng: center2[1] };
+      return new Response(JSON.stringify({ error: "Ort nicht gefunden" }), {
+        status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    // 1) Cache lookup
+    // 1) Cache lookup für Suchergebnisse
     const { data: cached } = await admin
       .from("places_cache")
       .select("payload, expires_at")
-      .eq("zip", zip).eq("category", category).eq("radius_km", radiusKm)
+      .eq("zip", cacheKey).eq("category", category).eq("radius_km", radiusKm)
       .gt("expires_at", new Date().toISOString())
       .maybeSingle();
 
     if (cached?.payload) {
-      return new Response(JSON.stringify({ source: "cache", places: cached.payload }), {
+      return new Response(JSON.stringify({ source: "cache", center, places: cached.payload }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
