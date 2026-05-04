@@ -177,7 +177,7 @@ const Markt = () => {
   const displayList = showNearby ? nearbyResults ?? [] : filtered;
   const adZip = anchor?.zip ?? null;
   const adCity = anchor?.city ?? null;
-  const adKind = (anchor?.kind ?? kind) as "rent" | "sale" | "wg_room";
+  const adKind: "rent" | "sale" = ((anchor?.kind ?? kind) === "sale" ? "sale" : "rent");
 
   const clearAnchor = () => {
     const next = new URLSearchParams(params);
