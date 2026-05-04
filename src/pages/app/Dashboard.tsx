@@ -94,6 +94,8 @@ const Dashboard = () => {
   const [listings, setListings] = useState<any[]>([]);
   const [appsIn, setAppsIn] = useState<number>(0);
   const [appsOut, setAppsOut] = useState<number>(0);
+  const [nkaOpen, setNkaOpen] = useState<number>(0);
+  const [nkaDraft, setNkaDraft] = useState<number>(0);
 
   useEffect(() => { document.title = "Übersicht · ImmonIQ"; }, []);
 
@@ -120,6 +122,15 @@ const Dashboard = () => {
       setListings(li.data ?? []);
       setAppsIn(ai.count ?? 0);
       setAppsOut(ao.count ?? 0);
+
+      const [nkaOpenRes, nkaDraftRes] = await Promise.all([
+        supabase.from("payments").select("id", { count: "exact", head: true })
+          .eq("user_id", user.id).eq("kind", "nka_nachzahlung").eq("status", "open"),
+        supabase.from("nka_periods").select("id", { count: "exact", head: true })
+          .eq("user_id", user.id).eq("status", "draft"),
+      ]);
+      setNkaOpen(nkaOpenRes.count ?? 0);
+      setNkaDraft(nkaDraftRes.count ?? 0);
     })();
   }, [user]);
 
