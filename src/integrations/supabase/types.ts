@@ -1035,6 +1035,36 @@ export type Database = {
           },
         ]
       }
+      places_cache: {
+        Row: {
+          category: string
+          created_at: string
+          expires_at: string
+          id: string
+          payload: Json
+          radius_km: number
+          zip: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          payload: Json
+          radius_km: number
+          zip: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          payload?: Json
+          radius_km?: number
+          zip?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
