@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Logo } from "@/components/Logo";
 import { eur, date } from "@/lib/format";
-import { Home, AlertTriangle, Plus, ShieldCheck, Loader2 } from "lucide-react";
+import { Home, AlertTriangle, Plus, ShieldCheck, Loader2, FileText, Download } from "lucide-react";
 import { toast } from "sonner";
 
 type Resolved = {
@@ -20,6 +20,13 @@ type Resolved = {
   unit: { label: string; rent_cold: number; utilities: number; living_space: number };
   property: { name: string; street: string; zip: string; city: string };
   issues: Array<{ id: string; title: string; description: string; severity: string; status: string; reported_at: string; category: string }>;
+};
+
+type NkaItem = {
+  id: string; period_id: string; year: number;
+  period_start: string; period_end: string;
+  vorauszahlung_summe: number; ist_summe: number; saldo: number;
+  pdf_path: string | null; sent_at: string | null;
 };
 
 const SEV_TONE: Record<string, string> = {
