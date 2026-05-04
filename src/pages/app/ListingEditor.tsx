@@ -31,6 +31,11 @@ const ListingEditor = () => {
     zip: "", city: "", street_public: "",
     energy_class: "", energy_value: "",
     features: { balkon: false, ebk: false, garten: false, garage: false, keller: false, aufzug: false, haustiere_ok: false, moebliert: false },
+    wg_total_rooms: "", wg_current_flatmates: "", wg_room_size_sqm: "",
+    wg_furnished: false,
+    wg_shared_facilities: { bad: true, kueche: true, balkon: false, garten: false },
+    wg_flatmate_age_min: "", wg_flatmate_age_max: "", wg_flatmate_gender_pref: "any",
+    students_welcome: false,
   });
 
   useEffect(() => {
