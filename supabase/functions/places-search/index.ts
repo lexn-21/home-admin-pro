@@ -285,14 +285,14 @@ Deno.serve(async (req) => {
 
     // 4) Cache + Usage-Log schreiben
     await admin.from("places_cache").upsert({
-      zip, category, radius_km: radiusKm,
+      zip: cacheKey, category, radius_km: radiusKm,
       payload: places,
       expires_at: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
     }, { onConflict: "zip,category,radius_km" });
 
     await admin.from("ai_usage_log").insert({ user_id: userId, function_name: "places-search" });
 
-    return new Response(JSON.stringify({ source: "google", places }), {
+    return new Response(JSON.stringify({ source: "google", center, places }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e: any) {
