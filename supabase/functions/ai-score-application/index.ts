@@ -32,17 +32,20 @@ Deno.serve(async (req) => {
 
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);
     const { data: app } = await admin.from("applications")
-      .select("*, listings(price, deposit, utilities, rooms, living_space, city)")
+      .select("*, listings(price, deposit, utilities, rooms, living_space, city, kind, students_welcome, wg_flatmate_age_min, wg_flatmate_age_max)")
       .eq("id", application_id).maybeSingle();
     if (!app) return new Response(JSON.stringify({ error: "not found" }), { status: 404, headers: corsHeaders });
     if (app.owner_user_id !== user.id) return new Response("forbidden", { status: 403, headers: corsHeaders });
 
     const { data: seeker } = await admin.from("seeker_profiles").select("*").eq("user_id", app.seeker_user_id).maybeSingle();
 
-    const userPrompt = `Bewerte diese Wohnungsbewerbung neutral und fair für den Vermieter.
+    const isStudent = !!seeker?.is_student;
+    const isWg = app.listings?.kind === "wg_room";
+
+    const userPrompt = `Bewerte diese ${isWg ? "WG-Zimmer" : "Wohnungs"}-Bewerbung neutral und fair für den Vermieter${isWg ? "/die WG" : ""}.
 
 INSERAT:
-- Kaltmiete: ${app.listings?.price} €
+- ${isWg ? "Zimmer-Miete" : "Kaltmiete"}: ${app.listings?.price} €
 - Nebenkosten: ${app.listings?.utilities ?? "?"} €
 - Größe: ${app.listings?.living_space ?? "?"} m², ${app.listings?.rooms ?? "?"} Zi
 - Stadt: ${app.listings?.city ?? "?"}
@@ -56,12 +59,24 @@ BEWERBER-PROFIL:
 - Raucher: ${seeker?.smoker ? "ja" : "nein"} · Tiere: ${seeker?.has_pets ? "ja" : "nein"}
 - Einzug ab: ${seeker?.move_in_from ?? "?"}
 - Über mich: ${seeker?.about_me?.slice(0, 500) ?? "—"}
+${isStudent ? `
+STUDENT:
+- Hochschule: ${seeker?.university ?? "?"} · Studiengang: ${seeker?.study_program ?? "?"} · Semester: ${seeker?.study_semester ?? "?"}
+- BAföG: ${seeker?.bafoeg_amount ? seeker.bafoeg_amount + " €/Mo" : "—"}
+- Bürge: ${seeker?.guarantor_name ?? "—"} (${seeker?.guarantor_relation ?? "?"}), Einkommen ${seeker?.guarantor_income ?? "?"} €
+- Immatrikulation hochgeladen: ${seeker?.study_certificate_path ? "ja" : "nein"}
+- Bürgschaftsdokument: ${seeker?.guarantor_document_path ? "ja" : "nein"}
+` : ""}
 
 ANSCHREIBEN: ${app.cover_message?.slice(0, 600) ?? "—"}
 
+${isStudent
+  ? "WICHTIG: Bei Studenten zählt die Bürgschaft (Eltern-Einkommen >= 3x Miete) und Immatrikulation MEHR als das eigene Einkommen. BAföG zählt als sicheres Einkommen."
+  : "40er-Regel: Kaltmiete*3 <= Netto = +Punkte."}
+
 Antworte STRIKT als JSON:
 {
-  "score": Zahl 0-100 (40er-Regel: Kaltmiete*3 ≤ Netto = +Punkte),
+  "score": Zahl 0-100,
   "summary": "1 Satz Empfehlung",
   "strengths": ["max 3 Stichpunkte"],
   "concerns": ["max 3 Stichpunkte oder leeres Array"]

@@ -17,6 +17,8 @@ const empty = {
   net_income_monthly: "", employment_type: "unbefristet",
   employer: "", schufa_status: "unverified",
   move_in_from: "", max_rent: "", preferred_zips: "", about_me: "",
+  is_student: false, university: "", study_program: "", study_semester: "",
+  bafoeg_amount: "", guarantor_name: "", guarantor_relation: "", guarantor_income: "",
 };
 
 function score(p: any) {
@@ -77,6 +79,14 @@ const SeekerProfile = () => {
         ? String(form.preferred_zips).split(",").map((s: string) => s.trim()).filter(Boolean)
         : [],
       about_me: form.about_me || null,
+      is_student: !!form.is_student,
+      university: form.university || null,
+      study_program: form.study_program || null,
+      study_semester: form.study_semester ? Number(form.study_semester) : null,
+      bafoeg_amount: form.bafoeg_amount ? Number(form.bafoeg_amount) : null,
+      guarantor_name: form.guarantor_name || null,
+      guarantor_relation: form.guarantor_relation || null,
+      guarantor_income: form.guarantor_income ? Number(form.guarantor_income) : null,
       completeness_score: score(form),
     };
     const { error } = await supabase.from("seeker_profiles").upsert(payload, { onConflict: "user_id" });
@@ -179,6 +189,39 @@ const SeekerProfile = () => {
             <Textarea rows={4} value={form.about_me} onChange={(e) => setForm({ ...form, about_me: e.target.value })}
               placeholder="Hallo, ich bin … arbeite als … suche eine ruhige Wohnung für …" /></div>
         </div>
+      </Card>
+
+      <Card className="p-6 glass space-y-4 border-violet-500/20">
+        <div className="flex items-center justify-between">
+          <h2 className="font-bold flex items-center gap-2">🎓 Studenten-Profil</h2>
+          <label className="flex items-center gap-2 text-sm">
+            <Switch checked={form.is_student} onCheckedChange={(v) => setForm({ ...form, is_student: v })} /> Ich bin Student/in
+          </label>
+        </div>
+        {form.is_student && (
+          <div className="grid grid-cols-2 gap-3">
+            <div><Label>Hochschule</Label>
+              <Input value={form.university} onChange={(e) => setForm({ ...form, university: e.target.value })} /></div>
+            <div><Label>Studiengang</Label>
+              <Input value={form.study_program} onChange={(e) => setForm({ ...form, study_program: e.target.value })} /></div>
+            <div><Label>Semester</Label>
+              <Input type="number" value={form.study_semester} onChange={(e) => setForm({ ...form, study_semester: e.target.value })} /></div>
+            <div><Label>BAföG (€/Mo)</Label>
+              <Input type="number" value={form.bafoeg_amount} onChange={(e) => setForm({ ...form, bafoeg_amount: e.target.value })} /></div>
+            <div className="col-span-2 pt-2 border-t">
+              <p className="text-xs font-semibold mb-2 text-muted-foreground">Bürgschaft (z. B. Eltern)</p>
+            </div>
+            <div><Label>Name Bürge</Label>
+              <Input value={form.guarantor_name} onChange={(e) => setForm({ ...form, guarantor_name: e.target.value })} /></div>
+            <div><Label>Verhältnis</Label>
+              <Input value={form.guarantor_relation} onChange={(e) => setForm({ ...form, guarantor_relation: e.target.value })} placeholder="Vater, Mutter…" /></div>
+            <div className="col-span-2"><Label>Netto-Einkommen Bürge (€/Mo)</Label>
+              <Input type="number" value={form.guarantor_income} onChange={(e) => setForm({ ...form, guarantor_income: e.target.value })} /></div>
+            <p className="col-span-2 text-[11px] text-muted-foreground">
+              Tipp: Lade Immatrikulationsbescheinigung & Bürgschaftserklärung im Tresor hoch — Vermieter sehen so schneller deine Bonität.
+            </p>
+          </div>
+        )}
       </Card>
 
       <div className="flex justify-end">

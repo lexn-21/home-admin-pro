@@ -42,7 +42,7 @@ const Markt = () => {
 
   // filter state (URL-synced)
   const [q, setQ] = useState(params.get("q") ?? "");
-  const [kind, setKind] = useState<"rent" | "sale">((params.get("k") as any) || "rent");
+  const [kind, setKind] = useState<"rent" | "sale" | "wg_room">((params.get("k") as any) || "rent");
   const [maxPrice, setMaxPrice] = useState(params.get("maxp") ?? "");
   const [minRooms, setMinRooms] = useState(params.get("minr") ?? "");
   const [minSpace, setMinSpace] = useState(params.get("mins") ?? "");
@@ -58,7 +58,7 @@ const Markt = () => {
   // anchor radius search (kept from before)
   const anchorId = params.get("near");
   const anchorZip = params.get("zip");
-  const anchorKindParam = (params.get("kind") as "rent" | "sale" | null) ?? null;
+  const anchorKindParam = (params.get("kind") as "rent" | "sale" | "wg_room" | null) ?? null;
   const anchorLabel = params.get("label");
   const [anchor, setAnchor] = useState<any>(null);
   const [radiusKm, setRadiusKm] = useState<number>(Number(params.get("r") ?? 10));
@@ -177,7 +177,7 @@ const Markt = () => {
   const displayList = showNearby ? nearbyResults ?? [] : filtered;
   const adZip = anchor?.zip ?? null;
   const adCity = anchor?.city ?? null;
-  const adKind = (anchor?.kind ?? kind) as "rent" | "sale";
+  const adKind: "rent" | "sale" = ((anchor?.kind ?? kind) === "sale" ? "sale" : "rent");
 
   const clearAnchor = () => {
     const next = new URLSearchParams(params);
@@ -314,11 +314,11 @@ const Markt = () => {
                   <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <Input className="pl-9" placeholder="Stadt, PLZ oder Stichwort" value={q} onChange={(e) => setQ(e.target.value)} />
                 </div>
-                <Select value={kind} onValueChange={(v) => setKind(v as "rent" | "sale")}>
+                <Select value={kind} onValueChange={(v) => setKind(v as "rent" | "sale" | "wg_room")}>
                   <SelectTrigger className="w-[110px]"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="rent">Mieten</SelectItem>
-                    <SelectItem value="sale">Kaufen</SelectItem>
+                    <SelectItem value="sale">Kaufen</SelectItem><SelectItem value="wg_room">WG-Zimmer</SelectItem>
                   </SelectContent>
                 </Select>
                 <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
@@ -465,8 +465,8 @@ const Markt = () => {
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">Kein Foto</div>
                           )}
-                          <Badge className="absolute top-2 left-2 bg-background/85 backdrop-blur text-foreground border">
-                            {l.kind === "rent" ? "Miete" : "Kauf"}
+                          <Badge className={`absolute top-2 left-2 backdrop-blur border ${l.kind === "wg_room" ? "bg-violet-500/85 text-white border-violet-500" : "bg-background/85 text-foreground"}`}>
+                            {l.kind === "rent" ? "Miete" : l.kind === "sale" ? "Kauf" : "WG-Zimmer"}
                           </Badge>
                           {fr?.fresh && (
                             <Badge className="absolute top-2 left-[5.5rem] bg-emerald-600 text-white border-0 gap-1">
@@ -497,7 +497,7 @@ const Markt = () => {
                               <span className="flex items-center gap-1"><Bed className="h-3 w-3" /> {l.rooms ?? "—"}</span>
                               <span className="flex items-center gap-1"><Maximize2 className="h-3 w-3" /> {l.living_space ?? "—"} m²</span>
                             </div>
-                            <span className="font-bold text-gradient-gold">{eur(l.price)}{l.kind === "rent" ? "/Mo" : ""}</span>
+                            <span className="font-bold text-gradient-gold">{eur(l.price)}{(l.kind === "rent" || l.kind === "wg_room") ? "/Mo" : ""}</span>
                           </div>
                           <div className="flex items-center justify-between text-[11px] text-muted-foreground mt-auto pt-2 border-t border-border/50">
                             <span className="flex items-center gap-1">

@@ -31,6 +31,11 @@ const ListingEditor = () => {
     zip: "", city: "", street_public: "",
     energy_class: "", energy_value: "",
     features: { balkon: false, ebk: false, garten: false, garage: false, keller: false, aufzug: false, haustiere_ok: false, moebliert: false },
+    wg_total_rooms: "", wg_current_flatmates: "", wg_room_size_sqm: "",
+    wg_furnished: false,
+    wg_shared_facilities: { bad: true, kueche: true, balkon: false, garten: false },
+    wg_flatmate_age_min: "", wg_flatmate_age_max: "", wg_flatmate_gender_pref: "any",
+    students_welcome: false,
   });
 
   useEffect(() => {
@@ -195,6 +200,15 @@ const ListingEditor = () => {
       features: form.features,
       status: publish ? "published" : (editing ? form.status : "draft"),
       published_at: publish ? new Date().toISOString() : (form.published_at ?? null),
+      wg_total_rooms: form.wg_total_rooms ? Number(form.wg_total_rooms) : null,
+      wg_current_flatmates: form.wg_current_flatmates ? Number(form.wg_current_flatmates) : null,
+      wg_room_size_sqm: form.wg_room_size_sqm ? Number(form.wg_room_size_sqm) : null,
+      wg_furnished: !!form.wg_furnished,
+      wg_shared_facilities: form.wg_shared_facilities,
+      wg_flatmate_age_min: form.wg_flatmate_age_min ? Number(form.wg_flatmate_age_min) : null,
+      wg_flatmate_age_max: form.wg_flatmate_age_max ? Number(form.wg_flatmate_age_max) : null,
+      wg_flatmate_gender_pref: form.wg_flatmate_gender_pref || null,
+      students_welcome: !!form.students_welcome,
     };
 
     if (publish && !form.energy_class) {
@@ -258,11 +272,12 @@ const ListingEditor = () => {
               <SelectContent>
                 <SelectItem value="rent">Vermieten</SelectItem>
                 <SelectItem value="sale">Verkaufen</SelectItem>
+                <SelectItem value="wg_room">WG-Zimmer</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div>
-            <Label>{form.kind === "rent" ? "Kaltmiete (€/Mo)" : "Kaufpreis (€)"}</Label>
+            <Label>{form.kind === "sale" ? "Kaufpreis (€)" : form.kind === "wg_room" ? "Zimmer-Miete warm (€/Mo)" : "Kaltmiete (€/Mo)"}</Label>
             <div className="flex gap-2">
               <Input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
               <Button type="button" variant="outline" size="icon" title="Marktwert vorschlagen" onClick={suggestPrice}>
@@ -270,7 +285,7 @@ const ListingEditor = () => {
               </Button>
             </div>
           </div>
-          {form.kind === "rent" && <>
+          {(form.kind === "rent" || form.kind === "wg_room") && <>
             <div><Label>Nebenkosten (€)</Label>
               <Input type="number" value={form.utilities} onChange={(e) => setForm({ ...form, utilities: e.target.value })} /></div>
             <div><Label>Kaution (€)</Label>
@@ -286,6 +301,60 @@ const ListingEditor = () => {
             <Input type="date" value={form.available_from} onChange={(e) => setForm({ ...form, available_from: e.target.value })} /></div>
         </div>
       </Card>
+
+      {form.kind === "wg_room" && (
+        <Card className="p-6 glass space-y-4 border-violet-500/30">
+          <h2 className="font-bold flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-violet-500" /> WG-Details
+          </h2>
+          <div className="grid grid-cols-3 gap-3">
+            <div><Label>Zimmergröße (m²)</Label>
+              <Input type="number" value={form.wg_room_size_sqm} onChange={(e) => setForm({ ...form, wg_room_size_sqm: e.target.value })} /></div>
+            <div><Label>Gesamtzimmer in der WG</Label>
+              <Input type="number" value={form.wg_total_rooms} onChange={(e) => setForm({ ...form, wg_total_rooms: e.target.value })} /></div>
+            <div><Label>Aktuelle Mitbewohner</Label>
+              <Input type="number" value={form.wg_current_flatmates} onChange={(e) => setForm({ ...form, wg_current_flatmates: e.target.value })} /></div>
+            <div><Label>Alter min</Label>
+              <Input type="number" value={form.wg_flatmate_age_min} onChange={(e) => setForm({ ...form, wg_flatmate_age_min: e.target.value })} /></div>
+            <div><Label>Alter max</Label>
+              <Input type="number" value={form.wg_flatmate_age_max} onChange={(e) => setForm({ ...form, wg_flatmate_age_max: e.target.value })} /></div>
+            <div>
+              <Label>Geschlecht (Präferenz)</Label>
+              <Select value={form.wg_flatmate_gender_pref} onValueChange={(v) => setForm({ ...form, wg_flatmate_gender_pref: v })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="any">Egal</SelectItem>
+                  <SelectItem value="female">Weiblich</SelectItem>
+                  <SelectItem value="male">Männlich</SelectItem>
+                  <SelectItem value="divers">Divers</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2 pt-2">
+            {(["bad", "kueche", "balkon", "garten"] as const).map((k) => {
+              const on = !!form.wg_shared_facilities?.[k];
+              return (
+                <button key={k} type="button"
+                  onClick={() => setForm({ ...form, wg_shared_facilities: { ...form.wg_shared_facilities, [k]: !on } })}
+                  className={`px-3 py-1.5 rounded-full text-xs border ${on ? "bg-violet-500/15 border-violet-500/40 text-violet-700 dark:text-violet-300" : "border-border text-muted-foreground"}`}>
+                  Geteilt: {k === "kueche" ? "Küche" : k === "bad" ? "Bad" : k.charAt(0).toUpperCase() + k.slice(1)}
+                </button>
+              );
+            })}
+            <button type="button"
+              onClick={() => setForm({ ...form, wg_furnished: !form.wg_furnished })}
+              className={`px-3 py-1.5 rounded-full text-xs border ${form.wg_furnished ? "bg-violet-500/15 border-violet-500/40 text-violet-700 dark:text-violet-300" : "border-border text-muted-foreground"}`}>
+              Möbliert
+            </button>
+            <button type="button"
+              onClick={() => setForm({ ...form, students_welcome: !form.students_welcome })}
+              className={`px-3 py-1.5 rounded-full text-xs border ${form.students_welcome ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-700 dark:text-emerald-300" : "border-border text-muted-foreground"}`}>
+              🎓 Studenten willkommen
+            </button>
+          </div>
+        </Card>
+      )}
 
       <Card className="p-6 glass space-y-4">
         <h2 className="font-bold">Adresse (öffentlich)</h2>
