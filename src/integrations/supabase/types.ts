@@ -304,6 +304,33 @@ export type Database = {
         }
         Relationships: []
       }
+      application_votes: {
+        Row: {
+          application_id: string
+          comment: string | null
+          created_at: string
+          id: string
+          member_link_id: string
+          vote: string
+        }
+        Insert: {
+          application_id: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          member_link_id: string
+          vote: string
+        }
+        Update: {
+          application_id?: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          member_link_id?: string
+          vote?: string
+        }
+        Relationships: []
+      }
       applications: {
         Row: {
           ai_concerns: string[] | null
@@ -832,12 +859,21 @@ export type Database = {
           rooms: number | null
           status: Database["public"]["Enums"]["listing_status"]
           street_public: string | null
+          students_welcome: boolean | null
           title: string
           unit_id: string | null
           updated_at: string
           user_id: string
           utilities: number | null
           views_count: number
+          wg_current_flatmates: number | null
+          wg_flatmate_age_max: number | null
+          wg_flatmate_age_min: number | null
+          wg_flatmate_gender_pref: string | null
+          wg_furnished: boolean | null
+          wg_room_size_sqm: number | null
+          wg_shared_facilities: Json | null
+          wg_total_rooms: number | null
           zip: string | null
         }
         Insert: {
@@ -867,12 +903,21 @@ export type Database = {
           rooms?: number | null
           status?: Database["public"]["Enums"]["listing_status"]
           street_public?: string | null
+          students_welcome?: boolean | null
           title: string
           unit_id?: string | null
           updated_at?: string
           user_id: string
           utilities?: number | null
           views_count?: number
+          wg_current_flatmates?: number | null
+          wg_flatmate_age_max?: number | null
+          wg_flatmate_age_min?: number | null
+          wg_flatmate_gender_pref?: string | null
+          wg_furnished?: boolean | null
+          wg_room_size_sqm?: number | null
+          wg_shared_facilities?: Json | null
+          wg_total_rooms?: number | null
           zip?: string | null
         }
         Update: {
@@ -902,12 +947,21 @@ export type Database = {
           rooms?: number | null
           status?: Database["public"]["Enums"]["listing_status"]
           street_public?: string | null
+          students_welcome?: boolean | null
           title?: string
           unit_id?: string | null
           updated_at?: string
           user_id?: string
           utilities?: number | null
           views_count?: number
+          wg_current_flatmates?: number | null
+          wg_flatmate_age_max?: number | null
+          wg_flatmate_age_min?: number | null
+          wg_flatmate_gender_pref?: string | null
+          wg_furnished?: boolean | null
+          wg_room_size_sqm?: number | null
+          wg_shared_facilities?: Json | null
+          wg_total_rooms?: number | null
           zip?: string | null
         }
         Relationships: []
@@ -1408,14 +1462,20 @@ export type Database = {
       seeker_profiles: {
         Row: {
           about_me: string | null
+          bafoeg_amount: number | null
           completeness_score: number
           created_at: string
           employer: string | null
           employment_type: Database["public"]["Enums"]["employment_type"] | null
           full_name: string | null
+          guarantor_document_path: string | null
+          guarantor_income: number | null
+          guarantor_name: string | null
+          guarantor_relation: string | null
           has_pets: boolean | null
           household_size: number | null
           id: string
+          is_student: boolean | null
           max_rent: number | null
           move_in_from: string | null
           net_income_monthly: number | null
@@ -1424,11 +1484,16 @@ export type Database = {
           profile_photo: string | null
           schufa_status: Database["public"]["Enums"]["schufa_status"]
           smoker: boolean | null
+          study_certificate_path: string | null
+          study_program: string | null
+          study_semester: number | null
+          university: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           about_me?: string | null
+          bafoeg_amount?: number | null
           completeness_score?: number
           created_at?: string
           employer?: string | null
@@ -1436,9 +1501,14 @@ export type Database = {
             | Database["public"]["Enums"]["employment_type"]
             | null
           full_name?: string | null
+          guarantor_document_path?: string | null
+          guarantor_income?: number | null
+          guarantor_name?: string | null
+          guarantor_relation?: string | null
           has_pets?: boolean | null
           household_size?: number | null
           id?: string
+          is_student?: boolean | null
           max_rent?: number | null
           move_in_from?: string | null
           net_income_monthly?: number | null
@@ -1447,11 +1517,16 @@ export type Database = {
           profile_photo?: string | null
           schufa_status?: Database["public"]["Enums"]["schufa_status"]
           smoker?: boolean | null
+          study_certificate_path?: string | null
+          study_program?: string | null
+          study_semester?: number | null
+          university?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           about_me?: string | null
+          bafoeg_amount?: number | null
           completeness_score?: number
           created_at?: string
           employer?: string | null
@@ -1459,9 +1534,14 @@ export type Database = {
             | Database["public"]["Enums"]["employment_type"]
             | null
           full_name?: string | null
+          guarantor_document_path?: string | null
+          guarantor_income?: number | null
+          guarantor_name?: string | null
+          guarantor_relation?: string | null
           has_pets?: boolean | null
           household_size?: number | null
           id?: string
+          is_student?: boolean | null
           max_rent?: number | null
           move_in_from?: string | null
           net_income_monthly?: number | null
@@ -1470,6 +1550,10 @@ export type Database = {
           profile_photo?: string | null
           schufa_status?: Database["public"]["Enums"]["schufa_status"]
           smoker?: boolean | null
+          study_certificate_path?: string | null
+          study_program?: string | null
+          study_semester?: number | null
+          university?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -1890,6 +1974,48 @@ export type Database = {
         }
         Relationships: []
       }
+      wg_member_links: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          last_accessed_at: string | null
+          listing_id: string
+          member_email: string | null
+          member_name: string
+          revoked: boolean
+          role: string
+          token: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          last_accessed_at?: string | null
+          listing_id: string
+          member_email?: string | null
+          member_name: string
+          revoked?: boolean
+          role?: string
+          token?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          last_accessed_at?: string | null
+          listing_id?: string
+          member_email?: string | null
+          member_name?: string
+          revoked?: boolean
+          role?: string
+          token?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -2038,6 +2164,11 @@ export type Database = {
           read_ct: number
         }[]
       }
+      tenant_portal_get_nka: { Args: { _token: string }; Returns: Json }
+      tenant_portal_nka_pdf_path: {
+        Args: { _distribution_id: string; _token: string }
+        Returns: string
+      }
       tenant_portal_report_issue: {
         Args: {
           _category: string
@@ -2051,6 +2182,16 @@ export type Database = {
       tenant_portal_resolve: { Args: { _token: string }; Returns: Json }
       trial_days_left: { Args: { _user_id: string }; Returns: number }
       user_plan_tier: { Args: { _user_id: string }; Returns: string }
+      wg_casting_resolve: { Args: { _token: string }; Returns: Json }
+      wg_casting_vote: {
+        Args: {
+          _application_id: string
+          _comment?: string
+          _token: string
+          _vote: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       application_status:
@@ -2090,7 +2231,7 @@ export type Database = {
         | "in_progress"
         | "resolved"
         | "closed"
-      listing_kind: "rent" | "sale"
+      listing_kind: "rent" | "sale" | "wg_room"
       listing_status: "draft" | "published" | "paused" | "closed"
       payment_kind:
         | "rent_cold"
@@ -2296,7 +2437,7 @@ export const Constants = {
         "resolved",
         "closed",
       ],
-      listing_kind: ["rent", "sale"],
+      listing_kind: ["rent", "sale", "wg_room"],
       listing_status: ["draft", "published", "paused", "closed"],
       payment_kind: [
         "rent_cold",
