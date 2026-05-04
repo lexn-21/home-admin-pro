@@ -318,7 +318,7 @@ const Markt = () => {
                   <SelectTrigger className="w-[110px]"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="rent">Mieten</SelectItem>
-                    <SelectItem value="sale">Kaufen</SelectItem>
+                    <SelectItem value="sale">Kaufen</SelectItem><SelectItem value="wg_room">WG-Zimmer</SelectItem>
                   </SelectContent>
                 </Select>
                 <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
