@@ -24,6 +24,9 @@ const ListingApplications = () => {
   const [apps, setApps] = useState<any[]>([]);
   const [chatApp, setChatApp] = useState<any>(null);
   const [scoring, setScoring] = useState<string | null>(null);
+  const [wgOpen, setWgOpen] = useState(false);
+  const [wgMembers, setWgMembers] = useState<any[]>([]);
+  const [newMember, setNewMember] = useState({ name: "", email: "" });
 
   const aiScore = async (appId: string) => {
     setScoring(appId);
