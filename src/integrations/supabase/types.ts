@@ -2092,7 +2092,13 @@ export type Database = {
         | "closed"
       listing_kind: "rent" | "sale"
       listing_status: "draft" | "published" | "paused" | "closed"
-      payment_kind: "rent_cold" | "utilities" | "deposit" | "other"
+      payment_kind:
+        | "rent_cold"
+        | "utilities"
+        | "deposit"
+        | "other"
+        | "nka_nachzahlung"
+        | "nka_erstattung"
       payment_status_simple: "paid" | "open" | "late"
       provider_category:
         | "sanitaer"
@@ -2292,7 +2298,14 @@ export const Constants = {
       ],
       listing_kind: ["rent", "sale"],
       listing_status: ["draft", "published", "paused", "closed"],
-      payment_kind: ["rent_cold", "utilities", "deposit", "other"],
+      payment_kind: [
+        "rent_cold",
+        "utilities",
+        "deposit",
+        "other",
+        "nka_nachzahlung",
+        "nka_erstattung",
+      ],
       payment_status_simple: ["paid", "open", "late"],
       provider_category: [
         "sanitaer",
