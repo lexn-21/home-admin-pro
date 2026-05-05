@@ -86,6 +86,7 @@ const QuickAction = ({ to, icon: Icon, label, desc, badge }: {
 const Dashboard = () => {
   const { user } = useAuth();
   const [name, setName] = useState("");
+  const [loading, setLoading] = useState(true);
   const [properties, setProperties] = useState<any[]>([]);
   const [units, setUnits] = useState<any[]>([]);
   const [tenants, setTenants] = useState<any[]>([]);
@@ -131,6 +132,7 @@ const Dashboard = () => {
       ]);
       setNkaOpen(nkaOpenRes.count ?? 0);
       setNkaDraft(nkaDraftRes.count ?? 0);
+      setLoading(false);
     })();
   }, [user]);
 
