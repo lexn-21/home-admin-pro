@@ -86,6 +86,7 @@ const QuickAction = ({ to, icon: Icon, label, desc, badge }: {
 const Dashboard = () => {
   const { user } = useAuth();
   const [name, setName] = useState("");
+  const [loading, setLoading] = useState(true);
   const [properties, setProperties] = useState<any[]>([]);
   const [units, setUnits] = useState<any[]>([]);
   const [tenants, setTenants] = useState<any[]>([]);
@@ -131,6 +132,7 @@ const Dashboard = () => {
       ]);
       setNkaOpen(nkaOpenRes.count ?? 0);
       setNkaDraft(nkaDraftRes.count ?? 0);
+      setLoading(false);
     })();
   }, [user]);
 
@@ -208,7 +210,17 @@ const Dashboard = () => {
         </div>
       </Item>
 
-      {isEmpty ? (
+      {loading ? (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+          {[0,1,2,3].map(i => (
+            <Card key={i} className="p-5 glass h-[120px] animate-pulse">
+              <div className="h-3 w-24 bg-muted rounded mb-3" />
+              <div className="h-7 w-32 bg-muted rounded mb-2" />
+              <div className="h-2 w-20 bg-muted rounded" />
+            </Card>
+          ))}
+        </div>
+      ) : isEmpty ? (
         <Item variant="scale">
           <Card className="p-8 lg:p-12 text-center glass relative overflow-hidden">
             <motion.div
