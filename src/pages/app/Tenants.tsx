@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Users, Mail, Phone, Link2, Building2 } from "lucide-react";
 import { toast } from "sonner";
+import { toastError } from "@/lib/errors";
 import { eur, date } from "@/lib/format";
 import { z } from "zod";
 import EmptyState from "@/components/EmptyState";
@@ -67,7 +68,7 @@ const Tenants = () => {
     if (!payload.lease_start) delete payload.lease_start;
     if (!payload.lease_end) delete payload.lease_end;
     const { error } = await supabase.from("tenants").insert(payload);
-    if (error) return toast.error(error.message);
+    if (error) return toastError(error, { onRetry: submit });
     toast.success("Mieter angelegt.");
     setOpen(false);
     setForm({ property_id: "", full_name: "", email: "", phone: "", lease_start: "", lease_end: "", deposit: "" });
@@ -76,7 +77,7 @@ const Tenants = () => {
 
   return (
     <div className="space-y-6">
-      <header className="flex items-center justify-between">
+      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold">Mieter</h1>
           <p className="text-muted-foreground text-sm mt-1">Mietverhältnisse und Kontaktdaten.</p>

@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Plus, Building2, MapPin, ArrowRight, Megaphone } from "lucide-react";
 import { toast } from "sonner";
+import { toastError } from "@/lib/errors";
 import { eur } from "@/lib/format";
 import { z } from "zod";
 import EmptyState from "@/components/EmptyState";
@@ -67,7 +68,7 @@ const Properties = () => {
     Object.keys(payload).forEach(k => { if (payload[k] === "" || payload[k] === undefined) delete payload[k]; });
 
     const { error } = await supabase.from("properties").insert(payload);
-    if (error) return toast.error(error.message);
+    if (error) return toastError(error, { onRetry: submit });
     toast.success("Objekt angelegt — 4 Standard-Fristen wurden automatisch erzeugt.");
     setOpen(false);
     setForm(empty);
@@ -76,7 +77,7 @@ const Properties = () => {
 
   return (
     <div className="space-y-6">
-      <header className="flex items-center justify-between">
+      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Objekte</h1>
           <p className="text-muted-foreground text-sm mt-1">Deine Immobilien — Stammdaten und AfA.</p>

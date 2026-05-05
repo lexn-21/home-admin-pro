@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ExternalLink, Plus, AlertOctagon, ListChecks, CheckCircle2, CalendarClock } from "lucide-react";
 import { toast } from "sonner";
+import { toastError } from "@/lib/errors";
 import EmptyState from "@/components/EmptyState";
 import { ListSkeleton } from "@/components/ListSkeleton";
 
@@ -66,7 +67,7 @@ export default function Tasks() {
       legal_ref: form.legal_ref || null,
       legal_url: form.legal_url || null,
     });
-    if (error) { toast.error(error.message); return; }
+    if (error) { toastError(error, { onRetry: create }); return; }
     toast.success("Aufgabe angelegt");
     setOpen(false);
     setForm({ title: "", description: "", category: "", due_date: "", property_id: "", legal_ref: "", legal_url: "" });

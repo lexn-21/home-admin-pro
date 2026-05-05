@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Wallet, Building2 } from "lucide-react";
 import { toast } from "sonner";
+import { toastError } from "@/lib/errors";
 import { eur, date } from "@/lib/format";
 import { z } from "zod";
 import EmptyState from "@/components/EmptyState";
@@ -62,7 +63,7 @@ const Payments = () => {
     const payload: any = { ...parsed.data, user_id: user.id, unit_id: unitId };
     if (!payload.note) delete payload.note;
     const { error } = await supabase.from("payments").insert(payload);
-    if (error) return toast.error(error.message);
+    if (error) return toastError(error, { onRetry: submit });
     toast.success("Zahlung erfasst.");
     setOpen(false);
     setForm({ property_id: "", paid_on: new Date().toISOString().slice(0, 10), amount: "", kind: "rent_cold", note: "" });
@@ -73,7 +74,7 @@ const Payments = () => {
 
   return (
     <div className="space-y-6">
-      <header className="flex items-center justify-between">
+      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold">Zahlungen</h1>
           <p className="text-muted-foreground text-sm mt-1">Erfasste Mietzahlungen — Bank-Anbindung folgt.</p>
@@ -143,7 +144,22 @@ const Payments = () => {
         />
       ) : (
         <Card className="glass overflow-hidden">
-          <table className="w-full text-sm">
+          {/* Mobile: Card-Liste */}
+          <div className="md:hidden divide-y divide-border">
+            {items.map(p => (
+              <div key={p.id} className="p-4 flex items-center justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium truncate">{p.properties?.name ?? "—"}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {date(p.paid_on)} · {KIND_LABEL[p.kind]}
+                  </p>
+                </div>
+                <p className="font-semibold text-success whitespace-nowrap">+{eur(p.amount)}</p>
+              </div>
+            ))}
+          </div>
+          {/* Desktop: Tabelle */}
+          <table className="w-full text-sm hidden md:table">
             <thead className="bg-muted/50 text-xs">
               <tr>
                 <th className="text-left p-3">Datum</th>

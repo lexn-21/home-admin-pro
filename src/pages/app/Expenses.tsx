@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Receipt, Paperclip, Info, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
+import { toastError } from "@/lib/errors";
 import { eur, date } from "@/lib/format";
 import { z } from "zod";
 import EmptyState from "@/components/EmptyState";
@@ -81,7 +82,7 @@ const Expenses = () => {
     if (!payload.description) delete payload.description;
 
     const { error } = await supabase.from("expenses").insert(payload);
-    if (error) return toast.error(error.message);
+    if (error) return toastError(error, { onRetry: submit });
     toast.success("Beleg erfasst.");
     setOpen(false);
     setFile(null);
@@ -110,7 +111,7 @@ const Expenses = () => {
 
   return (
     <div className="space-y-6">
-      <header className="flex items-center justify-between">
+      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold">Belege</h1>
           <p className="text-muted-foreground text-sm mt-1">Werbungskosten und Anschaffungen — verschlüsselt abgelegt.</p>
@@ -198,7 +199,26 @@ const Expenses = () => {
         />
       ) : (
         <Card className="glass overflow-hidden">
-          <table className="w-full text-sm">
+          {/* Mobile */}
+          <div className="md:hidden divide-y divide-border">
+            {items.map(e => (
+              <div key={e.id} className="p-4 space-y-1.5">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    {e.receipt_path && <Paperclip className="h-3 w-3 text-primary flex-shrink-0" />}
+                    <p className="font-medium truncate">{e.vendor || e.description || "—"}</p>
+                  </div>
+                  <p className="font-semibold whitespace-nowrap">−{eur(e.amount)}</p>
+                </div>
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>{date(e.spent_on)} · {e.properties?.name ?? "ohne Objekt"}</span>
+                  <span className="px-2 py-0.5 rounded-full bg-muted text-[10px]">{CAT_INFO[e.category].label}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          {/* Desktop */}
+          <table className="w-full text-sm hidden md:table">
             <thead className="bg-muted/50 text-xs">
               <tr>
                 <th className="text-left p-3">Datum</th>
