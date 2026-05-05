@@ -56,15 +56,7 @@ const Properties = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return toast.error("Nicht angemeldet.");
 
-    // Free-Plan-Limit: max. 1 Objekt
-    const { data: hasPro } = await supabase.rpc("has_pro_access", {
-      _user_id: user.id,
-      _env: (import.meta.env.VITE_PAYMENTS_CLIENT_TOKEN as string | undefined)?.startsWith("pk_test_") ? "sandbox" : "live",
-    });
-    if (!hasPro && items.length >= 1) {
-      toast.error("Free-Plan: max. 1 Objekt. Pro freischalten für unbegrenzt Objekte.");
-      return;
-    }
+    // Hartes Limit kommt aus DB-Trigger (check_user_quota): Free=1, Verwalten+=10, Pro=unbegrenzt
 
     const payload: any = { ...parsed.data, user_id: user.id };
     Object.keys(payload).forEach(k => { if (payload[k] === "" || payload[k] === undefined) delete payload[k]; });
