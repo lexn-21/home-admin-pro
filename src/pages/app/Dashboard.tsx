@@ -210,7 +210,17 @@ const Dashboard = () => {
         </div>
       </Item>
 
-      {isEmpty ? (
+      {loading ? (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+          {[0,1,2,3].map(i => (
+            <Card key={i} className="p-5 glass h-[120px] animate-pulse">
+              <div className="h-3 w-24 bg-muted rounded mb-3" />
+              <div className="h-7 w-32 bg-muted rounded mb-2" />
+              <div className="h-2 w-20 bg-muted rounded" />
+            </Card>
+          ))}
+        </div>
+      ) : isEmpty ? (
         <Item variant="scale">
           <Card className="p-8 lg:p-12 text-center glass relative overflow-hidden">
             <motion.div
