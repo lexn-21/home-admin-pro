@@ -102,6 +102,15 @@ const Auth = () => {
         return toast.error("Dieses Passwort wurde in Datenlecks gefunden. Bitte ein neues wählen.");
       return toast.error(error.message);
     }
+    // Fire-and-forget Welcome-Mail (idempotent über E-Mail-Adresse)
+    supabase.functions.invoke("send-transactional-email", {
+      body: {
+        templateName: "welcome",
+        recipientEmail: ev.data,
+        idempotencyKey: `welcome-${ev.data}`,
+        templateData: { name: nv.data },
+      },
+    }).catch(() => { /* nicht blockierend */ });
     toast.success("Konto erstellt. Willkommen bei ImmonIQ.");
     navigate("/app/onboarding", { replace: true });
   };
