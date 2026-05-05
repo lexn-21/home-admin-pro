@@ -34,6 +34,11 @@ const Onboarding = () => {
 
   useEffect(() => { document.title = "Onboarding · ImmonIQ"; }, []);
 
+  const markSeen = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) localStorage.setItem(`onboarding_seen_${user.id}`, "1");
+  };
+
   const next = () => setStep((s) => Math.min(s + 1, STEPS.length - 1));
 
   const saveProperty = async () => {
