@@ -54,7 +54,7 @@ const TaxBridge = () => {
     return s + buildingShare * rate;
   }, 0);
 
-  const taxResult = income - byCat.immediate - (byCat.financing ?? 0) - afaTotal;
+  const taxResult = income - (byCat.immediate ?? 0) - (byCat.financing ?? 0) - afaTotal;
 
   const exportCSV = () => {
     const rows = [

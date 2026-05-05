@@ -3,6 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, FileText, AlertCircle } from "lucide-react";
+import EmptyState from "@/components/EmptyState";
+import { CardGridSkeleton } from "@/components/ListSkeleton";
 
 interface Template {
   id: string;
@@ -17,10 +19,13 @@ interface Template {
 
 export default function Templates() {
   const [items, setItems] = useState<Template[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    document.title = "Vertragsvorlagen · ImmonIQ";
     supabase.from("contract_templates").select("*").order("sort_order").then(({ data }) => {
       setItems((data as Template[]) || []);
+      setLoading(false);
     });
   }, []);
 
@@ -46,6 +51,14 @@ export default function Templates() {
         </div>
       </div>
 
+      {loading && <CardGridSkeleton count={4} />}
+      {!loading && items.length === 0 && (
+        <EmptyState
+          icon={FileText}
+          title="Noch keine Vorlagen geladen"
+          description="Sobald die geprüften Quellen synchronisiert sind, findest du hier rechtssichere Verträge von Haus & Grund und Mieterbund."
+        />
+      )}
       {Object.entries(grouped).map(([cat, list]) => (
         <div key={cat} className="space-y-3">
           <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">{cat}</h2>

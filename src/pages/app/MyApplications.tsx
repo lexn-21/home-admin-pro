@@ -25,12 +25,14 @@ const MyApplications = () => {
   const load = async () => {
     setLoading(true); setError(null);
     try {
-      // Parallel + 10s Timeout, sonst hängt die Seite ewig
-      const timeout = <T,>(p: Promise<T>, ms = 10000) =>
-        Promise.race([p, new Promise<T>((_, rej) => setTimeout(() => rej(new Error("Zeitüberschreitung")), ms))]);
+      const timeout = <T,>(p: PromiseLike<T>, ms = 10000): Promise<T> =>
+        Promise.race([
+          Promise.resolve(p),
+          new Promise<T>((_, rej) => setTimeout(() => rej(new Error("Zeitüberschreitung — bitte erneut versuchen.")), ms)),
+        ]);
       const [aRes, sRes] = await Promise.all([
-        timeout(Promise.resolve(supabase.from("applications").select("*, listings(*)").order("created_at", { ascending: false }))),
-        timeout(Promise.resolve(supabase.from("listing_saves").select("*, listings(*)"))),
+        timeout(supabase.from("applications").select("*, listings(*)").order("created_at", { ascending: false })),
+        timeout(supabase.from("listing_saves").select("*, listings(*)")),
       ]);
       if ((aRes as any).error) throw (aRes as any).error;
       setApps((aRes as any).data ?? []);

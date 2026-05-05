@@ -6,16 +6,22 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Eye, Users, Pause, Play, Trash2, ExternalLink, Megaphone } from "lucide-react";
 import { eur, num } from "@/lib/format";
-import { toast } from "sonner";
+import { toastError, toastSuccess } from "@/lib/errors";
+import EmptyState from "@/components/EmptyState";
+import { CardGridSkeleton } from "@/components/ListSkeleton";
 
 const Listings = () => {
   const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const nav = useNavigate();
 
   useEffect(() => { document.title = "Inserate · ImmonIQ"; load(); }, []);
   const load = async () => {
-    const { data } = await supabase.from("listings").select("*").order("created_at", { ascending: false });
+    setLoading(true);
+    const { data, error } = await supabase.from("listings").select("*").order("created_at", { ascending: false });
+    if (error) toastError(error, { onRetry: load });
     setItems(data ?? []);
+    setLoading(false);
   };
 
   const toggle = async (l: any) => {
@@ -23,22 +29,22 @@ const Listings = () => {
     const patch: any = { status: next };
     if (next === "published" && !l.published_at) patch.published_at = new Date().toISOString();
     const { error } = await supabase.from("listings").update(patch).eq("id", l.id);
-    if (error) return toast.error(error.message);
-    toast.success(next === "published" ? "Live geschaltet" : "Pausiert");
+    if (error) return toastError(error, { onRetry: () => toggle(l) });
+    toastSuccess(next === "published" ? "Live geschaltet" : "Pausiert");
     load();
   };
 
   const remove = async (id: string) => {
     if (!confirm("Inserat wirklich löschen?")) return;
     const { error } = await supabase.from("listings").delete().eq("id", id);
-    if (error) return toast.error(error.message);
-    toast.success("Gelöscht");
+    if (error) return toastError(error, { onRetry: () => remove(id) });
+    toastSuccess("Gelöscht");
     load();
   };
 
   return (
     <div className="space-y-6">
-      <header className="flex items-center justify-between">
+      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
             <Megaphone className="h-7 w-7 text-primary" /> Meine Inserate
@@ -52,14 +58,15 @@ const Listings = () => {
         </Button>
       </header>
 
-      {items.length === 0 ? (
-        <Card className="p-12 text-center glass">
-          <Megaphone className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-          <p className="text-muted-foreground mb-4">Noch keine Inserate. Veröffentliche eine freie Einheit.</p>
-          <Button onClick={() => nav("/app/listings/new")} className="bg-gradient-gold text-primary-foreground shadow-gold">
-            Erstes Inserat anlegen
-          </Button>
-        </Card>
+      {loading ? (
+        <CardGridSkeleton count={4} />
+      ) : items.length === 0 ? (
+        <EmptyState
+          icon={Megaphone}
+          title="Noch keine Inserate"
+          description="Veröffentliche eine freie Einheit in 60 Sekunden — Bewerbungen kommen strukturiert direkt in deine Inbox."
+          action={{ label: "Erstes Inserat anlegen", to: "/app/listings/new", icon: Plus }}
+        />
       ) : (
         <div className="grid md:grid-cols-2 gap-4">
           {items.map((l) => (
