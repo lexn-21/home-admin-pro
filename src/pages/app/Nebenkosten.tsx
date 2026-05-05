@@ -17,9 +17,10 @@ const DIST_LABELS: Record<DistKey, string> = {
   einheiten: "pro Einheit",
   verbrauch_manual: "nach Verbrauch (manuell)",
   direkt_zuordnung: "direkte Zuordnung",
+  heizkostenv_50_50: "Heizkosten 50/50 (HeizkostenV)",
 };
 
-const DIST_OPTIONS: DistKey[] = ["qm", "personen", "einheiten", "verbrauch_manual", "direkt_zuordnung"];
+const DIST_OPTIONS: DistKey[] = ["qm", "personen", "einheiten", "verbrauch_manual", "direkt_zuordnung", "heizkostenv_50_50"];
 
 type Period = {
   id: string;
