@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Plus, Calculator, FileDown, Send, Trash2, Receipt, AlertTriangle, Info } from "lucide-react";
+import { Plus, Calculator, FileDown, Send, Trash2, Receipt, AlertTriangle, Info, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { computeDistributions, renderNkaPdf, type NkaCostItem, type NkaUnit, type DistKey } from "@/lib/nka";
 
@@ -165,6 +165,26 @@ export default function Nebenkosten() {
   async function deleteItem(id: string) {
     await supabase.from("nka_cost_items").delete().eq("id", id);
     setItems((prev) => prev.filter(i => i.id !== id));
+  }
+
+  async function aiClassify(it: CostItem) {
+    if (!it.label && !it.amount) return toast.error("Bitte erst Bezeichnung eingeben");
+    try {
+      const { data, error } = await supabase.functions.invoke("ai-classify-expense", {
+        body: { description: it.label, vendor: null, amount: it.amount },
+      });
+      if (error) throw error;
+      const cat = costCategories.find(c => c.code === data.category_code);
+      await updateItem(it.id, {
+        category_code: data.category_code,
+        distribution_key: data.distribution_key as DistKey,
+        umlagefaehig: data.umlagefaehig,
+        label: it.label || cat?.label || data.category_code,
+      });
+      toast.success(`KI: ${cat?.label ?? data.category_code} · ${data.umlagefaehig ? "umlagefähig" : "nicht umlagefähig"}`);
+    } catch (e: any) {
+      toast.error(e.message || "KI-Klassifikation fehlgeschlagen");
+    }
   }
 
   // Berechnung
