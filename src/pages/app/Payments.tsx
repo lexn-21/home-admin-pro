@@ -143,7 +143,22 @@ const Payments = () => {
         />
       ) : (
         <Card className="glass overflow-hidden">
-          <table className="w-full text-sm">
+          {/* Mobile: Card-Liste */}
+          <div className="md:hidden divide-y divide-border">
+            {items.map(p => (
+              <div key={p.id} className="p-4 flex items-center justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium truncate">{p.properties?.name ?? "—"}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {date(p.paid_on)} · {KIND_LABEL[p.kind]}
+                  </p>
+                </div>
+                <p className="font-semibold text-success whitespace-nowrap">+{eur(p.amount)}</p>
+              </div>
+            ))}
+          </div>
+          {/* Desktop: Tabelle */}
+          <table className="w-full text-sm hidden md:table">
             <thead className="bg-muted/50 text-xs">
               <tr>
                 <th className="text-left p-3">Datum</th>
