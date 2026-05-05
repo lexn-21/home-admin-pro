@@ -56,15 +56,19 @@ const Bookings = () => {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ provider_id: "", category: "sanitaer", title: "", description: "", urgency: "normal" });
 
+  const [loading, setLoading] = useState(true);
+
   const load = async () => {
+    setLoading(true);
     const [{ data: p }, { data: b }] = await Promise.all([
       supabase.from("providers").select("*").order("premium", { ascending: false }).order("rating", { ascending: false }),
       supabase.from("bookings").select("*").order("created_at", { ascending: false }),
     ]);
     setProviders((p ?? []) as Provider[]);
     setBookings((b ?? []) as Booking[]);
+    setLoading(false);
   };
-  useEffect(() => { load(); }, []);
+  useEffect(() => { document.title = "Handwerker · ImmonIQ"; load(); }, []);
 
   const filteredProviders = useMemo(
     () => filter === "all" ? providers : providers.filter(p => p.category === filter),
