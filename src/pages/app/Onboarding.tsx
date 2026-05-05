@@ -166,7 +166,7 @@ const Onboarding = () => {
               Als Nächstes: einen Mieter zuordnen, die erste Mietzahlung erfassen, oder einen Beleg hochladen.
               Am Ende des Quartals: einmal auf "Steuer-Export" klicken — fertig.
             </p>
-            <Button onClick={() => navigate("/app")} size="lg" className="bg-gradient-gold text-primary-foreground shadow-gold">
+            <Button onClick={async () => { await markSeen(); navigate("/app"); }} size="lg" className="bg-gradient-gold text-primary-foreground shadow-gold">
               Zum Dashboard <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </Card>
