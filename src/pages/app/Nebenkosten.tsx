@@ -393,11 +393,14 @@ export default function Nebenkosten() {
                         <Input className="col-span-3 h-9" value={it.label ?? ""} onChange={(e) => updateItem(it.id, { label: e.target.value })} placeholder="Bezeichnung" />
                         <Input className="col-span-2 h-9" type="number" step="0.01" value={it.amount} onChange={(e) => updateItem(it.id, { amount: Number(e.target.value) })} placeholder="Betrag €" />
                         <Select value={it.distribution_key} onValueChange={(v) => updateItem(it.id, { distribution_key: v as DistKey })}>
-                          <SelectTrigger className="col-span-3 h-9"><SelectValue /></SelectTrigger>
+                          <SelectTrigger className="col-span-2 h-9"><SelectValue /></SelectTrigger>
                           <SelectContent>
                             {DIST_OPTIONS.map(d => <SelectItem key={d} value={d}>{DIST_LABELS[d]}</SelectItem>)}
                           </SelectContent>
                         </Select>
+                        <Button variant="ghost" size="icon" className="col-span-1 h-9 text-primary" onClick={() => aiClassify(it)} title="KI-Klassifikation">
+                          <Sparkles className="h-4 w-4" />
+                        </Button>
                         <Button variant="ghost" size="icon" className="col-span-1 h-9" onClick={() => deleteItem(it.id)}>
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
