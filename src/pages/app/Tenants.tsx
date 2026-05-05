@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Users, Mail, Phone, Link2, Building2 } from "lucide-react";
 import { toast } from "sonner";
+import { toastError } from "@/lib/errors";
 import { eur, date } from "@/lib/format";
 import { z } from "zod";
 import EmptyState from "@/components/EmptyState";

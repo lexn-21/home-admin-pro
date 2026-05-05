@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Plus, Building2, MapPin, ArrowRight, Megaphone } from "lucide-react";
 import { toast } from "sonner";
+import { toastError } from "@/lib/errors";
 import { eur } from "@/lib/format";
 import { z } from "zod";
 import EmptyState from "@/components/EmptyState";
