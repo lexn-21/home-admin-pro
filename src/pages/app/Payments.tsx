@@ -113,18 +113,34 @@ const Payments = () => {
         </Dialog>
       </header>
 
-      <Card className="p-6 glass">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs text-muted-foreground">Summe aller erfassten Zahlungen</p>
-            <p className="text-3xl font-bold mt-1 text-gradient-gold">{eur(total)}</p>
+      {!loading && items.length > 0 && (
+        <Card className="p-6 glass">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs text-muted-foreground">Summe aller erfassten Zahlungen</p>
+              <p className="text-3xl font-bold mt-1 text-gradient-gold">{eur(total)}</p>
+            </div>
+            <Wallet className="h-8 w-8 text-primary" />
           </div>
-          <Wallet className="h-8 w-8 text-primary" />
-        </div>
-      </Card>
+        </Card>
+      )}
 
-      {items.length === 0 ? (
-        <Card className="p-10 text-center glass"><p className="text-sm text-muted-foreground">Noch keine Zahlungen.</p></Card>
+      {loading ? (
+        <ListSkeleton rows={4} />
+      ) : properties.length === 0 ? (
+        <EmptyState
+          icon={Building2}
+          title="Erstmal ein Objekt anlegen"
+          description="Zahlungen werden Objekten zugeordnet. Lege zuerst deine erste Immobilie an, dann kannst du hier Mieten erfassen."
+          action={{ label: "Objekt anlegen", to: "/app/properties", icon: Plus }}
+        />
+      ) : items.length === 0 ? (
+        <EmptyState
+          icon={Wallet}
+          title="Noch keine Zahlungen erfasst"
+          description="Erfasse Mieteingänge, Nebenkosten und Kautionen — automatisch in deinen Steuerbericht übernommen."
+          action={{ label: "Erste Zahlung erfassen", onClick: () => setOpen(true), icon: Plus }}
+        />
       ) : (
         <Card className="glass overflow-hidden">
           <table className="w-full text-sm">

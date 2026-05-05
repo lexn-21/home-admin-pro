@@ -11,6 +11,8 @@ import { Plus, Receipt, Paperclip, Info, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { eur, date } from "@/lib/format";
 import { z } from "zod";
+import EmptyState from "@/components/EmptyState";
+import { ListSkeleton } from "@/components/ListSkeleton";
 
 const schema = z.object({
   property_id: z.string().uuid().optional().or(z.literal("")),
@@ -32,6 +34,7 @@ const CAT_INFO: Record<string, { label: string; hint: string }> = {
 const Expenses = () => {
   const [items, setItems] = useState<any[]>([]);
   const [props, setProps] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [form, setForm] = useState({ property_id: "", spent_on: new Date().toISOString().slice(0, 10), amount: "", vendor: "", description: "", category: "immediate" });
@@ -39,12 +42,14 @@ const Expenses = () => {
   useEffect(() => { document.title = "Belege · ImmonIQ"; load(); }, []);
 
   const load = async () => {
+    setLoading(true);
     const [e, p] = await Promise.all([
       supabase.from("expenses").select("*, properties(name)").order("spent_on", { ascending: false }),
       supabase.from("properties").select("id, name"),
     ]);
     setItems(e.data ?? []);
     setProps(p.data ?? []);
+    setLoading(false);
   };
 
   const submit = async () => {
@@ -182,8 +187,15 @@ const Expenses = () => {
         </Card>
       )}
 
-      {items.length === 0 ? (
-        <Card className="p-10 text-center glass"><p className="text-sm text-muted-foreground">Noch keine Belege.</p></Card>
+      {loading ? (
+        <ListSkeleton rows={5} />
+      ) : items.length === 0 ? (
+        <EmptyState
+          icon={Receipt}
+          title="Noch keine Belege erfasst"
+          description="Erfasse Werbungskosten, Anschaffungen und NK-umlagefähige Posten. Foto oder PDF anhängen — wir erkennen Kategorie und 15%-Grenze automatisch."
+          action={{ label: "Ersten Beleg erfassen", onClick: () => setOpen(true), icon: Plus }}
+        />
       ) : (
         <Card className="glass overflow-hidden">
           <table className="w-full text-sm">

@@ -6,10 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Users, Mail, Phone, Link2 } from "lucide-react";
+import { Plus, Users, Mail, Phone, Link2, Building2 } from "lucide-react";
 import { toast } from "sonner";
 import { eur, date } from "@/lib/format";
 import { z } from "zod";
+import EmptyState from "@/components/EmptyState";
+import { CardGridSkeleton } from "@/components/ListSkeleton";
 
 const schema = z.object({
   property_id: z.string().uuid("Objekt wählen"),
@@ -24,18 +26,21 @@ const schema = z.object({
 const Tenants = () => {
   const [tenants, setTenants] = useState<any[]>([]);
   const [properties, setProperties] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ property_id: "", full_name: "", email: "", phone: "", lease_start: "", lease_end: "", deposit: "" });
 
   useEffect(() => { document.title = "Mieter · ImmonIQ"; load(); }, []);
 
   const load = async () => {
+    setLoading(true);
     const [t, p] = await Promise.all([
       supabase.from("tenants").select("*, properties(name)").order("created_at", { ascending: false }),
       supabase.from("properties").select("id, name").order("name"),
     ]);
     setTenants(t.data ?? []);
     setProperties(p.data ?? []);
+    setLoading(false);
   };
 
   const submit = async () => {
@@ -104,17 +109,22 @@ const Tenants = () => {
         </Dialog>
       </header>
 
-      {properties.length === 0 && (
-        <Card className="p-6 glass border-primary/30">
-          <p className="text-sm">Lege zuerst ein Objekt an, bevor du Mieter erfasst.</p>
-        </Card>
-      )}
-
-      {tenants.length === 0 ? (
-        <Card className="p-10 text-center glass">
-          <Users className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-          <p className="text-sm text-muted-foreground">Noch keine Mieter angelegt.</p>
-        </Card>
+      {loading ? (
+        <CardGridSkeleton count={2} />
+      ) : properties.length === 0 ? (
+        <EmptyState
+          icon={Building2}
+          title="Erstmal ein Objekt anlegen"
+          description="Mieter werden Objekten zugeordnet. Lege zuerst deine erste Immobilie an."
+          action={{ label: "Objekt anlegen", to: "/app/properties", icon: Plus }}
+        />
+      ) : tenants.length === 0 ? (
+        <EmptyState
+          icon={Users}
+          title="Noch keine Mieter"
+          description="Erfasse Mietverhältnisse mit Kontaktdaten und Kaution. Generiere danach mit einem Klick einen Mieter-Portal-Link."
+          action={{ label: "Mieter anlegen", onClick: () => setOpen(true), icon: Plus }}
+        />
       ) : (
         <div className="grid md:grid-cols-2 gap-3">
           {tenants.map(t => (
