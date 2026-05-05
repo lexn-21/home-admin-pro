@@ -346,16 +346,23 @@ export default function Nebenkosten() {
             </div>
             <div className="flex-1 min-w-[200px]">
               <Label>Abrechnungsperiode</Label>
-              <Select value={periodId} onValueChange={setPeriodId}>
-                <SelectTrigger><SelectValue placeholder="— wählen —" /></SelectTrigger>
-                <SelectContent>
-                  {periods.map(p => (
-                    <SelectItem key={p.id} value={p.id}>
-                      {p.year} ({p.period_start} – {p.period_end}) {p.status !== "draft" && `· ${p.status}`}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex gap-2">
+                <Select value={periodId} onValueChange={setPeriodId}>
+                  <SelectTrigger><SelectValue placeholder="— wählen —" /></SelectTrigger>
+                  <SelectContent>
+                    {periods.map(p => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.year} ({p.period_start} – {p.period_end}) {p.status !== "draft" && `· ${p.status}`}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {periodId && (
+                  <Button variant="ghost" size="icon" onClick={() => setPeriodId("")} title="Auswahl zurücksetzen">
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </div>
             <Button variant="outline" onClick={() => setNewPeriodOpen(true)}>
               <Plus className="h-4 w-4 mr-1" /> Neue Periode
