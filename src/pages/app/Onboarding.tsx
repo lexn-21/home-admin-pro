@@ -81,7 +81,7 @@ const Onboarding = () => {
       <div className="absolute inset-0 bg-hero-glow pointer-events-none" />
       <div className="relative container py-8 flex items-center justify-between">
         <Logo />
-        <button onClick={() => navigate("/app")} className="text-xs text-muted-foreground hover:text-foreground">Überspringen</button>
+        <button onClick={async () => { await markSeen(); navigate("/app"); }} className="text-xs text-muted-foreground hover:text-foreground">Überspringen</button>
       </div>
 
       <div className="relative container max-w-xl px-4 pb-16">
