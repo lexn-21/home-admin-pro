@@ -10,6 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ExternalLink, Plus, AlertOctagon, ListChecks, CheckCircle2, CalendarClock } from "lucide-react";
 import { toast } from "sonner";
+import EmptyState from "@/components/EmptyState";
+import { ListSkeleton } from "@/components/ListSkeleton";
 
 interface Task {
   id: string;
@@ -118,7 +120,15 @@ export default function Tasks() {
       </div>
 
       {loading ? (
-        <p className="text-muted-foreground">Lade Aufgaben...</p>
+        <ListSkeleton rows={4} />
+      ) : tasks.length === 0 ? (
+        <EmptyState
+          icon={ListChecks}
+          title="Alles im Griff — keine offenen Aufgaben"
+          description="Sobald du ein Objekt anlegst, generieren wir automatisch deine wichtigsten gesetzlichen Fristen (Nebenkostenabrechnung, Heizungsablesung, Steuererklärung u.v.m.)."
+          action={{ label: "Aufgabe anlegen", onClick: () => setOpen(true), icon: Plus }}
+          secondary={{ label: "Objekt anlegen", to: "/app/properties" }}
+        />
       ) : (
         <div className="space-y-6">
           <Section title="Überfällig" icon={AlertOctagon} tone="destructive" tasks={overdue} onToggle={toggle} propMap={propMap} />

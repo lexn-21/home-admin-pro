@@ -6,10 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Wallet } from "lucide-react";
+import { Plus, Wallet, Building2 } from "lucide-react";
 import { toast } from "sonner";
 import { eur, date } from "@/lib/format";
 import { z } from "zod";
+import EmptyState from "@/components/EmptyState";
+import { ListSkeleton } from "@/components/ListSkeleton";
+import { Link } from "react-router-dom";
 
 const schema = z.object({
   property_id: z.string().uuid("Objekt wählen"),
@@ -26,18 +29,21 @@ const KIND_LABEL: Record<string, string> = {
 const Payments = () => {
   const [items, setItems] = useState<any[]>([]);
   const [properties, setProperties] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ property_id: "", paid_on: new Date().toISOString().slice(0, 10), amount: "", kind: "rent_cold", note: "" });
 
   useEffect(() => { document.title = "Zahlungen · ImmonIQ"; load(); }, []);
 
   const load = async () => {
+    setLoading(true);
     const [p, pr] = await Promise.all([
       supabase.from("payments").select("*, properties(name)").order("paid_on", { ascending: false }),
       supabase.from("properties").select("id, name").order("name"),
     ]);
     setItems(p.data ?? []);
     setProperties(pr.data ?? []);
+    setLoading(false);
   };
 
   const submit = async () => {
@@ -107,18 +113,34 @@ const Payments = () => {
         </Dialog>
       </header>
 
-      <Card className="p-6 glass">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs text-muted-foreground">Summe aller erfassten Zahlungen</p>
-            <p className="text-3xl font-bold mt-1 text-gradient-gold">{eur(total)}</p>
+      {!loading && items.length > 0 && (
+        <Card className="p-6 glass">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs text-muted-foreground">Summe aller erfassten Zahlungen</p>
+              <p className="text-3xl font-bold mt-1 text-gradient-gold">{eur(total)}</p>
+            </div>
+            <Wallet className="h-8 w-8 text-primary" />
           </div>
-          <Wallet className="h-8 w-8 text-primary" />
-        </div>
-      </Card>
+        </Card>
+      )}
 
-      {items.length === 0 ? (
-        <Card className="p-10 text-center glass"><p className="text-sm text-muted-foreground">Noch keine Zahlungen.</p></Card>
+      {loading ? (
+        <ListSkeleton rows={4} />
+      ) : properties.length === 0 ? (
+        <EmptyState
+          icon={Building2}
+          title="Erstmal ein Objekt anlegen"
+          description="Zahlungen werden Objekten zugeordnet. Lege zuerst deine erste Immobilie an, dann kannst du hier Mieten erfassen."
+          action={{ label: "Objekt anlegen", to: "/app/properties", icon: Plus }}
+        />
+      ) : items.length === 0 ? (
+        <EmptyState
+          icon={Wallet}
+          title="Noch keine Zahlungen erfasst"
+          description="Erfasse Mieteingänge, Nebenkosten und Kautionen — automatisch in deinen Steuerbericht übernommen."
+          action={{ label: "Erste Zahlung erfassen", onClick: () => setOpen(true), icon: Plus }}
+        />
       ) : (
         <Card className="glass overflow-hidden">
           <table className="w-full text-sm">
