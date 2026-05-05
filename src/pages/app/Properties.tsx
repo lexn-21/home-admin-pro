@@ -10,6 +10,8 @@ import { Plus, Building2, MapPin, ArrowRight, Megaphone } from "lucide-react";
 import { toast } from "sonner";
 import { eur } from "@/lib/format";
 import { z } from "zod";
+import EmptyState from "@/components/EmptyState";
+import { CardGridSkeleton } from "@/components/ListSkeleton";
 
 const schema = z.object({
   name: z.string().trim().min(1, "Name fehlt").max(100),
@@ -32,14 +34,17 @@ const empty = { name: "", street: "", zip: "", city: "", build_year: "", area_sq
 
 const Properties = () => {
   const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<any>(empty);
 
   useEffect(() => { document.title = "Objekte · ImmonIQ"; load(); }, []);
 
   const load = async () => {
+    setLoading(true);
     const { data } = await supabase.from("properties").select("*").order("created_at", { ascending: false });
     setItems(data ?? []);
+    setLoading(false);
   };
 
   const submit = async () => {
@@ -117,11 +122,16 @@ const Properties = () => {
         </Dialog>
       </header>
 
-      {items.length === 0 ? (
-        <Card className="p-12 text-center glass">
-          <Building2 className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-          <p className="text-muted-foreground">Noch keine Objekte. Lege dein erstes an.</p>
-        </Card>
+      {loading ? (
+        <CardGridSkeleton count={3} />
+      ) : items.length === 0 ? (
+        <EmptyState
+          icon={Building2}
+          title="Dein erstes Objekt wartet"
+          description="Lege jetzt deine erste Immobilie an — Stammdaten, AfA und Mietkonditionen in unter einer Minute. Wir generieren automatisch deine 4 wichtigsten Fristen."
+          action={{ label: "Objekt anlegen", onClick: () => setOpen(true), icon: Plus }}
+          secondary={{ label: "Tour starten", to: "/app/onboarding" }}
+        />
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {items.map(p => (
