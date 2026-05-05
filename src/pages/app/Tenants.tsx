@@ -68,7 +68,7 @@ const Tenants = () => {
     if (!payload.lease_start) delete payload.lease_start;
     if (!payload.lease_end) delete payload.lease_end;
     const { error } = await supabase.from("tenants").insert(payload);
-    if (error) return toast.error(error.message);
+    if (error) return toastError(error, { onRetry: submit });
     toast.success("Mieter angelegt.");
     setOpen(false);
     setForm({ property_id: "", full_name: "", email: "", phone: "", lease_start: "", lease_end: "", deposit: "" });

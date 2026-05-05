@@ -67,7 +67,7 @@ export default function Tasks() {
       legal_ref: form.legal_ref || null,
       legal_url: form.legal_url || null,
     });
-    if (error) { toast.error(error.message); return; }
+    if (error) { toastError(error, { onRetry: create }); return; }
     toast.success("Aufgabe angelegt");
     setOpen(false);
     setForm({ title: "", description: "", category: "", due_date: "", property_id: "", legal_ref: "", legal_url: "" });

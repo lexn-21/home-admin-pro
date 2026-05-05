@@ -68,7 +68,7 @@ const Properties = () => {
     Object.keys(payload).forEach(k => { if (payload[k] === "" || payload[k] === undefined) delete payload[k]; });
 
     const { error } = await supabase.from("properties").insert(payload);
-    if (error) return toast.error(error.message);
+    if (error) return toastError(error, { onRetry: submit });
     toast.success("Objekt angelegt — 4 Standard-Fristen wurden automatisch erzeugt.");
     setOpen(false);
     setForm(empty);

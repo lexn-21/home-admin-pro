@@ -82,7 +82,7 @@ const Expenses = () => {
     if (!payload.description) delete payload.description;
 
     const { error } = await supabase.from("expenses").insert(payload);
-    if (error) return toast.error(error.message);
+    if (error) return toastError(error, { onRetry: submit });
     toast.success("Beleg erfasst.");
     setOpen(false);
     setFile(null);

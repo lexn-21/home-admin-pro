@@ -63,7 +63,7 @@ const Payments = () => {
     const payload: any = { ...parsed.data, user_id: user.id, unit_id: unitId };
     if (!payload.note) delete payload.note;
     const { error } = await supabase.from("payments").insert(payload);
-    if (error) return toast.error(error.message);
+    if (error) return toastError(error, { onRetry: submit });
     toast.success("Zahlung erfasst.");
     setOpen(false);
     setForm({ property_id: "", paid_on: new Date().toISOString().slice(0, 10), amount: "", kind: "rent_cold", note: "" });
