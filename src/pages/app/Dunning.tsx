@@ -9,6 +9,8 @@ import { eur, date } from "@/lib/format";
 import { computeBalances, generateDunningHTML, openDunningWindow, type TenantBalance } from "@/lib/dunning";
 import { toast } from "sonner";
 import { AIDisclaimer } from "@/components/AIDisclaimer";
+import EmptyState from "@/components/EmptyState";
+import { ListSkeleton } from "@/components/ListSkeleton";
 
 const LEVEL_BADGE: Record<number, { label: string; cls: string; icon: any }> = {
   0: { label: "Aktuell", cls: "bg-success/15 text-success border-success/30", icon: CheckCircle2 },
@@ -24,10 +26,12 @@ const Dunning = () => {
   const [properties, setProperties] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
   const [landlordName, setLandlordName] = useState("Vermieter");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     document.title = "Mahnwesen · ImmonIQ";
     (async () => {
+      setLoading(true);
       const [t, u, p, pay, prof] = await Promise.all([
         supabase.from("tenants").select("*"),
         supabase.from("units").select("*"),
@@ -40,6 +44,7 @@ const Dunning = () => {
       setProperties(p.data ?? []);
       setPayments(pay.data ?? []);
       if ((prof as any).data?.display_name) setLandlordName((prof as any).data.display_name);
+      setLoading(false);
     })();
   }, [user]);
 
@@ -83,10 +88,16 @@ const Dunning = () => {
         </Card>
       </div>
 
-      {balances.length === 0 ? (
-        <Card className="p-10 text-center glass">
-          <p className="text-sm text-muted-foreground">Noch keine Mieter erfasst.</p>
-        </Card>
+      {loading ? (
+        <ListSkeleton rows={3} />
+      ) : balances.length === 0 ? (
+        <EmptyState
+          icon={AlertTriangle}
+          title="Noch keine Mieter erfasst"
+          description="Sobald du Mieter zu deinen Objekten hinzufügst, berechnet ImmonIQ automatisch Soll/Ist und erstellt rechtssichere Mahnungen nach BGB."
+          action={{ label: "Mieter anlegen", to: "/app/tenants" }}
+          secondary={{ label: "Objekt anlegen", to: "/app/properties" }}
+        />
       ) : (
         <div className="space-y-3">
           {balances.map((b) => {
