@@ -237,7 +237,7 @@ const AppLayout = () => {
               </div>
               <div className="text-xs min-w-0 flex-1">
                 <p className="font-medium truncate">{user?.email}</p>
-                <p className="text-muted-foreground text-[10px]">Free · 14 Tage</p>
+                <p className="text-muted-foreground text-[10px]">{planLabel}</p>
               </div>
               <button onClick={handleSignOut} className="text-muted-foreground hover:text-foreground p-1" title="Abmelden">
                 <LogOut className="h-3.5 w-3.5" />
