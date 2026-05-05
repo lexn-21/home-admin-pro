@@ -34,6 +34,11 @@ const Onboarding = () => {
 
   useEffect(() => { document.title = "Onboarding · ImmonIQ"; }, []);
 
+  const markSeen = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) localStorage.setItem(`onboarding_seen_${user.id}`, "1");
+  };
+
   const next = () => setStep((s) => Math.min(s + 1, STEPS.length - 1));
 
   const saveProperty = async () => {
@@ -76,7 +81,7 @@ const Onboarding = () => {
       <div className="absolute inset-0 bg-hero-glow pointer-events-none" />
       <div className="relative container py-8 flex items-center justify-between">
         <Logo />
-        <button onClick={() => navigate("/app")} className="text-xs text-muted-foreground hover:text-foreground">Überspringen</button>
+        <button onClick={async () => { await markSeen(); navigate("/app"); }} className="text-xs text-muted-foreground hover:text-foreground">Überspringen</button>
       </div>
 
       <div className="relative container max-w-xl px-4 pb-16">
@@ -161,7 +166,7 @@ const Onboarding = () => {
               Als Nächstes: einen Mieter zuordnen, die erste Mietzahlung erfassen, oder einen Beleg hochladen.
               Am Ende des Quartals: einmal auf "Steuer-Export" klicken — fertig.
             </p>
-            <Button onClick={() => navigate("/app")} size="lg" className="bg-gradient-gold text-primary-foreground shadow-gold">
+            <Button onClick={async () => { await markSeen(); navigate("/app"); }} size="lg" className="bg-gradient-gold text-primary-foreground shadow-gold">
               Zum Dashboard <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </Card>

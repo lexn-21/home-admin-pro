@@ -1,5 +1,6 @@
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -114,6 +115,27 @@ const AppLayout = () => {
 
   // Schließe Drawer bei Routenwechsel
   useEffect(() => { setMobileNavOpen(false); setCreateOpen(false); }, [location.pathname]);
+
+  // Auto-Redirect ins Onboarding für neue User (0 Objekte, noch nicht übersprungen)
+  useEffect(() => {
+    if (!user) return;
+    const key = `onboarding_seen_${user.id}`;
+    if (localStorage.getItem(key)) return;
+    let cancelled = false;
+    (async () => {
+      const { count } = await supabase
+        .from("properties")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id);
+      if (cancelled) return;
+      if ((count ?? 0) === 0) {
+        navigate("/app/onboarding", { replace: true });
+      } else {
+        localStorage.setItem(key, "1");
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user, navigate]);
 
   return (
     <TooltipProvider delayDuration={300}>
