@@ -2,13 +2,14 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-export type DistKey = "qm" | "personen" | "einheiten" | "verbrauch_manual" | "direkt_zuordnung";
+export type DistKey = "qm" | "personen" | "einheiten" | "verbrauch_manual" | "direkt_zuordnung" | "heizkostenv_50_50";
 
 export type NkaUnit = {
   id: string;
   label: string;
   living_space: number | null;
   persons_count: number | null;
+  heating_share_pct?: number | null;
   tenant_id?: string;
   tenant_name?: string;
   vorauszahlung_summe: number;
