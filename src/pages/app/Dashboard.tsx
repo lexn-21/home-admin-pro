@@ -8,6 +8,7 @@ import { eur, pct, num } from "@/lib/format";
 import { Stagger, Item, Tappable } from "@/components/motion/Primitives";
 import { WinsWidget } from "@/components/WinsWidget";
 import { GameDeck } from "@/components/GameDeck";
+import { LegalUpdatesWidget } from "@/components/LegalUpdatesWidget";
 import { motion } from "framer-motion";
 import {
   ArrowUpRight, Building2, Wallet, Receipt, TrendingUp, Plus,
@@ -218,6 +219,10 @@ const Dashboard = () => {
 
       <Item>
         <GameDeck />
+      </Item>
+
+      <Item>
+        <LegalUpdatesWidget />
       </Item>
 
       {loading ? (
