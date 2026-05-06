@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          code: string
+          description: string
+          icon: string
+          sort_order: number
+          tier: string
+          title: string
+        }
+        Insert: {
+          code: string
+          description: string
+          icon?: string
+          sort_order?: number
+          tier?: string
+          title: string
+        }
+        Update: {
+          code?: string
+          description?: string
+          icon?: string
+          sort_order?: number
+          tier?: string
+          title?: string
+        }
+        Relationships: []
+      }
       ad_events: {
         Row: {
           ad_id: string
@@ -1531,6 +1558,39 @@ export type Database = {
         }
         Relationships: []
       }
+      quests: {
+        Row: {
+          active: boolean
+          code: string
+          description: string
+          metric: string
+          reward_points: number
+          sort_order: number
+          target: number
+          title: string
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          description: string
+          metric: string
+          reward_points?: number
+          sort_order?: number
+          target?: number
+          title: string
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          description?: string
+          metric?: string
+          reward_points?: number
+          sort_order?: number
+          target?: number
+          title?: string
+        }
+        Relationships: []
+      }
       seeker_profiles: {
         Row: {
           about_me: string | null
@@ -1962,6 +2022,32 @@ export type Database = {
           },
         ]
       }
+      user_achievements: {
+        Row: {
+          code: string
+          unlocked_at: string
+          user_id: string
+        }
+        Insert: {
+          code: string
+          unlocked_at?: string
+          user_id: string
+        }
+        Update: {
+          code?: string
+          unlocked_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_code_fkey"
+            columns: ["code"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
       user_stats: {
         Row: {
           created_at: string
@@ -2212,6 +2298,7 @@ export type Database = {
         Args: { _annual_rent: number; _living_space: number; _zip: string }
         Returns: Json
       }
+      calc_landlord_score: { Args: { _user_id: string }; Returns: Json }
       can_post_wins: { Args: { _user_id: string }; Returns: boolean }
       can_view_seeker_profile: {
         Args: { _seeker: string; _viewer: string }
@@ -2234,6 +2321,7 @@ export type Database = {
         Returns: number
       }
       ensure_default_unit: { Args: { _property_id: string }; Returns: string }
+      evaluate_achievements: { Args: never; Returns: Json }
       has_pro_access: {
         Args: { _env?: string; _user_id: string }
         Returns: boolean
