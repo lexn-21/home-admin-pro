@@ -11,7 +11,7 @@ import {
   LogOut, Settings as SettingsIcon, ShieldCheck,
   Lock, Wrench, Bell, Search, Scale,
   TrendingUp, Megaphone, Inbox,
-  FileText, Plus, Home, Menu, X, CalendarCheck, Search as SearchIcon, ScanLine,
+  FileText, Plus, Home, Menu, X, CalendarCheck, Search as SearchIcon, ScanLine, PartyPopper,
 } from "lucide-react";
 import { AskCopilot } from "@/components/AskCopilot";
 import { DocScanner } from "@/components/DocScanner";
