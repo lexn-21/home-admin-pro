@@ -141,6 +141,7 @@ const App = () => (
                 <Route path="templates" element={<Templates />} />
                 <Route path="deadlines" element={<Deadlines />} />
                 <Route path="law" element={<LawCorner />} />
+                <Route path="feed" element={<Feed />} />
                 <Route path="ads" element={<MyAds />} />
                 <Route path="admin/ads" element={<AdminAds />} />
                 <Route path="settings" element={<Settings />} />
