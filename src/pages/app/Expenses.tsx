@@ -13,6 +13,7 @@ import { toastError } from "@/lib/errors";
 import { eur, date } from "@/lib/format";
 import { z } from "zod";
 import EmptyState from "@/components/EmptyState";
+import { recordActivity } from "@/lib/activity";
 import { ListSkeleton } from "@/components/ListSkeleton";
 
 const schema = z.object({
