@@ -9,6 +9,7 @@ import { Logo } from "@/components/Logo";
 import { Building2, Users, Wallet, Receipt, Calculator, ShieldCheck, Download, TrendingUp, TrendingDown, FileText } from "lucide-react";
 import { eur, date } from "@/lib/format";
 import { toast } from "sonner";
+import { ADVISOR_DEMO_TOKEN, advisorDemoData } from "@/lib/advisorDemo";
 
 const CAT_LABEL: Record<string, string> = {
   immediate: "Erhaltungsaufwand", depreciable: "AfA-fähig", utilities_passthrough: "NK-umlagefähig",
