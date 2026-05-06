@@ -61,6 +61,7 @@ const CheckoutReturn = lazy(() => import("./pages/CheckoutReturn"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const Install = lazy(() => import("./pages/Install"));
 const WgCasting = lazy(() => import("./pages/WgCasting"));
+const Feed = lazy(() => import("./pages/app/Feed"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -140,6 +141,7 @@ const App = () => (
                 <Route path="templates" element={<Templates />} />
                 <Route path="deadlines" element={<Deadlines />} />
                 <Route path="law" element={<LawCorner />} />
+                <Route path="feed" element={<Feed />} />
                 <Route path="ads" element={<MyAds />} />
                 <Route path="admin/ads" element={<AdminAds />} />
                 <Route path="settings" element={<Settings />} />

@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Plus, Calculator, FileDown, Send, Trash2, Receipt, AlertTriangle, Info, Sparkles, X } from "lucide-react";
 import { toast } from "sonner";
 import { computeDistributions, renderNkaPdf, type NkaCostItem, type NkaUnit, type DistKey } from "@/lib/nka";
+import { recordActivity } from "@/lib/activity";
 
 const DIST_LABELS: Record<DistKey, string> = {
   qm: "nach m²",
@@ -293,6 +294,7 @@ export default function Nebenkosten() {
         const upd = await supabase.from("nka_periods").update({ status: "sent" }).eq("id", period.id);
         if (upd.error) throw new Error("Status: " + upd.error.message);
         toast.success(`${processed} Abrechnung(en) versendet & Forderungen angelegt`);
+        recordActivity("nka_done", { message: `NK-Abrechnung ${period.year} abgeschlossen — ${processed} Mieter` });
       } else {
         toast.success(`${processed} PDF(s) generiert und gespeichert`);
       }

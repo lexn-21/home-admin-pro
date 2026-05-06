@@ -11,7 +11,7 @@ import {
   LogOut, Settings as SettingsIcon, ShieldCheck,
   Lock, Wrench, Bell, Search, Scale,
   TrendingUp, Megaphone, Inbox,
-  FileText, Plus, Home, Menu, X, CalendarCheck, Search as SearchIcon, ScanLine,
+  FileText, Plus, Home, Menu, X, CalendarCheck, Search as SearchIcon, ScanLine, PartyPopper,
 } from "lucide-react";
 import { AskCopilot } from "@/components/AskCopilot";
 import { DocScanner } from "@/components/DocScanner";
@@ -34,6 +34,7 @@ const groups: NavGroup[] = [
     items: [
       { to: "/app", label: "Dashboard", icon: Home, end: true, hint: "Cashflow, KPIs, Termine" },
       { to: "/app/tasks", label: "Mein Plan", icon: CalendarCheck, badge: "TO-DO", hint: "Alle Aufgaben & Fristen — nichts mehr verpassen" },
+      { to: "/app/feed", label: "Community", icon: PartyPopper, badge: "NEU", hint: "Anonyme Wins & Tipps von verifizierten Eigentümern" },
     ],
   },
   {

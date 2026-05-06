@@ -524,6 +524,42 @@ export type Database = {
           },
         ]
       }
+      community_wins: {
+        Row: {
+          amount_eur: number | null
+          city: string | null
+          created_at: string
+          id: string
+          kind: Database["public"]["Enums"]["win_kind"]
+          message: string | null
+          reactions_count: number
+          user_id: string
+          zip_prefix: string | null
+        }
+        Insert: {
+          amount_eur?: number | null
+          city?: string | null
+          created_at?: string
+          id?: string
+          kind: Database["public"]["Enums"]["win_kind"]
+          message?: string | null
+          reactions_count?: number
+          user_id: string
+          zip_prefix?: string | null
+        }
+        Update: {
+          amount_eur?: number | null
+          city?: string | null
+          created_at?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["win_kind"]
+          message?: string | null
+          reactions_count?: number
+          user_id?: string
+          zip_prefix?: string | null
+        }
+        Relationships: []
+      }
       contract_templates: {
         Row: {
           active: boolean
@@ -1002,6 +1038,42 @@ export type Database = {
           vacancy_rate?: number | null
           yield_factor?: number
           zip?: string
+        }
+        Relationships: []
+      }
+      market_pulse: {
+        Row: {
+          caption: string | null
+          city: string | null
+          created_at: string
+          delta_pct: number | null
+          id: string
+          metric: string
+          value: number
+          week_start: string
+          zip_prefix: string | null
+        }
+        Insert: {
+          caption?: string | null
+          city?: string | null
+          created_at?: string
+          delta_pct?: number | null
+          id?: string
+          metric: string
+          value: number
+          week_start: string
+          zip_prefix?: string | null
+        }
+        Update: {
+          caption?: string | null
+          city?: string | null
+          created_at?: string
+          delta_pct?: number | null
+          id?: string
+          metric?: string
+          value?: number
+          week_start?: string
+          zip_prefix?: string | null
         }
         Relationships: []
       }
@@ -1890,6 +1962,42 @@ export type Database = {
           },
         ]
       }
+      user_stats: {
+        Row: {
+          created_at: string
+          last_active_week: string | null
+          level: number
+          points: number
+          pseudonym: string | null
+          total_wins: number
+          updated_at: string
+          user_id: string
+          weekly_streak: number
+        }
+        Insert: {
+          created_at?: string
+          last_active_week?: string | null
+          level?: number
+          points?: number
+          pseudonym?: string | null
+          total_wins?: number
+          updated_at?: string
+          user_id: string
+          weekly_streak?: number
+        }
+        Update: {
+          created_at?: string
+          last_active_week?: string | null
+          level?: number
+          points?: number
+          pseudonym?: string | null
+          total_wins?: number
+          updated_at?: string
+          user_id?: string
+          weekly_streak?: number
+        }
+        Relationships: []
+      }
       vault_documents: {
         Row: {
           category: Database["public"]["Enums"]["vault_category"]
@@ -2016,6 +2124,32 @@ export type Database = {
         }
         Relationships: []
       }
+      win_reactions: {
+        Row: {
+          created_at: string
+          user_id: string
+          win_id: string
+        }
+        Insert: {
+          created_at?: string
+          user_id: string
+          win_id: string
+        }
+        Update: {
+          created_at?: string
+          user_id?: string
+          win_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "win_reactions_win_id_fkey"
+            columns: ["win_id"]
+            isOneToOne: false
+            referencedRelation: "community_wins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -2078,6 +2212,7 @@ export type Database = {
         Args: { _annual_rent: number; _living_space: number; _zip: string }
         Returns: Json
       }
+      can_post_wins: { Args: { _user_id: string }; Returns: boolean }
       can_view_seeker_profile: {
         Args: { _seeker: string; _viewer: string }
         Returns: boolean
@@ -2163,6 +2298,16 @@ export type Database = {
           msg_id: number
           read_ct: number
         }[]
+      }
+      record_user_activity: {
+        Args: {
+          _amount?: number
+          _city?: string
+          _kind: string
+          _message?: string
+          _zip?: string
+        }
+        Returns: string
       }
       tenant_portal_get_nka: { Args: { _token: string }; Returns: Json }
       tenant_portal_nka_pdf_path: {
@@ -2268,6 +2413,14 @@ export type Database = {
         | "protokoll"
         | "korrespondenz"
         | "sonstiges"
+      win_kind:
+        | "tax_saved"
+        | "receipts_added"
+        | "nka_done"
+        | "listing_published"
+        | "tenant_added"
+        | "milestone"
+        | "tip"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2476,6 +2629,15 @@ export const Constants = {
         "protokoll",
         "korrespondenz",
         "sonstiges",
+      ],
+      win_kind: [
+        "tax_saved",
+        "receipts_added",
+        "nka_done",
+        "listing_published",
+        "tenant_added",
+        "milestone",
+        "tip",
       ],
     },
   },

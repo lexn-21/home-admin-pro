@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { recordActivity } from "@/lib/activity";
 import { ArrowLeft, ImagePlus, Sparkles, Scale, X, Wand2, Loader2 } from "lucide-react";
 
 const ListingEditor = () => {
@@ -221,6 +222,7 @@ const ListingEditor = () => {
     const { error } = await q;
     if (error) return toast.error(error.message);
     toast.success(publish ? "🚀 Live geschaltet!" : "Gespeichert");
+    if (publish) recordActivity("listing_published", { zip: form.zip || undefined, city: form.city || undefined, message: form.title });
     nav("/app/listings");
   };
 
