@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Plus, Calculator, FileDown, Send, Trash2, Receipt, AlertTriangle, Info, Sparkles, X } from "lucide-react";
 import { toast } from "sonner";
 import { computeDistributions, renderNkaPdf, type NkaCostItem, type NkaUnit, type DistKey } from "@/lib/nka";
+import { recordActivity } from "@/lib/activity";
 
 const DIST_LABELS: Record<DistKey, string> = {
   qm: "nach m²",
