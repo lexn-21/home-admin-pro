@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import {
@@ -7,7 +7,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import {
   ShieldCheck, Trophy, Target, Home, Users, Receipt,
-  FileCheck, Megaphone, Calculator, Flame, CheckCircle2, Lock, ChevronRight,
+  FileCheck, Megaphone, Calculator, Flame, CheckCircle2, ChevronRight, Clock,
 } from "lucide-react";
 
 type Score = { score: number; completeness: number; activity: number; accounting: number; nka: number; streak_bonus: number };
@@ -20,20 +20,36 @@ const ICON_MAP: Record<string, any> = {
   flame: Flame, "shield-check": ShieldCheck,
 };
 
+// Tax deadline: 31. Juli of year+1 for previous year's filing.
+function taxDeadline() {
+  const now = new Date();
+  const y = now.getFullYear();
+  // Belege werden für das vorherige Steuerjahr gesammelt; Frist 31.07. des Folgejahres
+  const taxYear = y - (now.getMonth() < 7 ? 1 : 0); // bis Juli sammeln wir noch fürs Vorjahr
+  const deadline = new Date(taxYear + 1, 6, 31); // Juli = 6
+  const days = Math.max(0, Math.ceil((deadline.getTime() - now.getTime()) / 86400000));
+  return { taxYear, days, deadline };
+}
+
 export const GameDeck = () => {
   const [score, setScore] = useState<Score | null>(null);
   const [defs, setDefs] = useState<Achievement[]>([]);
   const [unlocked, setUnlocked] = useState<Set<string>>(new Set());
   const [quests, setQuests] = useState<Quest[]>([]);
   const [progress, setProgress] = useState<Record<string, number>>({});
+  const [yearReceipts, setYearReceipts] = useState(0);
   const [loading, setLoading] = useState(true);
+
+  const tax = useMemo(taxDeadline, []);
 
   useEffect(() => {
     (async () => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) return setLoading(false);
       await supabase.rpc("evaluate_achievements");
-      const [s, d, ua, qq, exp, nka, lst] = await Promise.all([
+      const yearStart = new Date(tax.taxYear, 0, 1).toISOString();
+      const yearEnd = new Date(tax.taxYear + 1, 0, 1).toISOString();
+      const [s, d, ua, qq, exp, nka, lst, expYear] = await Promise.all([
         supabase.rpc("calc_landlord_score", { _user_id: u.user.id }),
         supabase.from("achievements").select("*").order("sort_order"),
         supabase.from("user_achievements").select("code"),
@@ -42,11 +58,14 @@ export const GameDeck = () => {
           .gte("created_at", new Date(Date.now() - 30 * 86400000).toISOString()),
         supabase.from("nka_periods").select("status,updated_at").eq("user_id", u.user.id),
         supabase.from("listings").select("status,published_at").eq("user_id", u.user.id),
+        supabase.from("expenses").select("id", { count: "exact", head: true }).eq("user_id", u.user.id)
+          .not("receipt_path", "is", null).gte("spent_on", yearStart.slice(0, 10)).lt("spent_on", yearEnd.slice(0, 10)),
       ]);
       setScore(s.data as Score);
       setDefs((d.data || []) as Achievement[]);
       setUnlocked(new Set((ua.data || []).map((r: any) => r.code)));
       setQuests((qq.data || []) as Quest[]);
+      setYearReceipts(expYear.count || 0);
 
       const w = Date.now() - 7 * 86400000, m = Date.now() - 30 * 86400000;
       const E = exp.data || [], N = nka.data || [], L = lst.data || [];
@@ -58,7 +77,7 @@ export const GameDeck = () => {
       });
       setLoading(false);
     })();
-  }, []);
+  }, [tax.taxYear]);
 
   if (loading || !score) return null;
 
@@ -70,6 +89,15 @@ export const GameDeck = () => {
     score.score >= 80 ? "text-emerald-500" :
     score.score >= 60 ? "text-primary" :
     score.score >= 40 ? "text-amber-500" : "text-muted-foreground";
+
+  // Trophäen: nur die 3 nächsten erreichbaren anzeigen
+  const lockedDefs = defs.filter(a => !unlocked.has(a.code));
+  const nextThreeLocked = lockedDefs.slice(0, 3);
+  const remainingLocked = Math.max(0, lockedDefs.length - nextThreeLocked.length);
+  const unlockedDefs = defs.filter(a => unlocked.has(a.code));
+
+  // Deadline-Druck als sanfter Reminder
+  const deadlineUrgent = tax.days <= 60;
 
   return (
     <Dialog>
@@ -108,8 +136,11 @@ export const GameDeck = () => {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ShieldCheck className="h-5 w-5 text-primary" />
-            Vermieter-Score & Trophäen
+            Portfolio-Score
           </DialogTitle>
+          <p className="text-xs text-muted-foreground pt-1">
+            Wie gesund & vollständig dein Vermieter-Setup ist. (Dein <span className="font-medium text-foreground">Level</span> misst dagegen deine Aktivität.)
+          </p>
         </DialogHeader>
 
         <div className="space-y-5">
@@ -135,6 +166,24 @@ export const GameDeck = () => {
                   <span className="w-10 text-right tabular-nums text-muted-foreground">{b.val}/{b.max}</span>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Steuer-Deadline Mission */}
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground mb-2 flex items-center gap-1.5">
+              <Clock className="h-3 w-3" /> Steuer-Frist
+            </p>
+            <div className={`p-3 rounded-lg border ${deadlineUrgent ? "border-amber-500/40 bg-amber-500/5" : "border-border/60 bg-muted/30"}`}>
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-sm font-medium">Belege für Steuer {tax.taxYear}</p>
+                <Badge variant={deadlineUrgent ? "default" : "outline"} className="text-[10px]">
+                  noch {tax.days} {tax.days === 1 ? "Tag" : "Tage"}
+                </Badge>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {yearReceipts} {yearReceipts === 1 ? "Beleg" : "Belege"} erfasst · Frist 31.07.{tax.taxYear + 1}
+              </p>
             </div>
           </div>
 
@@ -167,34 +216,55 @@ export const GameDeck = () => {
             </div>
           )}
 
-          {/* Trophies */}
+          {/* Trophies — nur 3 nächste + bereits erreichte */}
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground mb-2 flex items-center gap-1.5">
               <Trophy className="h-3 w-3" /> Trophäen · {unlocked.size}/{defs.length}
             </p>
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-              {defs.map(a => {
-                const Icon = ICON_MAP[a.icon] || Trophy;
-                const got = unlocked.has(a.code);
-                return (
-                  <div
-                    key={a.code}
-                    title={a.description}
-                    className={`p-2 rounded-lg border text-center ${
-                      got ? "bg-primary/5 border-primary/30" : "bg-muted/20 border-border/50 opacity-50 grayscale"
-                    }`}
-                  >
-                    <Icon className="h-4 w-4 mx-auto mb-1" />
-                    <p className="text-[10px] font-medium leading-tight">{a.title}</p>
-                    {got ? (
+
+            {unlockedDefs.length > 0 && (
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mb-3">
+                {unlockedDefs.map(a => {
+                  const Icon = ICON_MAP[a.icon] || Trophy;
+                  return (
+                    <div
+                      key={a.code}
+                      title={a.description}
+                      className="p-2 rounded-lg border bg-primary/5 border-primary/30 text-center"
+                    >
+                      <Icon className="h-4 w-4 mx-auto mb-1 text-primary" />
+                      <p className="text-[10px] font-medium leading-tight">{a.title}</p>
                       <CheckCircle2 className="h-2.5 w-2.5 mx-auto mt-1 text-emerald-500" />
-                    ) : (
-                      <Lock className="h-2.5 w-2.5 mx-auto mt-1 opacity-50" />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {nextThreeLocked.length > 0 && (
+              <>
+                <p className="text-[10px] text-muted-foreground mb-1.5">Als Nächstes erreichbar:</p>
+                <div className="space-y-1.5">
+                  {nextThreeLocked.map(a => {
+                    const Icon = ICON_MAP[a.icon] || Trophy;
+                    return (
+                      <div key={a.code} className="flex items-center gap-2 p-2 rounded-lg bg-muted/20 border border-border/50">
+                        <Icon className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-medium truncate">{a.title}</p>
+                          <p className="text-[10px] text-muted-foreground truncate">{a.description}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                {remainingLocked > 0 && (
+                  <p className="text-[10px] text-muted-foreground text-center mt-2">
+                    +{remainingLocked} weitere Trophäen warten
+                  </p>
+                )}
+              </>
+            )}
           </div>
         </div>
       </DialogContent>
