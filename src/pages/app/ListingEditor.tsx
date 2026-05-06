@@ -222,6 +222,7 @@ const ListingEditor = () => {
     const { error } = await q;
     if (error) return toast.error(error.message);
     toast.success(publish ? "🚀 Live geschaltet!" : "Gespeichert");
+    if (publish) recordActivity("listing_published", { zip: form.zip || undefined, city: form.city || undefined, message: form.title });
     nav("/app/listings");
   };
 
