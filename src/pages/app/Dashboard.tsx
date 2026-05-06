@@ -211,6 +211,10 @@ const Dashboard = () => {
         </div>
       </Item>
 
+      <Item>
+        <WinsWidget />
+      </Item>
+
       {loading ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
           {[0,1,2,3].map(i => (
