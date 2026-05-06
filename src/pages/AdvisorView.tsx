@@ -9,6 +9,7 @@ import { Logo } from "@/components/Logo";
 import { Building2, Users, Wallet, Receipt, Calculator, ShieldCheck, Download, TrendingUp, TrendingDown, FileText } from "lucide-react";
 import { eur, date } from "@/lib/format";
 import { toast } from "sonner";
+import { ADVISOR_DEMO_TOKEN, advisorDemoData } from "@/lib/advisorDemo";
 
 const CAT_LABEL: Record<string, string> = {
   immediate: "Erhaltungsaufwand", depreciable: "AfA-fähig", utilities_passthrough: "NK-umlagefähig",
@@ -29,6 +30,11 @@ const AdvisorView = () => {
   useEffect(() => {
     document.title = "Steuerberater-Ansicht · ImmonIQ";
     if (!token) { setError("Ungültiger Link"); setLoading(false); return; }
+    if (token === ADVISOR_DEMO_TOKEN) {
+      setData(advisorDemoData);
+      setLoading(false);
+      return;
+    }
     (async () => {
       const { data: payload, error: e1 } = await supabase.rpc("advisor_get_data", { _token: token });
       if (e1 || !payload) {
@@ -101,9 +107,18 @@ const AdvisorView = () => {
           <div className="flex items-center gap-3">
             <Logo />
             <Badge className="bg-primary/15 text-primary border-primary/30">Steuerberater · Read-only</Badge>
+            {data?.is_demo && <Badge className="bg-gradient-gold text-primary-foreground border-0">Demo</Badge>}
           </div>
           <p className="text-xs text-muted-foreground">Mandant: <span className="font-medium text-foreground">{data?.owner_name ?? "—"}</span></p>
         </div>
+        {data?.is_demo && (
+          <div className="border-t border-border/60 bg-primary/5">
+            <div className="container max-w-6xl py-2 text-xs text-center text-muted-foreground">
+              Du siehst einen <strong className="text-foreground">Demo-Mandanten</strong> mit Beispieldaten — exakt das, was du als Steuerberater von echten Mandanten bekommst.
+              {" "}<a href="/auth" className="text-primary hover:underline font-medium">Berater-Konto anlegen →</a>
+            </div>
+          </div>
+        )}
       </header>
 
       <main className="container max-w-6xl py-8 space-y-8 animate-fade-in">

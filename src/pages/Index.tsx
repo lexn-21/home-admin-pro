@@ -36,7 +36,7 @@ const PERSONAS: Record<PersonaKey, {
     ],
     primary: { label: "Kostenlos starten", sub: "In 60 Sekunden — ohne Kreditkarte", to: "/auth", icon: Sparkles },
     secondary: { label: "Marktwert ansehen", sub: "Für deine PLZ — gratis", to: "/markt", icon: TrendingUp },
-    tertiary: { label: "Tresor-Demo öffnen", sub: "So sicher liegen deine Dokumente", to: "/auth", icon: FolderLock },
+    tertiary: { label: "Tresor-Demo öffnen", sub: "So sicher liegen deine Dokumente", to: "/auth?demo=vault", icon: FolderLock },
   },
   landlord: {
     label: "Verwalten +",
@@ -62,7 +62,7 @@ const PERSONAS: Record<PersonaKey, {
       { icon: Shield, text: "Read-only Zugang — DSGVO-konform" },
       { icon: Clock, text: "Stundensatz schonen, mehr Mandanten" },
     ],
-    primary: { label: "Demo-Mandant ansehen", sub: "Live-Beispiel ohne Anmeldung", to: "/markt", icon: Search },
+    primary: { label: "Demo-Mandant ansehen", sub: "Live-Beispiel ohne Anmeldung", to: "/advisor/demo", icon: Search },
     secondary: { label: "Berater-Konto anlegen", sub: "Kostenlos — pro Mandant abrechnen", to: "/auth", icon: UserPlus },
     tertiary: { label: "Preise & Konditionen", sub: "Faire Kanzlei-Lizenzen", to: "/pricing", icon: Receipt },
   },
