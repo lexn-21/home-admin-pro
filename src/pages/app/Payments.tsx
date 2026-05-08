@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,25 +6,36 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Wallet, Building2 } from "lucide-react";
+import { Plus, Wallet, Building2, TrendingUp, Calendar, Repeat, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { toastError } from "@/lib/errors";
 import { eur, date } from "@/lib/format";
 import { z } from "zod";
 import EmptyState from "@/components/EmptyState";
 import { ListSkeleton } from "@/components/ListSkeleton";
-import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 const schema = z.object({
-  property_id: z.string().uuid("Objekt wählen"),
+  property_id: z.string().uuid("Bitte Objekt wählen"),
   paid_on: z.string().min(1, "Datum fehlt"),
-  amount: z.number().min(0.01).max(999999),
-  kind: z.enum(["rent_cold","utilities","deposit","other"]),
+  amount: z.number().min(0.01, "Betrag fehlt").max(999999),
+  kind: z.enum(["rent_cold", "utilities", "deposit", "other"]),
   note: z.string().max(300).optional().or(z.literal("")),
 });
 
 const KIND_LABEL: Record<string, string> = {
   rent_cold: "Kaltmiete", utilities: "Nebenkosten", deposit: "Kaution", other: "Sonstige",
+};
+const KIND_EMOJI: Record<string, string> = {
+  rent_cold: "🏠", utilities: "💡", deposit: "🔒", other: "💶",
+};
+
+type Filter = "month" | "year" | "all";
+
+const monthKey = (iso: string) => iso.slice(0, 7); // YYYY-MM
+const monthLabel = (key: string) => {
+  const [y, m] = key.split("-");
+  return new Date(Number(y), Number(m) - 1, 1).toLocaleDateString("de-DE", { month: "long", year: "numeric" });
 };
 
 const Payments = () => {
@@ -32,9 +43,19 @@ const Payments = () => {
   const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ property_id: "", paid_on: new Date().toISOString().slice(0, 10), amount: "", kind: "rent_cold", note: "" });
+  const [filter, setFilter] = useState<Filter>("month");
+  const [propFilter, setPropFilter] = useState<string>("all");
+  const [highlightId, setHighlightId] = useState<string | null>(null);
+  const [form, setForm] = useState({
+    property_id: "",
+    paid_on: new Date().toISOString().slice(0, 10),
+    amount: "",
+    kind: "rent_cold",
+    note: "",
+  });
+  const rowRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  useEffect(() => { document.title = "Zahlungen · ImmonIQ"; load(); }, []);
+  useEffect(() => { document.title = "Einnahmen · ImmonIQ"; load(); }, []);
 
   const load = async () => {
     setLoading(true);
@@ -46,6 +67,19 @@ const Payments = () => {
     setProperties(pr.data ?? []);
     setLoading(false);
   };
+
+  // Auto-select property if only one exists, when opening dialog
+  useEffect(() => {
+    if (open && properties.length === 1 && !form.property_id) {
+      setForm(f => ({ ...f, property_id: properties[0].id }));
+    }
+  }, [open, properties]); // eslint-disable-line
+
+  // Quick fill: Letzte Zahlung (Kaltmiete) für gewähltes Objekt
+  const lastForProperty = useMemo(() => {
+    if (!form.property_id) return null;
+    return items.find(i => i.property_id === form.property_id && i.kind === "rent_cold") ?? null;
+  }, [items, form.property_id]);
 
   const submit = async () => {
     const parsed = schema.safeParse({
@@ -62,68 +96,228 @@ const Payments = () => {
     if (uErr) return toast.error(uErr.message);
     const payload: any = { ...parsed.data, user_id: user.id, unit_id: unitId };
     if (!payload.note) delete payload.note;
-    const { error } = await supabase.from("payments").insert(payload);
+    const { data: ins, error } = await supabase.from("payments").insert(payload).select("id").single();
     if (error) return toastError(error, { onRetry: submit });
-    toast.success("Zahlung erfasst.");
+
+    const propName = properties.find(p => p.id === parsed.data.property_id)?.name ?? "Objekt";
+    toast.success(`✓ ${eur(parsed.data.amount)} verbucht`, {
+      description: `${KIND_LABEL[parsed.data.kind]} · ${propName} · ${date(parsed.data.paid_on)}`,
+    });
+
+    // Highlight & scroll
+    if (ins?.id) {
+      setHighlightId(ins.id);
+      setTimeout(() => {
+        rowRefs.current[ins.id]?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 250);
+      setTimeout(() => setHighlightId(null), 3500);
+    }
+    // Auto-set filter so user actually sees the new entry
+    const m = parsed.data.paid_on.slice(0, 7);
+    const now = new Date().toISOString().slice(0, 7);
+    if (m !== now) setFilter("year");
+
     setOpen(false);
-    setForm({ property_id: "", paid_on: new Date().toISOString().slice(0, 10), amount: "", kind: "rent_cold", note: "" });
+    setForm({
+      property_id: properties.length === 1 ? properties[0].id : "",
+      paid_on: new Date().toISOString().slice(0, 10),
+      amount: "", kind: "rent_cold", note: "",
+    });
     load();
   };
 
-  const total = items.reduce((s, p) => s + Number(p.amount), 0);
+  // Filtering
+  const now = new Date();
+  const yearStart = `${now.getFullYear()}-01-01`;
+  const monthStart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
+
+  const filtered = useMemo(() => {
+    return items.filter(i => {
+      if (propFilter !== "all" && i.property_id !== propFilter) return false;
+      if (filter === "month" && i.paid_on < monthStart) return false;
+      if (filter === "year" && i.paid_on < yearStart) return false;
+      return true;
+    });
+  }, [items, filter, propFilter, monthStart, yearStart]);
+
+  const sumThisMonth = useMemo(
+    () => items.filter(i => i.paid_on >= monthStart).reduce((s, p) => s + Number(p.amount), 0),
+    [items, monthStart]
+  );
+  const sumThisYear = useMemo(
+    () => items.filter(i => i.paid_on >= yearStart).reduce((s, p) => s + Number(p.amount), 0),
+    [items, yearStart]
+  );
+  const sumFiltered = useMemo(
+    () => filtered.reduce((s, p) => s + Number(p.amount), 0),
+    [filtered]
+  );
+
+  // Group by month
+  const grouped = useMemo(() => {
+    const map = new Map<string, any[]>();
+    for (const it of filtered) {
+      const k = monthKey(it.paid_on);
+      if (!map.has(k)) map.set(k, []);
+      map.get(k)!.push(it);
+    }
+    return Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]));
+  }, [filtered]);
+
+  const fillFromLast = () => {
+    if (!lastForProperty) return;
+    setForm(f => ({ ...f, amount: String(lastForProperty.amount), kind: lastForProperty.kind }));
+    toast.success("Letzte Werte übernommen");
+  };
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <header className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold">Zahlungen</h1>
-          <p className="text-muted-foreground text-sm mt-1">Erfasste Mietzahlungen — Bank-Anbindung folgt.</p>
+          <h1 className="text-3xl font-bold">Einnahmen</h1>
+          <p className="text-muted-foreground text-sm mt-1">Mieteingänge erfassen — direkt im Steuerbericht & Dashboard sichtbar.</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-gradient-gold text-primary-foreground shadow-gold" disabled={properties.length === 0}>
-              <Plus className="h-4 w-4 mr-2" /> Zahlung
+            <Button size="lg" className="bg-gradient-gold text-primary-foreground shadow-gold w-full sm:w-auto" disabled={properties.length === 0}>
+              <Plus className="h-5 w-5 mr-2" /> Einnahme erfassen
             </Button>
           </DialogTrigger>
-          <DialogContent>
-            <DialogHeader><DialogTitle>Zahlung erfassen</DialogTitle></DialogHeader>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="col-span-2"><Label>Objekt *</Label>
-                <Select value={form.property_id} onValueChange={(v) => setForm({ ...form, property_id: v })}>
-                  <SelectTrigger><SelectValue placeholder="Wählen…" /></SelectTrigger>
-                  <SelectContent>{properties.map((p: any) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}</SelectContent>
-                </Select>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Einnahme erfassen</DialogTitle>
+              <p className="text-xs text-muted-foreground">In 10 Sekunden gebucht. Pflichtfelder mit *.</p>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label className="text-xs">Objekt *</Label>
+                {properties.length === 1 ? (
+                  <div className="mt-1 px-3 py-2.5 rounded-md border bg-muted/30 text-sm flex items-center gap-2">
+                    <Building2 className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">{properties[0].name}</span>
+                  </div>
+                ) : (
+                  <Select value={form.property_id} onValueChange={(v) => setForm({ ...form, property_id: v })}>
+                    <SelectTrigger className="mt-1"><SelectValue placeholder="Objekt wählen…" /></SelectTrigger>
+                    <SelectContent>{properties.map((p: any) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}</SelectContent>
+                  </Select>
+                )}
               </div>
-              <div><Label>Datum *</Label><Input type="date" value={form.paid_on} onChange={(e) => setForm({ ...form, paid_on: e.target.value })} /></div>
-              <div><Label>Betrag (€) *</Label><Input type="number" step="0.01" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} /></div>
-              <div className="col-span-2"><Label>Art</Label>
+
+              {lastForProperty && !form.amount && (
+                <button
+                  type="button"
+                  onClick={fillFromLast}
+                  className="w-full text-left p-3 rounded-lg border border-primary/40 bg-primary/5 hover:bg-primary/10 transition flex items-center gap-3"
+                >
+                  <Repeat className="h-4 w-4 text-primary flex-shrink-0" />
+                  <div className="flex-1 min-w-0 text-xs">
+                    <p className="font-medium">Wie letzte Buchung übernehmen?</p>
+                    <p className="text-muted-foreground truncate">
+                      {eur(Number(lastForProperty.amount))} · {KIND_LABEL[lastForProperty.kind]} · {date(lastForProperty.paid_on)}
+                    </p>
+                  </div>
+                </button>
+              )}
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label className="text-xs">Betrag (€) *</Label>
+                  <Input
+                    type="number"
+                    inputMode="decimal"
+                    step="0.01"
+                    placeholder="z.B. 850"
+                    value={form.amount}
+                    onChange={(e) => setForm({ ...form, amount: e.target.value })}
+                    className="mt-1 text-lg font-semibold"
+                    autoFocus
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Datum *</Label>
+                  <Input type="date" value={form.paid_on} onChange={(e) => setForm({ ...form, paid_on: e.target.value })} className="mt-1" />
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-xs">Art</Label>
                 <Select value={form.kind} onValueChange={(v) => setForm({ ...form, kind: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="rent_cold">Kaltmiete</SelectItem>
-                    <SelectItem value="utilities">Nebenkosten</SelectItem>
-                    <SelectItem value="deposit">Kaution</SelectItem>
-                    <SelectItem value="other">Sonstige</SelectItem>
+                    <SelectItem value="rent_cold">🏠 Kaltmiete</SelectItem>
+                    <SelectItem value="utilities">💡 Nebenkosten</SelectItem>
+                    <SelectItem value="deposit">🔒 Kaution</SelectItem>
+                    <SelectItem value="other">💶 Sonstige</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="col-span-2"><Label>Notiz</Label><Input value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} /></div>
+
+              <div>
+                <Label className="text-xs">Notiz (optional)</Label>
+                <Input placeholder="z.B. Mai 2026" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} className="mt-1" />
+              </div>
             </div>
-            <DialogFooter><Button onClick={submit} className="bg-gradient-gold text-primary-foreground shadow-gold">Erfassen</Button></DialogFooter>
+            <DialogFooter>
+              <Button onClick={submit} size="lg" className="bg-gradient-gold text-primary-foreground shadow-gold w-full">
+                <CheckCircle2 className="h-4 w-4 mr-2" /> Buchen
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </header>
 
+      {/* KPI-Karten */}
       {!loading && items.length > 0 && (
-        <Card className="p-6 glass">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs text-muted-foreground">Summe aller erfassten Zahlungen</p>
-              <p className="text-3xl font-bold mt-1 text-gradient-gold">{eur(total)}</p>
-            </div>
-            <Wallet className="h-8 w-8 text-primary" />
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+          <Card className="p-4 glass">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground"><Calendar className="h-3.5 w-3.5" /> Diesen Monat</div>
+            <p className="text-2xl font-bold mt-1 text-success tabular">{eur(sumThisMonth)}</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">{items.filter(i => i.paid_on >= monthStart).length} Buchungen</p>
+          </Card>
+          <Card className="p-4 glass">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground"><TrendingUp className="h-3.5 w-3.5" /> Dieses Jahr</div>
+            <p className="text-2xl font-bold mt-1 tabular">{eur(sumThisYear)}</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">{items.filter(i => i.paid_on >= yearStart).length} Buchungen</p>
+          </Card>
+          <Card className="p-4 glass col-span-2 lg:col-span-1">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground"><Wallet className="h-3.5 w-3.5" /> Gesamt</div>
+            <p className="text-2xl font-bold mt-1 tabular text-gradient-gold">{eur(items.reduce((s, p) => s + Number(p.amount), 0))}</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">{items.length} Buchungen insgesamt</p>
+          </Card>
+        </div>
+      )}
+
+      {/* Filter */}
+      {!loading && items.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="inline-flex rounded-lg bg-muted p-0.5">
+            {(["month", "year", "all"] as Filter[]).map(f => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={cn(
+                  "px-3 py-1.5 text-xs font-medium rounded-md transition",
+                  filter === f ? "bg-background shadow-sm" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {f === "month" ? "Dieser Monat" : f === "year" ? "Dieses Jahr" : "Alle"}
+              </button>
+            ))}
           </div>
-        </Card>
+          {properties.length > 1 && (
+            <Select value={propFilter} onValueChange={setPropFilter}>
+              <SelectTrigger className="h-8 text-xs w-auto min-w-[150px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle Objekte</SelectItem>
+                {properties.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          )}
+          <span className="text-xs text-muted-foreground ml-auto">
+            Auswahl: <span className="font-semibold text-foreground tabular">{eur(sumFiltered)}</span>
+          </span>
+        </div>
       )}
 
       {loading ? (
@@ -132,54 +326,59 @@ const Payments = () => {
         <EmptyState
           icon={Building2}
           title="Erstmal ein Objekt anlegen"
-          description="Zahlungen werden Objekten zugeordnet. Lege zuerst deine erste Immobilie an, dann kannst du hier Mieten erfassen."
+          description="Einnahmen werden Objekten zugeordnet. Lege zuerst deine Immobilie an, dann kannst du hier Mieten erfassen."
           action={{ label: "Objekt anlegen", to: "/app/properties", icon: Plus }}
         />
       ) : items.length === 0 ? (
         <EmptyState
           icon={Wallet}
-          title="Noch keine Zahlungen erfasst"
-          description="Erfasse Mieteingänge, Nebenkosten und Kautionen — automatisch in deinen Steuerbericht übernommen."
-          action={{ label: "Erste Zahlung erfassen", onClick: () => setOpen(true), icon: Plus }}
+          title="Noch keine Einnahmen erfasst"
+          description="Erfasse Mieteingänge, Nebenkosten und Kautionen — automatisch im Dashboard und Steuerbericht."
+          action={{ label: "Erste Einnahme erfassen", onClick: () => setOpen(true), icon: Plus }}
         />
-      ) : (
-        <Card className="glass overflow-hidden">
-          {/* Mobile: Card-Liste */}
-          <div className="md:hidden divide-y divide-border">
-            {items.map(p => (
-              <div key={p.id} className="p-4 flex items-center justify-between gap-3">
-                <div className="min-w-0 flex-1">
-                  <p className="font-medium truncate">{p.properties?.name ?? "—"}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {date(p.paid_on)} · {KIND_LABEL[p.kind]}
-                  </p>
-                </div>
-                <p className="font-semibold text-success whitespace-nowrap">+{eur(p.amount)}</p>
-              </div>
-            ))}
-          </div>
-          {/* Desktop: Tabelle */}
-          <table className="w-full text-sm hidden md:table">
-            <thead className="bg-muted/50 text-xs">
-              <tr>
-                <th className="text-left p-3">Datum</th>
-                <th className="text-left p-3">Objekt</th>
-                <th className="text-left p-3">Art</th>
-                <th className="text-right p-3">Betrag</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map(p => (
-                <tr key={p.id} className="border-t border-border">
-                  <td className="p-3">{date(p.paid_on)}</td>
-                  <td className="p-3">{p.properties?.name ?? "—"}</td>
-                  <td className="p-3 text-muted-foreground">{KIND_LABEL[p.kind]}</td>
-                  <td className="p-3 text-right font-semibold text-success">+{eur(p.amount)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      ) : filtered.length === 0 ? (
+        <Card className="p-8 glass text-center">
+          <p className="text-sm text-muted-foreground">In diesem Zeitraum keine Einnahmen.</p>
+          <Button variant="ghost" size="sm" className="mt-2" onClick={() => setFilter("all")}>Alle anzeigen</Button>
         </Card>
+      ) : (
+        <div className="space-y-4">
+          {grouped.map(([key, rows]) => {
+            const monthSum = rows.reduce((s, p) => s + Number(p.amount), 0);
+            return (
+              <Card key={key} className="glass overflow-hidden">
+                <div className="px-4 py-2.5 bg-muted/40 flex items-center justify-between">
+                  <p className="text-xs font-semibold uppercase tracking-wide">{monthLabel(key)}</p>
+                  <p className="text-sm font-bold text-success tabular">+{eur(monthSum)}</p>
+                </div>
+                <div className="divide-y divide-border">
+                  {rows.map(p => (
+                    <div
+                      key={p.id}
+                      ref={el => { rowRefs.current[p.id] = el; }}
+                      className={cn(
+                        "px-4 py-3 flex items-center gap-3 transition-all duration-700",
+                        highlightId === p.id && "bg-success/10 ring-2 ring-success/40"
+                      )}
+                    >
+                      <div className="text-2xl flex-shrink-0">{KIND_EMOJI[p.kind]}</div>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-sm truncate">
+                          {p.properties?.name ?? "—"}
+                          {highlightId === p.id && <span className="ml-2 text-[10px] uppercase tracking-wide text-success font-bold">Neu</span>}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {date(p.paid_on)} · {KIND_LABEL[p.kind]}{p.note ? ` · ${p.note}` : ""}
+                        </p>
+                      </div>
+                      <p className="font-semibold text-success whitespace-nowrap tabular">+{eur(p.amount)}</p>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            );
+          })}
+        </div>
       )}
     </div>
   );
