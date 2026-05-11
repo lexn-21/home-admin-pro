@@ -412,7 +412,9 @@ const Payments = () => {
                           {highlightId === p.id && <span className="ml-2 text-[10px] uppercase tracking-wide text-success font-bold">Neu</span>}
                         </p>
                         <p className="text-xs text-muted-foreground truncate">
-                          {date(p.paid_on)} · {KIND_LABEL[p.kind]}{p.note ? ` · ${p.note}` : ""}
+                          {date(p.paid_on)} · {KIND_LABEL[p.kind]}
+                          {p.tenants?.full_name ? ` · 👤 ${p.tenants.full_name}` : ""}
+                          {p.note ? ` · ${p.note}` : ""}
                         </p>
                       </div>
                       <p className="font-semibold text-success whitespace-nowrap tabular">+{eur(p.amount)}</p>
