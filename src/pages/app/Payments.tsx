@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 
 const schema = z.object({
   property_id: z.string().uuid("Bitte Objekt wählen"),
+  tenant_id: z.string().uuid().optional().or(z.literal("")),
   paid_on: z.string().min(1, "Datum fehlt"),
   amount: z.number().min(0.01, "Betrag fehlt").max(999999),
   kind: z.enum(["rent_cold", "utilities", "deposit", "other"]),
