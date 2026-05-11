@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 
 const schema = z.object({
   property_id: z.string().uuid("Bitte Objekt wählen"),
+  tenant_id: z.string().uuid().optional().or(z.literal("")),
   paid_on: z.string().min(1, "Datum fehlt"),
   amount: z.number().min(0.01, "Betrag fehlt").max(999999),
   kind: z.enum(["rent_cold", "utilities", "deposit", "other"]),
@@ -41,6 +42,7 @@ const monthLabel = (key: string) => {
 const Payments = () => {
   const [items, setItems] = useState<any[]>([]);
   const [properties, setProperties] = useState<any[]>([]);
+  const [tenants, setTenants] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState<Filter>("month");
@@ -48,6 +50,7 @@ const Payments = () => {
   const [highlightId, setHighlightId] = useState<string | null>(null);
   const [form, setForm] = useState({
     property_id: "",
+    tenant_id: "",
     paid_on: new Date().toISOString().slice(0, 10),
     amount: "",
     kind: "rent_cold",
@@ -59,14 +62,22 @@ const Payments = () => {
 
   const load = async () => {
     setLoading(true);
-    const [p, pr] = await Promise.all([
-      supabase.from("payments").select("*, properties(name)").order("paid_on", { ascending: false }),
+    const [p, pr, te] = await Promise.all([
+      supabase.from("payments").select("*, properties(name), tenants(full_name)").order("paid_on", { ascending: false }),
       supabase.from("properties").select("id, name").order("name"),
+      supabase.from("tenants").select("id, full_name, property_id").order("full_name"),
     ]);
     setItems(p.data ?? []);
     setProperties(pr.data ?? []);
+    setTenants(te.data ?? []);
     setLoading(false);
   };
+
+  // Mieter gefiltert nach gewähltem Objekt
+  const tenantsForProperty = useMemo(
+    () => tenants.filter(t => t.property_id === form.property_id),
+    [tenants, form.property_id]
+  );
 
   // Auto-select property if only one exists, when opening dialog
   useEffect(() => {
@@ -74,6 +85,16 @@ const Payments = () => {
       setForm(f => ({ ...f, property_id: properties[0].id }));
     }
   }, [open, properties]); // eslint-disable-line
+
+  // Auto-select tenant if only one is linked to selected property
+  useEffect(() => {
+    if (!form.property_id) return;
+    if (tenantsForProperty.length === 1 && !form.tenant_id) {
+      setForm(f => ({ ...f, tenant_id: tenantsForProperty[0].id }));
+    } else if (tenantsForProperty.length === 0 && form.tenant_id) {
+      setForm(f => ({ ...f, tenant_id: "" }));
+    }
+  }, [form.property_id, tenantsForProperty]); // eslint-disable-line
 
   // Quick fill: Letzte Zahlung (Kaltmiete) für gewähltes Objekt
   const lastForProperty = useMemo(() => {
@@ -84,6 +105,7 @@ const Payments = () => {
   const submit = async () => {
     const parsed = schema.safeParse({
       property_id: form.property_id,
+      tenant_id: form.tenant_id,
       paid_on: form.paid_on,
       amount: Number(form.amount),
       kind: form.kind as any,
@@ -96,12 +118,14 @@ const Payments = () => {
     if (uErr) return toast.error(uErr.message);
     const payload: any = { ...parsed.data, user_id: user.id, unit_id: unitId };
     if (!payload.note) delete payload.note;
+    if (!payload.tenant_id) delete payload.tenant_id;
     const { data: ins, error } = await supabase.from("payments").insert(payload).select("id").single();
     if (error) return toastError(error, { onRetry: submit });
 
     const propName = properties.find(p => p.id === parsed.data.property_id)?.name ?? "Objekt";
+    const tName = tenants.find(t => t.id === parsed.data.tenant_id)?.full_name;
     toast.success(`✓ ${eur(parsed.data.amount)} verbucht`, {
-      description: `${KIND_LABEL[parsed.data.kind]} · ${propName} · ${date(parsed.data.paid_on)}`,
+      description: `${KIND_LABEL[parsed.data.kind]} · ${propName}${tName ? ` · ${tName}` : ""} · ${date(parsed.data.paid_on)}`,
     });
 
     // Highlight & scroll
@@ -120,6 +144,7 @@ const Payments = () => {
     setOpen(false);
     setForm({
       property_id: properties.length === 1 ? properties[0].id : "",
+      tenant_id: "",
       paid_on: new Date().toISOString().slice(0, 10),
       amount: "", kind: "rent_cold", note: "",
     });
@@ -203,6 +228,25 @@ const Payments = () => {
                   </Select>
                 )}
               </div>
+
+              {form.property_id && tenantsForProperty.length > 0 && (
+                <div>
+                  <Label className="text-xs">Mieter {tenantsForProperty.length > 1 ? "*" : ""}</Label>
+                  {tenantsForProperty.length === 1 ? (
+                    <div className="mt-1 px-3 py-2.5 rounded-md border bg-muted/30 text-sm flex items-center justify-between">
+                      <span className="font-medium">{tenantsForProperty[0].full_name}</span>
+                      <span className="text-[10px] text-muted-foreground">automatisch zugeordnet</span>
+                    </div>
+                  ) : (
+                    <Select value={form.tenant_id} onValueChange={(v) => setForm({ ...form, tenant_id: v })}>
+                      <SelectTrigger className="mt-1"><SelectValue placeholder="Mieter wählen…" /></SelectTrigger>
+                      <SelectContent>
+                        {tenantsForProperty.map((t: any) => <SelectItem key={t.id} value={t.id}>{t.full_name}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+              )}
 
               {lastForProperty && !form.amount && (
                 <button
@@ -368,7 +412,9 @@ const Payments = () => {
                           {highlightId === p.id && <span className="ml-2 text-[10px] uppercase tracking-wide text-success font-bold">Neu</span>}
                         </p>
                         <p className="text-xs text-muted-foreground truncate">
-                          {date(p.paid_on)} · {KIND_LABEL[p.kind]}{p.note ? ` · ${p.note}` : ""}
+                          {date(p.paid_on)} · {KIND_LABEL[p.kind]}
+                          {p.tenants?.full_name ? ` · 👤 ${p.tenants.full_name}` : ""}
+                          {p.note ? ` · ${p.note}` : ""}
                         </p>
                       </div>
                       <p className="font-semibold text-success whitespace-nowrap tabular">+{eur(p.amount)}</p>
