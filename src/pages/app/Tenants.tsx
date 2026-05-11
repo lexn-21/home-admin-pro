@@ -33,6 +33,13 @@ const Tenants = () => {
 
   useEffect(() => { document.title = "Mieter · ImmonIQ"; load(); }, []);
 
+  // Auto-Select: nur eine Immobilie? Direkt vorbelegen.
+  useEffect(() => {
+    if (open && properties.length === 1 && !form.property_id) {
+      setForm(f => ({ ...f, property_id: properties[0].id }));
+    }
+  }, [open, properties]); // eslint-disable-line
+
   const load = async () => {
     setLoading(true);
     const [t, p] = await Promise.all([
