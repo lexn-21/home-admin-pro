@@ -42,6 +42,7 @@ const monthLabel = (key: string) => {
 const Payments = () => {
   const [items, setItems] = useState<any[]>([]);
   const [properties, setProperties] = useState<any[]>([]);
+  const [tenants, setTenants] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState<Filter>("month");
@@ -49,6 +50,7 @@ const Payments = () => {
   const [highlightId, setHighlightId] = useState<string | null>(null);
   const [form, setForm] = useState({
     property_id: "",
+    tenant_id: "",
     paid_on: new Date().toISOString().slice(0, 10),
     amount: "",
     kind: "rent_cold",
