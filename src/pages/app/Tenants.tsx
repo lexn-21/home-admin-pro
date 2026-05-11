@@ -95,15 +95,22 @@ const Tenants = () => {
               <Plus className="h-4 w-4 mr-2" /> Mieter
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="sm:max-w-md">
             <DialogHeader><DialogTitle>Neuer Mieter</DialogTitle></DialogHeader>
             <div className="grid grid-cols-2 gap-3">
               <div className="col-span-2">
-                <Label>Objekt *</Label>
-                <Select value={form.property_id} onValueChange={(v) => setForm({ ...form, property_id: v })}>
-                  <SelectTrigger><SelectValue placeholder="Wählen…" /></SelectTrigger>
-                  <SelectContent>{properties.map((p: any) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}</SelectContent>
-                </Select>
+                <Label className="text-xs">Objekt *</Label>
+                {properties.length === 1 ? (
+                  <div className="mt-1 px-3 py-2.5 rounded-md border bg-muted/30 text-sm flex items-center gap-2">
+                    <Building2 className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">{properties[0].name}</span>
+                  </div>
+                ) : (
+                  <Select value={form.property_id} onValueChange={(v) => setForm({ ...form, property_id: v })}>
+                    <SelectTrigger className="mt-1"><SelectValue placeholder="Wählen…" /></SelectTrigger>
+                    <SelectContent>{properties.map((p: any) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}</SelectContent>
+                  </Select>
+                )}
               </div>
               <div className="col-span-2"><Label>Name *</Label><Input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} /></div>
               <div><Label>E-Mail</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
