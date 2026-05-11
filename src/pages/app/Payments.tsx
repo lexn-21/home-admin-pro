@@ -73,12 +73,28 @@ const Payments = () => {
     setLoading(false);
   };
 
+  // Mieter gefiltert nach gewähltem Objekt
+  const tenantsForProperty = useMemo(
+    () => tenants.filter(t => t.property_id === form.property_id),
+    [tenants, form.property_id]
+  );
+
   // Auto-select property if only one exists, when opening dialog
   useEffect(() => {
     if (open && properties.length === 1 && !form.property_id) {
       setForm(f => ({ ...f, property_id: properties[0].id }));
     }
   }, [open, properties]); // eslint-disable-line
+
+  // Auto-select tenant if only one is linked to selected property
+  useEffect(() => {
+    if (!form.property_id) return;
+    if (tenantsForProperty.length === 1 && !form.tenant_id) {
+      setForm(f => ({ ...f, tenant_id: tenantsForProperty[0].id }));
+    } else if (tenantsForProperty.length === 0 && form.tenant_id) {
+      setForm(f => ({ ...f, tenant_id: "" }));
+    }
+  }, [form.property_id, tenantsForProperty]); // eslint-disable-line
 
   // Quick fill: Letzte Zahlung (Kaltmiete) für gewähltes Objekt
   const lastForProperty = useMemo(() => {
@@ -89,6 +105,7 @@ const Payments = () => {
   const submit = async () => {
     const parsed = schema.safeParse({
       property_id: form.property_id,
+      tenant_id: form.tenant_id,
       paid_on: form.paid_on,
       amount: Number(form.amount),
       kind: form.kind as any,
@@ -101,12 +118,14 @@ const Payments = () => {
     if (uErr) return toast.error(uErr.message);
     const payload: any = { ...parsed.data, user_id: user.id, unit_id: unitId };
     if (!payload.note) delete payload.note;
+    if (!payload.tenant_id) delete payload.tenant_id;
     const { data: ins, error } = await supabase.from("payments").insert(payload).select("id").single();
     if (error) return toastError(error, { onRetry: submit });
 
     const propName = properties.find(p => p.id === parsed.data.property_id)?.name ?? "Objekt";
+    const tName = tenants.find(t => t.id === parsed.data.tenant_id)?.full_name;
     toast.success(`✓ ${eur(parsed.data.amount)} verbucht`, {
-      description: `${KIND_LABEL[parsed.data.kind]} · ${propName} · ${date(parsed.data.paid_on)}`,
+      description: `${KIND_LABEL[parsed.data.kind]} · ${propName}${tName ? ` · ${tName}` : ""} · ${date(parsed.data.paid_on)}`,
     });
 
     // Highlight & scroll
@@ -125,6 +144,7 @@ const Payments = () => {
     setOpen(false);
     setForm({
       property_id: properties.length === 1 ? properties[0].id : "",
+      tenant_id: "",
       paid_on: new Date().toISOString().slice(0, 10),
       amount: "", kind: "rent_cold", note: "",
     });
