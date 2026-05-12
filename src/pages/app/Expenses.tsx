@@ -433,7 +433,7 @@ const Expenses = () => {
                           {highlightId === e.id && <span className="text-[10px] uppercase tracking-wide text-success font-bold">Neu</span>}
                         </p>
                         <p className="text-xs text-muted-foreground truncate">
-                          {date(e.spent_on)} · {CAT_INFO[e.category].label}{e.properties?.name ? ` · ${e.properties.name}` : ""}
+                          {date(e.spent_on)} · {CAT_INFO[e.category].label}{e.properties?.name ? ` · ${e.properties.name}` : ""}{e.tenants?.full_name ? ` · 👤 ${e.tenants.full_name}` : ""}
                         </p>
                       </div>
                       <p className="font-semibold whitespace-nowrap tabular">−{eur(e.amount)}</p>
@@ -443,6 +443,13 @@ const Expenses = () => {
               </Card>
             );
           })}
+          {filtered.length > visibleCount && (
+            <div className="text-center pt-2">
+              <Button variant="outline" onClick={() => setVisibleCount(c => c + PAGE_SIZE)}>
+                Mehr anzeigen ({filtered.length - visibleCount} weitere)
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>
