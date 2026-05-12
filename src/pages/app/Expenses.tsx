@@ -103,6 +103,7 @@ const Expenses = () => {
   const submit = async () => {
     const parsed = schema.safeParse({
       property_id: form.property_id,
+      tenant_id: form.tenant_id,
       spent_on: form.spent_on,
       amount: Number(form.amount),
       vendor: form.vendor,
@@ -125,6 +126,7 @@ const Expenses = () => {
 
     const payload: any = { ...parsed.data, user_id: user.id, receipt_path };
     if (!payload.property_id) delete payload.property_id;
+    if (!payload.tenant_id) delete payload.tenant_id;
     if (!payload.vendor) delete payload.vendor;
     if (!payload.description) delete payload.description;
 
@@ -132,8 +134,9 @@ const Expenses = () => {
     if (error) return toastError(error, { onRetry: submit });
 
     const propName = props.find(p => p.id === parsed.data.property_id)?.name;
+    const tName = tenants.find(t => t.id === parsed.data.tenant_id)?.full_name;
     toast.success(`✓ ${eur(parsed.data.amount)} verbucht`, {
-      description: `${CAT_INFO[parsed.data.category].label}${propName ? ` · ${propName}` : ""} · ${date(parsed.data.spent_on)}`,
+      description: `${CAT_INFO[parsed.data.category].label}${propName ? ` · ${propName}` : ""}${tName ? ` · 👤 ${tName}` : ""} · ${date(parsed.data.spent_on)}`,
     });
     recordActivity("receipts_added");
 
@@ -150,6 +153,7 @@ const Expenses = () => {
     setFile(null);
     setForm({
       property_id: props.length === 1 ? props[0].id : "",
+      tenant_id: "",
       spent_on: new Date().toISOString().slice(0, 10),
       amount: "", vendor: "", description: "", category: "immediate",
     });
