@@ -19,12 +19,15 @@ import { cn } from "@/lib/utils";
 
 const schema = z.object({
   property_id: z.string().uuid().optional().or(z.literal("")),
+  tenant_id: z.string().uuid().optional().or(z.literal("")),
   spent_on: z.string().min(1),
   amount: z.number().min(0.01).max(9999999),
   vendor: z.string().trim().max(120).optional().or(z.literal("")),
   description: z.string().trim().max(500).optional().or(z.literal("")),
   category: z.enum(["immediate", "depreciable", "utilities_passthrough", "financing", "other"]),
 });
+
+const PAGE_SIZE = 50;
 
 const CAT_INFO: Record<string, { label: string; hint: string; emoji: string }> = {
   immediate: { label: "Sofort abzugsfähig", hint: "Erhaltungsaufwand · § 9 EStG · voll im Jahr absetzbar", emoji: "🔧" },
