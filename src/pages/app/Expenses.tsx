@@ -171,19 +171,24 @@ const Expenses = () => {
     return true;
   }), [items, filter, propFilter, monthStart, yearStart]);
 
+  // Reset pagination when filters change
+  useEffect(() => { setVisibleCount(PAGE_SIZE); }, [filter, propFilter]);
+
+  const visible = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount]);
+
   const sumThisMonth = useMemo(() => items.filter(i => i.spent_on >= monthStart).reduce((s, e) => s + Number(e.amount), 0), [items, monthStart]);
   const sumThisYear = useMemo(() => items.filter(i => i.spent_on >= yearStart).reduce((s, e) => s + Number(e.amount), 0), [items, yearStart]);
   const sumFiltered = useMemo(() => filtered.reduce((s, e) => s + Number(e.amount), 0), [filtered]);
 
   const grouped = useMemo(() => {
     const map = new Map<string, any[]>();
-    for (const it of filtered) {
+    for (const it of visible) {
       const k = monthKey(it.spent_on);
       if (!map.has(k)) map.set(k, []);
       map.get(k)!.push(it);
     }
     return Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]));
-  }, [filtered]);
+  }, [visible]);
 
   // §6(1)1a EStG warning
   const warnings = useMemo(() => {
