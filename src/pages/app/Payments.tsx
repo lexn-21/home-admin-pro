@@ -39,6 +39,8 @@ const monthLabel = (key: string) => {
   return new Date(Number(y), Number(m) - 1, 1).toLocaleDateString("de-DE", { month: "long", year: "numeric" });
 };
 
+const PAGE_SIZE = 50;
+
 const Payments = () => {
   const [items, setItems] = useState<any[]>([]);
   const [properties, setProperties] = useState<any[]>([]);
@@ -48,6 +50,7 @@ const Payments = () => {
   const [filter, setFilter] = useState<Filter>("month");
   const [propFilter, setPropFilter] = useState<string>("all");
   const [highlightId, setHighlightId] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [form, setForm] = useState({
     property_id: "",
     tenant_id: "",
