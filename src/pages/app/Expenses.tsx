@@ -19,12 +19,15 @@ import { cn } from "@/lib/utils";
 
 const schema = z.object({
   property_id: z.string().uuid().optional().or(z.literal("")),
+  tenant_id: z.string().uuid().optional().or(z.literal("")),
   spent_on: z.string().min(1),
   amount: z.number().min(0.01).max(9999999),
   vendor: z.string().trim().max(120).optional().or(z.literal("")),
   description: z.string().trim().max(500).optional().or(z.literal("")),
   category: z.enum(["immediate", "depreciable", "utilities_passthrough", "financing", "other"]),
 });
+
+const PAGE_SIZE = 50;
 
 const CAT_INFO: Record<string, { label: string; hint: string; emoji: string }> = {
   immediate: { label: "Sofort abzugsfähig", hint: "Erhaltungsaufwand · § 9 EStG · voll im Jahr absetzbar", emoji: "🔧" },
@@ -44,14 +47,17 @@ const monthLabel = (key: string) => {
 const Expenses = () => {
   const [items, setItems] = useState<any[]>([]);
   const [props, setProps] = useState<any[]>([]);
+  const [tenants, setTenants] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [filter, setFilter] = useState<Filter>("month");
   const [propFilter, setPropFilter] = useState<string>("all");
   const [highlightId, setHighlightId] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [form, setForm] = useState({
     property_id: "",
+    tenant_id: "",
     spent_on: new Date().toISOString().slice(0, 10),
     amount: "", vendor: "", description: "", category: "immediate",
   });
@@ -61,14 +67,21 @@ const Expenses = () => {
 
   const load = async () => {
     setLoading(true);
-    const [e, p] = await Promise.all([
-      supabase.from("expenses").select("*, properties(name)").order("spent_on", { ascending: false }),
+    const [e, p, t] = await Promise.all([
+      supabase.from("expenses").select("*, properties(name), tenants(full_name)").order("spent_on", { ascending: false }),
       supabase.from("properties").select("id, name, purchase_price, purchase_date"),
+      supabase.from("tenants").select("id, full_name, property_id").order("full_name"),
     ]);
     setItems(e.data ?? []);
     setProps(p.data ?? []);
+    setTenants(t.data ?? []);
     setLoading(false);
   };
+
+  const tenantsForProperty = useMemo(
+    () => tenants.filter(t => t.property_id === form.property_id),
+    [tenants, form.property_id]
+  );
 
   // Auto-select if only one property
   useEffect(() => {
@@ -77,9 +90,20 @@ const Expenses = () => {
     }
   }, [open, props]); // eslint-disable-line
 
+  // Auto-select tenant if only one for the property
+  useEffect(() => {
+    if (!form.property_id) return;
+    if (tenantsForProperty.length === 1 && !form.tenant_id) {
+      setForm(f => ({ ...f, tenant_id: tenantsForProperty[0].id }));
+    } else if (tenantsForProperty.length === 0 && form.tenant_id) {
+      setForm(f => ({ ...f, tenant_id: "" }));
+    }
+  }, [form.property_id, tenantsForProperty]); // eslint-disable-line
+
   const submit = async () => {
     const parsed = schema.safeParse({
       property_id: form.property_id,
+      tenant_id: form.tenant_id,
       spent_on: form.spent_on,
       amount: Number(form.amount),
       vendor: form.vendor,
@@ -102,6 +126,7 @@ const Expenses = () => {
 
     const payload: any = { ...parsed.data, user_id: user.id, receipt_path };
     if (!payload.property_id) delete payload.property_id;
+    if (!payload.tenant_id) delete payload.tenant_id;
     if (!payload.vendor) delete payload.vendor;
     if (!payload.description) delete payload.description;
 
@@ -109,8 +134,9 @@ const Expenses = () => {
     if (error) return toastError(error, { onRetry: submit });
 
     const propName = props.find(p => p.id === parsed.data.property_id)?.name;
+    const tName = tenants.find(t => t.id === parsed.data.tenant_id)?.full_name;
     toast.success(`✓ ${eur(parsed.data.amount)} verbucht`, {
-      description: `${CAT_INFO[parsed.data.category].label}${propName ? ` · ${propName}` : ""} · ${date(parsed.data.spent_on)}`,
+      description: `${CAT_INFO[parsed.data.category].label}${propName ? ` · ${propName}` : ""}${tName ? ` · 👤 ${tName}` : ""} · ${date(parsed.data.spent_on)}`,
     });
     recordActivity("receipts_added");
 
@@ -127,6 +153,7 @@ const Expenses = () => {
     setFile(null);
     setForm({
       property_id: props.length === 1 ? props[0].id : "",
+      tenant_id: "",
       spent_on: new Date().toISOString().slice(0, 10),
       amount: "", vendor: "", description: "", category: "immediate",
     });
@@ -144,19 +171,24 @@ const Expenses = () => {
     return true;
   }), [items, filter, propFilter, monthStart, yearStart]);
 
+  // Reset pagination when filters change
+  useEffect(() => { setVisibleCount(PAGE_SIZE); }, [filter, propFilter]);
+
+  const visible = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount]);
+
   const sumThisMonth = useMemo(() => items.filter(i => i.spent_on >= monthStart).reduce((s, e) => s + Number(e.amount), 0), [items, monthStart]);
   const sumThisYear = useMemo(() => items.filter(i => i.spent_on >= yearStart).reduce((s, e) => s + Number(e.amount), 0), [items, yearStart]);
   const sumFiltered = useMemo(() => filtered.reduce((s, e) => s + Number(e.amount), 0), [filtered]);
 
   const grouped = useMemo(() => {
     const map = new Map<string, any[]>();
-    for (const it of filtered) {
+    for (const it of visible) {
       const k = monthKey(it.spent_on);
       if (!map.has(k)) map.set(k, []);
       map.get(k)!.push(it);
     }
     return Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]));
-  }, [filtered]);
+  }, [visible]);
 
   // §6(1)1a EStG warning
   const warnings = useMemo(() => {
@@ -208,6 +240,25 @@ const Expenses = () => {
                   </Select>
                 )}
               </div>
+
+              {form.property_id && tenantsForProperty.length > 0 && (
+                <div>
+                  <Label className="text-xs">Mieter (optional)</Label>
+                  {tenantsForProperty.length === 1 ? (
+                    <div className="mt-1 px-3 py-2.5 rounded-md border bg-muted/30 text-sm flex items-center justify-between">
+                      <span className="font-medium">👤 {tenantsForProperty[0].full_name}</span>
+                      <span className="text-[10px] text-muted-foreground">automatisch zugeordnet</span>
+                    </div>
+                  ) : (
+                    <Select value={form.tenant_id} onValueChange={(v) => setForm({ ...form, tenant_id: v })}>
+                      <SelectTrigger className="mt-1"><SelectValue placeholder="Mieter wählen…" /></SelectTrigger>
+                      <SelectContent>
+                        {tenantsForProperty.map((t: any) => <SelectItem key={t.id} value={t.id}>{t.full_name}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+              )}
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -382,7 +433,7 @@ const Expenses = () => {
                           {highlightId === e.id && <span className="text-[10px] uppercase tracking-wide text-success font-bold">Neu</span>}
                         </p>
                         <p className="text-xs text-muted-foreground truncate">
-                          {date(e.spent_on)} · {CAT_INFO[e.category].label}{e.properties?.name ? ` · ${e.properties.name}` : ""}
+                          {date(e.spent_on)} · {CAT_INFO[e.category].label}{e.properties?.name ? ` · ${e.properties.name}` : ""}{e.tenants?.full_name ? ` · 👤 ${e.tenants.full_name}` : ""}
                         </p>
                       </div>
                       <p className="font-semibold whitespace-nowrap tabular">−{eur(e.amount)}</p>
@@ -392,6 +443,13 @@ const Expenses = () => {
               </Card>
             );
           })}
+          {filtered.length > visibleCount && (
+            <div className="text-center pt-2">
+              <Button variant="outline" onClick={() => setVisibleCount(c => c + PAGE_SIZE)}>
+                Mehr anzeigen ({filtered.length - visibleCount} weitere)
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>

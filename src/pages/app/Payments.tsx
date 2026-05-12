@@ -39,6 +39,8 @@ const monthLabel = (key: string) => {
   return new Date(Number(y), Number(m) - 1, 1).toLocaleDateString("de-DE", { month: "long", year: "numeric" });
 };
 
+const PAGE_SIZE = 50;
+
 const Payments = () => {
   const [items, setItems] = useState<any[]>([]);
   const [properties, setProperties] = useState<any[]>([]);
@@ -48,6 +50,7 @@ const Payments = () => {
   const [filter, setFilter] = useState<Filter>("month");
   const [propFilter, setPropFilter] = useState<string>("all");
   const [highlightId, setHighlightId] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [form, setForm] = useState({
     property_id: "",
     tenant_id: "",
@@ -165,6 +168,9 @@ const Payments = () => {
     });
   }, [items, filter, propFilter, monthStart, yearStart]);
 
+  useEffect(() => { setVisibleCount(PAGE_SIZE); }, [filter, propFilter]);
+  const visible = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount]);
+
   const sumThisMonth = useMemo(
     () => items.filter(i => i.paid_on >= monthStart).reduce((s, p) => s + Number(p.amount), 0),
     [items, monthStart]
@@ -181,13 +187,13 @@ const Payments = () => {
   // Group by month
   const grouped = useMemo(() => {
     const map = new Map<string, any[]>();
-    for (const it of filtered) {
+    for (const it of visible) {
       const k = monthKey(it.paid_on);
       if (!map.has(k)) map.set(k, []);
       map.get(k)!.push(it);
     }
     return Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]));
-  }, [filtered]);
+  }, [visible]);
 
   const fillFromLast = () => {
     if (!lastForProperty) return;
@@ -424,6 +430,13 @@ const Payments = () => {
               </Card>
             );
           })}
+          {filtered.length > visibleCount && (
+            <div className="text-center pt-2">
+              <Button variant="outline" onClick={() => setVisibleCount(c => c + PAGE_SIZE)}>
+                Mehr anzeigen ({filtered.length - visibleCount} weitere)
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>
