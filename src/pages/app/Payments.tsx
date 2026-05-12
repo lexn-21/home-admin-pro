@@ -430,6 +430,13 @@ const Payments = () => {
               </Card>
             );
           })}
+          {filtered.length > visibleCount && (
+            <div className="text-center pt-2">
+              <Button variant="outline" onClick={() => setVisibleCount(c => c + PAGE_SIZE)}>
+                Mehr anzeigen ({filtered.length - visibleCount} weitere)
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>
