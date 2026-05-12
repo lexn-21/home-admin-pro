@@ -47,14 +47,17 @@ const monthLabel = (key: string) => {
 const Expenses = () => {
   const [items, setItems] = useState<any[]>([]);
   const [props, setProps] = useState<any[]>([]);
+  const [tenants, setTenants] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [filter, setFilter] = useState<Filter>("month");
   const [propFilter, setPropFilter] = useState<string>("all");
   const [highlightId, setHighlightId] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [form, setForm] = useState({
     property_id: "",
+    tenant_id: "",
     spent_on: new Date().toISOString().slice(0, 10),
     amount: "", vendor: "", description: "", category: "immediate",
   });
@@ -64,14 +67,21 @@ const Expenses = () => {
 
   const load = async () => {
     setLoading(true);
-    const [e, p] = await Promise.all([
-      supabase.from("expenses").select("*, properties(name)").order("spent_on", { ascending: false }),
+    const [e, p, t] = await Promise.all([
+      supabase.from("expenses").select("*, properties(name), tenants(full_name)").order("spent_on", { ascending: false }),
       supabase.from("properties").select("id, name, purchase_price, purchase_date"),
+      supabase.from("tenants").select("id, full_name, property_id").order("full_name"),
     ]);
     setItems(e.data ?? []);
     setProps(p.data ?? []);
+    setTenants(t.data ?? []);
     setLoading(false);
   };
+
+  const tenantsForProperty = useMemo(
+    () => tenants.filter(t => t.property_id === form.property_id),
+    [tenants, form.property_id]
+  );
 
   // Auto-select if only one property
   useEffect(() => {
@@ -79,6 +89,16 @@ const Expenses = () => {
       setForm(f => ({ ...f, property_id: props[0].id }));
     }
   }, [open, props]); // eslint-disable-line
+
+  // Auto-select tenant if only one for the property
+  useEffect(() => {
+    if (!form.property_id) return;
+    if (tenantsForProperty.length === 1 && !form.tenant_id) {
+      setForm(f => ({ ...f, tenant_id: tenantsForProperty[0].id }));
+    } else if (tenantsForProperty.length === 0 && form.tenant_id) {
+      setForm(f => ({ ...f, tenant_id: "" }));
+    }
+  }, [form.property_id, tenantsForProperty]); // eslint-disable-line
 
   const submit = async () => {
     const parsed = schema.safeParse({
