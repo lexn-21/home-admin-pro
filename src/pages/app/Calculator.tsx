@@ -1,34 +1,93 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AlertTriangle, Calculator as CalcIcon, TrendingUp, Home, ExternalLink } from "lucide-react";
+import { AlertTriangle, Calculator as CalcIcon, TrendingUp, Home, ExternalLink, Percent } from "lucide-react";
 
 const fmt = (n: number) => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(n || 0);
+const fmt2 = (n: number) => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR", maximumFractionDigits: 2 }).format(n || 0);
 const pct = (n: number) => `${(n || 0).toFixed(2)} %`;
 
 export default function Calculator() {
+  const [params, setParams] = useSearchParams();
+  const tab = params.get("tab") || "afa";
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">Rechner</h1>
-        <p className="text-muted-foreground mt-1">AfA, Rendite und Verkehrswert — alles auf einen Blick.</p>
+        <p className="text-muted-foreground mt-1">AfA, Rendite, Wert & Zins — alles auf einen Blick.</p>
       </div>
 
-      <Tabs defaultValue="afa" className="space-y-6">
-        <TabsList className="grid w-full max-w-lg grid-cols-3">
+      <Tabs value={tab} onValueChange={(v) => setParams({ tab: v })} className="space-y-6">
+        <TabsList className="grid w-full max-w-2xl grid-cols-4">
           <TabsTrigger value="afa"><CalcIcon className="h-4 w-4 mr-2" />AfA</TabsTrigger>
           <TabsTrigger value="yield"><TrendingUp className="h-4 w-4 mr-2" />Rendite</TabsTrigger>
           <TabsTrigger value="value"><Home className="h-4 w-4 mr-2" />Wert</TabsTrigger>
+          <TabsTrigger value="zins"><Percent className="h-4 w-4 mr-2" />Zins</TabsTrigger>
         </TabsList>
 
         <TabsContent value="afa"><AfATab /></TabsContent>
         <TabsContent value="yield"><YieldTab /></TabsContent>
         <TabsContent value="value"><ValueTab /></TabsContent>
+        <TabsContent value="zins"><ZinsTab /></TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+function ZinsTab() {
+  const [restschuld, setRestschuld] = useState(250000);
+  const [altzins, setAltzins] = useState(1.5);
+  const [neuzins, setNeuzins] = useState(3.8);
+  const [tilgung, setTilgung] = useState(2.0);
+
+  const calc = useMemo(() => {
+    const altRate = restschuld * (altzins + tilgung) / 100 / 12;
+    const neuRate = restschuld * (neuzins + tilgung) / 100 / 12;
+    const diffMonat = neuRate - altRate;
+    const diffJahr = diffMonat * 12;
+    const zinsMehr = restschuld * (neuzins - altzins) / 100;
+    return { altRate, neuRate, diffMonat, diffJahr, zinsMehr };
+  }, [restschuld, altzins, neuzins, tilgung]);
+
+  return (
+    <Card className="glass">
+      <CardHeader>
+        <CardTitle>Anschlussfinanzierung — Was-wäre-wenn</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="grid md:grid-cols-2 gap-4">
+          <Field label="Restschuld bei Anschluss (€)" value={restschuld} onChange={setRestschuld} />
+          <Field label="Tilgung (% p.a.)" value={tilgung} onChange={setTilgung} step="0.1" />
+          <Field label="Alter Zins (%)" value={altzins} onChange={setAltzins} step="0.1" />
+          <Field label="Neuer Zins (%)" value={neuzins} onChange={setNeuzins} step="0.1" />
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-4 pt-4 border-t border-border/60">
+          <Stat label="Bisherige Rate / Monat" value={fmt2(calc.altRate)} />
+          <Stat label="Neue Rate / Monat" value={fmt2(calc.neuRate)} highlight />
+          <Stat label="Mehrbelastung / Monat" value={fmt2(calc.diffMonat)} />
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-4">
+          <Stat label="Mehrbelastung / Jahr" value={fmt(calc.diffJahr)} />
+          <Stat label="Zinsmehrkosten 1. Jahr" value={fmt(calc.zinsMehr)} />
+        </div>
+
+        {calc.diffMonat > 0 && (
+          <div className="rounded-xl border border-warning/40 bg-warning/10 p-4 flex gap-3">
+            <AlertTriangle className="h-5 w-5 text-warning flex-shrink-0 mt-0.5" />
+            <div className="text-sm text-muted-foreground">
+              <p className="font-semibold text-foreground">Tipp: Sondertilgung prüfen</p>
+              Reduziere die Restschuld vor Anschluss, um den Zinsschock abzufedern. Forward-Darlehen bis zu 60 Monate vorher möglich.
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
