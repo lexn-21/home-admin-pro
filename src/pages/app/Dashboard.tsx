@@ -9,6 +9,7 @@ import { Stagger, Item, Tappable } from "@/components/motion/Primitives";
 import { WinsWidget } from "@/components/WinsWidget";
 import { GameDeck } from "@/components/GameDeck";
 import { LegalUpdatesWidget } from "@/components/LegalUpdatesWidget";
+import { LeitzinsWidget } from "@/components/LeitzinsWidget";
 import { motion } from "framer-motion";
 import {
   ArrowUpRight, Building2, Wallet, Receipt, TrendingUp, Plus,
@@ -223,6 +224,10 @@ const Dashboard = () => {
 
       <Item>
         <LegalUpdatesWidget />
+      </Item>
+
+      <Item>
+        <LeitzinsWidget />
       </Item>
 
       {loading ? (
