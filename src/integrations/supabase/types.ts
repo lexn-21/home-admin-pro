@@ -1920,6 +1920,53 @@ export type Database = {
         }
         Relationships: []
       }
+      tenant_documents: {
+        Row: {
+          created_at: string
+          id: string
+          kind: Database["public"]["Enums"]["tenant_doc_kind"]
+          mime: string | null
+          name: string
+          notes: string | null
+          path: string
+          size_bytes: number | null
+          tenant_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["tenant_doc_kind"]
+          mime?: string | null
+          name: string
+          notes?: string | null
+          path: string
+          size_bytes?: number | null
+          tenant_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["tenant_doc_kind"]
+          mime?: string | null
+          name?: string
+          notes?: string | null
+          path?: string
+          size_bytes?: number | null
+          tenant_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_documents_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenant_issues: {
         Row: {
           category: string
@@ -1967,6 +2014,38 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      tenant_notes: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          tenant_id: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          tenant_id: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          tenant_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_notes_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tenant_portal_links: {
         Row: {
@@ -2586,6 +2665,13 @@ export type Database = {
         | "jurist"
         | "energieberater"
       schufa_status: "unverified" | "self_declared" | "document_uploaded"
+      tenant_doc_kind:
+        | "contract"
+        | "id"
+        | "schufa"
+        | "income"
+        | "handover"
+        | "other"
       vault_category:
         | "kaufvertrag"
         | "mietvertrag"
@@ -2802,6 +2888,14 @@ export const Constants = {
         "energieberater",
       ],
       schufa_status: ["unverified", "self_declared", "document_uploaded"],
+      tenant_doc_kind: [
+        "contract",
+        "id",
+        "schufa",
+        "income",
+        "handover",
+        "other",
+      ],
       vault_category: [
         "kaufvertrag",
         "mietvertrag",
