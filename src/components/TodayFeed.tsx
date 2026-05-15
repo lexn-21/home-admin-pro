@@ -170,7 +170,7 @@ export const TodayFeed = () => {
         amount: c.amount,
         paid_on: new Date().toISOString().slice(0, 10),
         month: c.monthKey,
-        kind: "rent_total" as any,
+        kind: "rent_cold" as any,
         type: "rent",
       });
       if (error) throw error;
