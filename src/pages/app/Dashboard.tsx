@@ -180,6 +180,13 @@ const Dashboard = () => {
         </header>
       </Item>
 
+      {/* Heute-Feed: Auto-Mietvorschläge, Überfällige, Tasks, Tipps, Wins */}
+      {!isEmpty && (
+        <Item>
+          <TodayFeed />
+        </Item>
+      )}
+
       {/* Intent-Picker — psychologisch: max 4 klare Wege */}
       <Item>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
