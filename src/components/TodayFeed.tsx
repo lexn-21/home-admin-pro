@@ -77,16 +77,17 @@ export const TodayFeed = () => {
     const prevMonth = monthKey(prevMonthDate);
 
     const unitsById = new Map(units.map(u => [u.id, u]));
+    const isRent = (k: string) => k === "rent_cold" || k === "utilities";
     const paidThisMonth = new Set(
       payments
-        .filter(p => p.kind === "rent_cold" || p.kind === "rent_warm" || p.kind === "rent_total")
+        .filter(p => isRent(p.kind))
         .filter(p => p.month === curMonth || p.paid_on.startsWith(curMonth))
         .map(p => p.tenant_id)
         .filter(Boolean) as string[]
     );
     const paidPrevMonth = new Set(
       payments
-        .filter(p => p.kind === "rent_cold" || p.kind === "rent_warm" || p.kind === "rent_total")
+        .filter(p => isRent(p.kind))
         .filter(p => p.month === prevMonth || p.paid_on.startsWith(prevMonth))
         .map(p => p.tenant_id)
         .filter(Boolean) as string[]
