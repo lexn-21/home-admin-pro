@@ -405,7 +405,8 @@ const Vault = () => {
 
       const { error: dbErr } = await supabase.from("vault_documents").insert({
         user_id: user.id,
-        property_id: uploadForm.property_id || null,
+        property_id: scope === "immo" ? (uploadForm.property_id || null) : null,
+        scope,
         category: uploadForm.category as any,
         display_name: uploadForm.display_name.trim(),
         original_name: uploadFile.name,
@@ -416,7 +417,7 @@ const Vault = () => {
         enc_salt: salt,
         notes: uploadForm.notes || null,
         retention_until: uploadForm.retention_until || null,
-      });
+      } as any);
       if (dbErr) throw dbErr;
 
       toast.success("Verschlüsselt & gespeichert");
