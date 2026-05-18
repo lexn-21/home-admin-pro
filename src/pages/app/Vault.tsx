@@ -34,6 +34,7 @@ type VaultDoc = {
   id: string;
   property_id: string | null;
   category: string;
+  scope: "immo" | "personal";
   display_name: string;
   original_name: string;
   mime_type: string | null;
