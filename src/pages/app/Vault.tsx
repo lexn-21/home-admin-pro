@@ -888,20 +888,22 @@ const Vault = () => {
               <Select value={uploadForm.category} onValueChange={(v) => setUploadForm({ ...uploadForm, category: v })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {CATEGORIES.map((c) => <SelectItem key={c.value} value={c.value}>{c.emoji} {c.label}</SelectItem>)}
+                  {activeCats.map((c) => <SelectItem key={c.value} value={c.value}>{c.emoji} {c.label}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <Label>Objekt (optional)</Label>
-              <Select value={uploadForm.property_id || "none"} onValueChange={(v) => setUploadForm({ ...uploadForm, property_id: v === "none" ? "" : v })}>
-                <SelectTrigger><SelectValue placeholder="Kein Objekt" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Kein Objekt</SelectItem>
-                  {properties.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
+            {scope === "immo" && (
+              <div>
+                <Label>Objekt (optional)</Label>
+                <Select value={uploadForm.property_id || "none"} onValueChange={(v) => setUploadForm({ ...uploadForm, property_id: v === "none" ? "" : v })}>
+                  <SelectTrigger><SelectValue placeholder="Kein Objekt" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Kein Objekt</SelectItem>
+                    {properties.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label>Aufbewahren bis</Label>
