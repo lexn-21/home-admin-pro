@@ -140,20 +140,34 @@ const Vault = () => {
 
   // Wenn Scanner / externer Flow eine Datei "geliefert" hat, automatisch nach Unlock speichern.
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // Scope aus URL übernehmen (?scope=personal | immo)
+  useEffect(() => {
+    const s = searchParams.get("scope");
+    if (s === "personal" || s === "immo") setScope(s);
+  }, [searchParams]);
+
   useEffect(() => {
     if (unlocked && searchParams.get("ingest") === "1" && pendingIngest.has()) {
       const file = pendingIngest.take();
       if (file) {
-        // kleine Verzögerung damit Vault-Daten geladen sind
         setTimeout(() => quickSaveFile(file), 200);
       }
-      // Param wieder entfernen
       const next = new URLSearchParams(searchParams);
       next.delete("ingest");
       setSearchParams(next, { replace: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [unlocked, searchParams]);
+
+  const switchScope = (s: "immo" | "personal") => {
+    setScope(s);
+    setFilterCat("all");
+    setFilterProp("all");
+    const next = new URLSearchParams(searchParams);
+    if (s === "personal") next.set("scope", "personal"); else next.delete("scope");
+    setSearchParams(next, { replace: true });
+  };
 
   const loadSettings = async () => {
     const { data } = await supabase.from("vault_settings").select("*").maybeSingle();
