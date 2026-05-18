@@ -649,8 +649,17 @@ const Vault = () => {
               <p className="text-xs text-success font-semibold uppercase tracking-wider">Tresor entsperrt</p>
             </div>
             <h1 className="text-3xl lg:text-4xl font-bold tracking-tight">
-              Dein <span className="text-gradient-gold">Eigentums-Archiv</span>
+              {scope === "personal" ? (
+                <>Deine <span className="text-gradient-gold">Lebensbürokratie</span></>
+              ) : (
+                <>Dein <span className="text-gradient-gold">Eigentums-Archiv</span></>
+              )}
             </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {scope === "personal"
+                ? "Personalausweis, Verträge, Bank, Versicherungen — alles griffbereit, alles verschlüsselt."
+                : "Alle Dokumente zu deinen Objekten — verschlüsselt, sortiert, in Sekunden findbar."}
+            </p>
           </div>
           <div className="flex gap-2 flex-wrap">
             <Button variant="outline" onClick={lock}><Lock className="h-4 w-4 mr-2" />Sperren</Button>
@@ -676,10 +685,38 @@ const Vault = () => {
             >
               <Camera className="h-4 w-4" /> Schnell-Scan
             </Button>
-            <Button onClick={() => setUploadOpen(true)} className="bg-gradient-gold text-primary-foreground shadow-gold">
+            <Button
+              onClick={() => {
+                setUploadForm((s) => ({ ...s, category: scope === "personal" ? "vertrag" : "sonstiges" }));
+                setUploadOpen(true);
+              }}
+              className="bg-gradient-gold text-primary-foreground shadow-gold"
+            >
               <Upload className="h-4 w-4 mr-2" />Mit Details
             </Button>
           </div>
+        </div>
+      </Item>
+
+      {/* Scope-Toggle: Immo vs. Lebensbürokratie */}
+      <Item>
+        <div className="inline-flex p-1 rounded-xl bg-muted/60 border">
+          <button
+            onClick={() => switchScope("immo")}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              scope === "immo" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            🏠 Immobilien
+          </button>
+          <button
+            onClick={() => switchScope("personal")}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              scope === "personal" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            🪪 Lebensbürokratie
+          </button>
         </div>
       </Item>
 
@@ -687,9 +724,9 @@ const Vault = () => {
       <Item>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[
-            { icon: FileText, label: "Dokumente", value: num(docs.length) },
-            { icon: Building2, label: "Objekte", value: num(properties.length) },
-            { icon: Sparkles, label: "Speicher", value: formatBytes(totalSize) },
+            { icon: FileText, label: scope === "personal" ? "Persönlich" : "Objekt-Docs", value: num(scopedDocs.length) },
+            { icon: Building2, label: scope === "personal" ? "Lebensbereiche" : "Objekte", value: num(scope === "personal" ? PERSONAL_CATEGORIES.length : properties.length) },
+            { icon: Sparkles, label: "Speicher gesamt", value: formatBytes(totalSize) },
             { icon: ShieldCheck, label: "Verschlüsselt", value: "100 %" },
           ].map((s) => (
             <Card key={s.label} className="p-4 glass">
