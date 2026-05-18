@@ -48,7 +48,9 @@ type VaultDoc = {
 
 type Property = { id: string; name: string };
 
-const CATEGORIES: { value: string; label: string; emoji: string }[] = [
+type Cat = { value: string; label: string; emoji: string };
+
+const IMMO_CATEGORIES: Cat[] = [
   { value: "kaufvertrag", label: "Kaufvertrag", emoji: "📜" },
   { value: "mietvertrag", label: "Mietvertrag", emoji: "🤝" },
   { value: "nebenkostenabrechnung", label: "Nebenkostenabrechnung", emoji: "🧾" },
@@ -62,6 +64,26 @@ const CATEGORIES: { value: string; label: string; emoji: string }[] = [
   { value: "foto", label: "Foto", emoji: "📸" },
   { value: "sonstiges", label: "Sonstiges", emoji: "📁" },
 ];
+
+const PERSONAL_CATEGORIES: Cat[] = [
+  { value: "ausweis", label: "Personalausweis / Pass", emoji: "🪪" },
+  { value: "fuehrerschein", label: "Führerschein", emoji: "🚗" },
+  { value: "mietvertrag", label: "Eigener Mietvertrag", emoji: "🤝" },
+  { value: "arbeit", label: "Arbeit & Gehalt", emoji: "💼" },
+  { value: "bank", label: "Bank & Finanzen", emoji: "🏦" },
+  { value: "versicherung", label: "Versicherungen", emoji: "🛡️" },
+  { value: "gesundheit", label: "Gesundheit", emoji: "🩺" },
+  { value: "kfz", label: "KFZ & Mobilität", emoji: "🚙" },
+  { value: "familie", label: "Familie & Urkunden", emoji: "👨‍👩‍👧" },
+  { value: "schule", label: "Schule & Zeugnisse", emoji: "🎓" },
+  { value: "steuerbescheid", label: "Steuerbescheid", emoji: "🏛️" },
+  { value: "vertrag", label: "Verträge sonstige", emoji: "📄" },
+  { value: "rechnung", label: "Rechnung / Beleg", emoji: "💶" },
+  { value: "korrespondenz", label: "Behörden / Briefe", emoji: "✉️" },
+  { value: "sonstiges", label: "Sonstiges", emoji: "📁" },
+];
+
+const CATEGORIES = [...IMMO_CATEGORIES, ...PERSONAL_CATEGORIES.filter(p => !IMMO_CATEGORIES.find(i => i.value === p.value))];
 
 const formatBytes = (n: number) => {
   if (n < 1024) return `${n} B`;
