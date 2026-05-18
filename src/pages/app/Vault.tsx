@@ -799,9 +799,13 @@ const Vault = () => {
         <Item>
           <Card className="p-10 text-center glass">
             <FileText className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
-            <p className="font-medium mb-1">{docs.length === 0 ? "Tresor ist leer" : "Keine Treffer"}</p>
+            <p className="font-medium mb-1">{scopedDocs.length === 0 ? (scope === "personal" ? "Noch keine persönlichen Dokumente" : "Tresor ist leer") : "Keine Treffer"}</p>
             <p className="text-sm text-muted-foreground">
-              {docs.length === 0 ? "Lade dein erstes Dokument hoch — Kaufvertrag, Mietvertrag, Steuerbescheid." : "Filter anpassen oder neu suchen."}
+              {scopedDocs.length === 0
+                ? (scope === "personal"
+                    ? "Personalausweis, Mietvertrag, Versicherungen, Bank-Unterlagen — einmal scannen, nie wieder suchen."
+                    : "Lade dein erstes Dokument hoch — Kaufvertrag, Mietvertrag, Steuerbescheid.")
+                : "Filter anpassen oder neu suchen."}
             </p>
           </Card>
         </Item>
