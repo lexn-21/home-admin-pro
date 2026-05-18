@@ -459,14 +459,17 @@ const Vault = () => {
   };
 
   // Derived
+  const activeCats = scope === "personal" ? PERSONAL_CATEGORIES : IMMO_CATEGORIES;
   const filtered = useMemo(() => {
     return docs.filter((d) => {
-      if (filterProp !== "all" && d.property_id !== filterProp) return false;
+      if ((d.scope ?? "immo") !== scope) return false;
+      if (scope === "immo" && filterProp !== "all" && d.property_id !== filterProp) return false;
       if (filterCat !== "all" && d.category !== filterCat) return false;
       if (search && !d.display_name.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
     });
-  }, [docs, search, filterProp, filterCat]);
+  }, [docs, search, filterProp, filterCat, scope]);
+  const scopedDocs = useMemo(() => docs.filter((d) => (d.scope ?? "immo") === scope), [docs, scope]);
 
   const totalSize = docs.reduce((a, d) => a + d.size_bytes, 0);
 
