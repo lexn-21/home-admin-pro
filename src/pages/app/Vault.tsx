@@ -344,8 +344,9 @@ const Vault = () => {
       const isImage = (f.type || "").startsWith("image/");
       const { error: dbErr } = await supabase.from("vault_documents").insert({
         user_id: user.id,
-        property_id: filterProp !== "all" ? filterProp : null,
-        category: (isImage ? "foto" : "sonstiges") as any,
+        property_id: scope === "immo" && filterProp !== "all" ? filterProp : null,
+        scope,
+        category: (isImage ? (scope === "personal" ? "sonstiges" : "foto") : "sonstiges") as any,
         display_name: niceName,
         original_name: f.name,
         mime_type: f.type || "application/octet-stream",
@@ -355,7 +356,7 @@ const Vault = () => {
         enc_salt: salt,
         notes: null,
         retention_until: null,
-      });
+      } as any);
       if (dbErr) throw dbErr;
       toast.success("Im Tresor gespeichert", { id: t });
       loadData();
